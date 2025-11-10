@@ -1,0 +1,75 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Production build
+dist/
+dist-ssr/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+
+# Testing
+coverage/
+*.lcov
+.nyc_output
+
+# Misc
+*.local
+.cache/
+.temp/
+.tmp/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Debug
+*.tsbuildinfo
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Vercel
+.vercel
+
+# Netlify
+.netlify
+
+# Azure
+.azure/
+
+# Temporary files
+*.swp
+*.swo
+*~
