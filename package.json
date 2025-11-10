@@ -11,7 +11,11 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "deploy": "vercel",
+    "deploy:prod": "vercel --prod",
+    "vercel:login": "vercel login",
+    "vercel:env": "vercel env pull"
   },
   "repository": {
     "type": "git",
