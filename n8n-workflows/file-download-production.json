@@ -44,13 +44,7 @@
       "name": "Get File Metadata",
       "type": "n8n-nodes-base.microsoftSql",
       "typeVersion": 1,
-      "position": [650, 300],
-      "credentials": {
-        "microsoftSql": {
-          "id": "AZURE_SQL_CREDENTIAL_ID",
-          "name": "Azure SQL Database"
-        }
-      }
+      "position": [650, 300]
     },
     {
       "parameters": {
@@ -90,29 +84,26 @@
       "parameters": {
         "resource": "blob",
         "operation": "get",
-        "containerName": "loan-files",
-        "blobName": "={{ $json.BlobIdentifier }}",
-        "dataPropertyName": "data"
+        "container": {
+          "__rl": true,
+          "mode": "list",
+          "value": "loan-files"
+        },
+        "blob": "={{ $json.BlobIdentifier }}"
       },
       "id": "azure-blob-download",
       "name": "Download from Blob Storage",
       "type": "n8n-nodes-base.azureStorage",
       "typeVersion": 1,
-      "position": [1250, 200],
-      "credentials": {
-        "azureStorage": {
-          "id": "AZURE_STORAGE_CREDENTIAL_ID",
-          "name": "Azure Storage Account"
-        }
-      }
+      "position": [1250, 200]
     },
     {
       "parameters": {
         "respondWith": "binary",
-        "binaryPropertyName": "data",
         "options": {
+          "binaryPropertyName": "data",
           "responseHeaders": {
-            "headers": [
+            "entries": [
               {
                 "name": "Content-Disposition",
                 "value": "attachment; filename=\"={{ $node['Get File Metadata'].json.OriginalFilename }}\""
