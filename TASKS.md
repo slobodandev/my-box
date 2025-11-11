@@ -175,7 +175,7 @@
 - [ ] Set container access level to Private
 - [ ] Generate SAS token or access key
 - [ ] Save connection string securely
-- [ ] Document Azure setup in `docs/azure-setup.md`
+- [x] Document Azure setup in `n8n-workflows/AZURE-SETUP-GUIDE.md` (comprehensive guide created)
 
 ### 0.11 Azure SQL Database Setup
 
@@ -185,7 +185,8 @@
 - [ ] Get connection string
 - [ ] Test connection from local machine
 - [ ] Save connection string in `.env` file
-- [ ] Document database setup in `docs/azure-setup.md`
+- [x] Document database setup in `n8n-workflows/AZURE-SETUP-GUIDE.md` (comprehensive guide created)
+- [x] Create database schema SQL (included in AZURE-SETUP-GUIDE.md)
 
 ### 0.12 n8n Setup
 
@@ -326,6 +327,10 @@
 - [x] Add Azure SQL node to insert into FileLoanAssociations table (loop for multiple loans)
 - [x] Add Function node to format success response
 - [x] Add error handling with Respond to Webhook nodes
+- [x] Create production-ready workflow JSON with real Azure nodes (`file-upload-production.json`)
+- [ ] Configure Azure Blob Storage credential in n8n
+- [ ] Configure Azure SQL credential in n8n
+- [ ] Import production workflow to n8n instance
 - [ ] Test workflow with sample file (needs Azure credentials)
 - [x] Export workflow JSON to `n8n-workflows/file-upload-spec.md` (specification created)
 - [x] Document webhook URL in `.env.example`
@@ -352,6 +357,8 @@
 - [x] Add Respond to Webhook node with binary file data
 - [x] Add error handling for file not found
 - [x] Add error handling for unauthorized access
+- [x] Create production-ready workflow JSON with real Azure nodes (`file-download-production.json`)
+- [ ] Import production workflow to n8n instance
 - [ ] Test workflow with sample fileId (needs Azure credentials)
 - [x] Export workflow JSON to `n8n-workflows/file-download-spec.md` (specification created)
 - [x] Document webhook URL in `.env.example`
@@ -374,6 +381,8 @@
 - [x] Add Azure SQL node to execute query
 - [x] Add Function node to format results as JSON array
 - [x] Add sorting by uploadedAt DESC
+- [x] Create production-ready workflow JSON with real Azure nodes (`file-list-production.json`)
+- [ ] Import production workflow to n8n instance
 - [ ] Test workflow with various filter combinations (needs Azure credentials)
 - [ ] Test workflow without filters (needs Azure credentials)
 - [x] Export workflow JSON to `n8n-workflows/file-list-spec.md` (specification created)
@@ -398,6 +407,8 @@
 - [x] Add Azure SQL node to UPDATE Files table (soft delete)
 - [x] Add Function node to format success response
 - [x] Add error handling for unauthorized access
+- [x] Create production-ready workflow JSON with real Azure nodes (`file-delete-production.json`)
+- [ ] Import production workflow to n8n instance
 - [ ] Test workflow with sample fileId (needs Azure credentials)
 - [x] Export workflow JSON to `n8n-workflows/file-delete-spec.md` (specification created)
 - [x] Document webhook URL in `.env.example`
@@ -416,6 +427,8 @@
 - [x] Add Webhook node (POST method, path: /webhook/get-loans)
 - [x] Add Azure SQL node to query Loans table
 - [x] Add Function node to format results
+- [x] Create production-ready workflow JSON with real Azure nodes (`get-loans-production.json`)
+- [ ] Import production workflow to n8n instance
 - [ ] Test workflow (needs Azure credentials)
 - [x] Export workflow JSON to `n8n-workflows/get-loans-spec.md` (specification created)
 - [x] Document webhook URL in `.env.example`
@@ -1010,13 +1023,13 @@
 
 | Phase | Status | Completed | Total | Progress |
 |-------|--------|-----------|-------|----------|
-| Phase 0: Project Setup | ✅ Complete | 25 | 30 | 83% |
-| Phase 1: Core Infrastructure | 🔄 In Progress | 32 | 40 | 80% |
+| Phase 0: Project Setup | ✅ Complete | 27 | 30 | 90% |
+| Phase 1: Core Infrastructure | 🔄 In Progress | 37 | 40 | 93% |
 | Phase 2: File Upload | Not Started | 0 | 20 | 0% |
 | Phase 3: File Management | Not Started | 0 | 25 | 0% |
 | Phase 4: UX & Polish | Not Started | 0 | 30 | 0% |
 | Phase 5: Testing & Deployment | 🔄 In Progress | 3 | 45 | 7% |
-| **TOTAL** | **🔄 In Progress** | **60** | **190** | **32%** |
+| **TOTAL** | **🔄 In Progress** | **67** | **190** | **35%** |
 
 ---
 
@@ -1056,8 +1069,23 @@
 - [x] Updated `README.md` with deployment instructions
 - [x] Created `UI-UPDATE-NOTE.md` documenting Tailwind CSS change
 
+### Azure Production Workflows (n8n)
+- [x] Created `n8n-workflows/file-upload-production.json` with real Azure Blob Storage and SQL nodes
+- [x] Created `n8n-workflows/file-download-production.json` with authorization and binary response
+- [x] Created `n8n-workflows/file-list-production.json` with dynamic filtering and pagination
+- [x] Created `n8n-workflows/file-delete-production.json` with soft delete implementation
+- [x] Created `n8n-workflows/get-loans-production.json` with file counts
+- [x] Created `n8n-workflows/AZURE-SETUP-GUIDE.md` - comprehensive Azure setup guide including:
+  - Step-by-step Azure Storage Account and SQL Database creation
+  - n8n credential configuration instructions
+  - Complete database schema SQL (Users, Loans, Files, FileLoanAssociations tables)
+  - Testing commands for all workflows
+  - Seed data examples
+  - Troubleshooting guide
+  - Security best practices
+
 ---
 
 **Last Updated:** 2025-11-10
-**Current Status:** Phase 0 Complete (83%), Phase 1 Core Infrastructure (80%), Ready for Azure setup and Phase 2
+**Current Status:** Phase 0 Complete (83%), Phase 1 Core Infrastructure (85%), Production Azure workflows ready, pending Azure resource setup
 **Maintained By:** Development Team
