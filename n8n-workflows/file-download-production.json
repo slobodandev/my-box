@@ -1,0 +1,289 @@
+{
+  "name": "File Download",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "file-download",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-download",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "file-download"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract fileId and userId from request\nconst body = $input.item.json.body || $input.item.json;\nconst fileId = body.fileId;\nconst userId = body.userId;\n\nif (!fileId) {\n  throw new Error('fileId is required');\n}\nif (!userId) {\n  throw new Error('userId is required');\n}\n\nreturn { fileId, userId };"
+      },
+      "id": "function-validate",
+      "name": "Validate Request",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT FileId, UserId, OriginalFilename, BlobIdentifier, FileSize, ContentType FROM Files WHERE FileId = @fileId AND IsDeleted = 0",
+        "additionalFields": {
+          "parameters": {
+            "parameters": [
+              {
+                "name": "fileId",
+                "value": "={{ $json.fileId }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "sql-get-file",
+      "name": "Get File Metadata",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "microsoftSql": {
+          "id": "AZURE_SQL_CREDENTIAL_ID",
+          "name": "Azure SQL Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.FileId }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "if-file-exists",
+      "name": "Check File Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.UserId }}",
+              "value2": "={{ $node['Validate Request'].json.userId }}"
+            }
+          ]
+        }
+      },
+      "id": "if-authorized",
+      "name": "Check Authorization",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1050, 250]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "containerName": "loan-files",
+        "blobName": "={{ $json.BlobIdentifier }}",
+        "binaryPropertyName": "data"
+      },
+      "id": "azure-blob-download",
+      "name": "Download from Blob Storage",
+      "type": "n8n-nodes-base.microsoftAzureBlobStorage",
+      "typeVersion": 1,
+      "position": [1250, 200],
+      "credentials": {
+        "microsoftAzureBlobStorageApi": {
+          "id": "AZURE_BLOB_CREDENTIAL_ID",
+          "name": "Azure Blob Storage Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "binaryPropertyName": "data",
+        "options": {
+          "responseHeaders": {
+            "headers": [
+              {
+                "name": "Content-Disposition",
+                "value": "attachment; filename=\"={{ $node['Get File Metadata'].json.OriginalFilename }}\""
+              },
+              {
+                "name": "Content-Type",
+                "value": "={{ $node['Get File Metadata'].json.ContentType }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "respond-file",
+      "name": "Respond with File",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1450, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "return {\n  success: false,\n  error: 'File not found or has been deleted'\n};"
+      },
+      "id": "function-not-found",
+      "name": "File Not Found Error",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "return {\n  success: false,\n  error: 'Unauthorized: You do not have access to this file'\n};"
+      },
+      "id": "function-unauthorized",
+      "name": "Unauthorized Error",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 404
+        }
+      },
+      "id": "respond-not-found",
+      "name": "Respond Not Found",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "id": "respond-unauthorized",
+      "name": "Respond Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Request": {
+      "main": [
+        [
+          {
+            "node": "Get File Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get File Metadata": {
+      "main": [
+        [
+          {
+            "node": "Check File Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check File Exists": {
+      "main": [
+        [
+          {
+            "node": "Check Authorization",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "File Not Found Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Authorization": {
+      "main": [
+        [
+          {
+            "node": "Download from Blob Storage",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unauthorized Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download from Blob Storage": {
+      "main": [
+        [
+          {
+            "node": "Respond with File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Not Found Error": {
+      "main": [
+        [
+          {
+            "node": "Respond Not Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unauthorized Error": {
+      "main": [
+        [
+          {
+            "node": "Respond Unauthorized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

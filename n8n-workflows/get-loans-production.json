@@ -1,0 +1,135 @@
+{
+  "name": "Get Loan List",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "get-loans",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-loans",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "get-loans"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract parameters\nconst body = $input.item.json.body || $input.item.json;\nconst userId = body.userId;\nconst includeFileCount = body.includeFileCount || false;\nconst status = body.status || null;\n\nif (!userId) {\n  throw new Error('userId is required');\n}\n\nreturn {\n  userId,\n  includeFileCount,\n  status\n};"
+      },
+      "id": "function-validate",
+      "name": "Validate Request",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  l.LoanId as id,\n  l.LoanNumber as loanNumber,\n  l.BorrowerName as borrowerName,\n  l.BorrowerEmail as borrowerEmail,\n  l.LoanAmount as loanAmount,\n  l.LoanType as loanType,\n  l.Status as status,\n  l.CreatedAt as createdAt,\n  l.UpdatedAt as updatedAt,\n  CASE WHEN @includeFileCount = 1 THEN (\n    SELECT COUNT(*) \n    FROM FileLoanAssociations fla \n    INNER JOIN Files f ON fla.FileId = f.FileId \n    WHERE fla.LoanId = l.LoanId AND f.IsDeleted = 0\n  ) ELSE NULL END as fileCount\nFROM Loans l\nWHERE l.UserId = @userId\n  AND (@status IS NULL OR l.Status = @status)\nORDER BY l.CreatedAt DESC",
+        "additionalFields": {
+          "parameters": {
+            "parameters": [
+              {
+                "name": "userId",
+                "value": "={{ $json.userId }}"
+              },
+              {
+                "name": "includeFileCount",
+                "value": "={{ $json.includeFileCount ? 1 : 0 }}"
+              },
+              {
+                "name": "status",
+                "value": "={{ $json.status }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "sql-get-loans",
+      "name": "Get Loans",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "microsoftSql": {
+          "id": "AZURE_SQL_CREDENTIAL_ID",
+          "name": "Azure SQL Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Format loan response\nconst includeFileCount = $node['Validate Request'].json.includeFileCount;\nconst loans = $input.all().map(item => {\n  const loan = {\n    id: item.json.id,\n    loanNumber: item.json.loanNumber,\n    borrowerName: item.json.borrowerName,\n    borrowerEmail: item.json.borrowerEmail,\n    loanAmount: item.json.loanAmount,\n    loanType: item.json.loanType,\n    status: item.json.status,\n    createdAt: item.json.createdAt,\n    updatedAt: item.json.updatedAt\n  };\n  \n  if (includeFileCount) {\n    loan.fileCount = item.json.fileCount || 0;\n  }\n  \n  return loan;\n});\n\nreturn {\n  success: true,\n  data: {\n    loans,\n    total: loans.length\n  }\n};"
+      },
+      "id": "function-format",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Request": {
+      "main": [
+        [
+          {
+            "node": "Get Loans",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Loans": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

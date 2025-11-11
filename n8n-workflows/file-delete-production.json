@@ -1,0 +1,305 @@
+{
+  "name": "File Delete",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "file-delete",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-delete",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "file-delete"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract fileId and userId\nconst body = $input.item.json.body || $input.item.json;\nconst fileId = body.fileId;\nconst userId = body.userId;\n\nif (!fileId) {\n  throw new Error('fileId is required');\n}\nif (!userId) {\n  throw new Error('userId is required');\n}\n\nreturn { fileId, userId };"
+      },
+      "id": "function-validate",
+      "name": "Validate Request",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT FileId, UserId, BlobIdentifier FROM Files WHERE FileId = @fileId AND IsDeleted = 0",
+        "additionalFields": {
+          "parameters": {
+            "parameters": [
+              {
+                "name": "fileId",
+                "value": "={{ $json.fileId }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "sql-get-file",
+      "name": "Get File Info",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "microsoftSql": {
+          "id": "AZURE_SQL_CREDENTIAL_ID",
+          "name": "Azure SQL Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.FileId }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "if-file-exists",
+      "name": "Check File Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.UserId }}",
+              "value2": "={{ $node['Validate Request'].json.userId }}"
+            }
+          ]
+        }
+      },
+      "id": "if-authorized",
+      "name": "Check Authorization",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1050, 250]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "UPDATE Files SET IsDeleted = 1, DeletedAt = GETDATE() WHERE FileId = @fileId",
+        "additionalFields": {
+          "parameters": {
+            "parameters": [
+              {
+                "name": "fileId",
+                "value": "={{ $node['Validate Request'].json.fileId }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "sql-soft-delete",
+      "name": "Soft Delete File",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [1250, 200],
+      "credentials": {
+        "microsoftSql": {
+          "id": "AZURE_SQL_CREDENTIAL_ID",
+          "name": "Azure SQL Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Optionally delete from blob storage (commented out for soft delete)\n// const blobIdentifier = $node['Get File Info'].json.BlobIdentifier;\nconst fileId = $node['Validate Request'].json.fileId;\n\nreturn {\n  success: true,\n  fileId,\n  message: 'File deleted successfully',\n  note: 'File soft-deleted from database. Blob remains in storage for recovery.'\n};"
+      },
+      "id": "function-success",
+      "name": "Format Success Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1450, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1650, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "return {\n  success: false,\n  error: 'File not found or already deleted'\n};"
+      },
+      "id": "function-not-found",
+      "name": "File Not Found Error",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "return {\n  success: false,\n  error: 'Unauthorized: You do not have permission to delete this file'\n};"
+      },
+      "id": "function-unauthorized",
+      "name": "Unauthorized Error",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 404
+        }
+      },
+      "id": "respond-not-found",
+      "name": "Respond Not Found",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "id": "respond-unauthorized",
+      "name": "Respond Unauthorized",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Request": {
+      "main": [
+        [
+          {
+            "node": "Get File Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get File Info": {
+      "main": [
+        [
+          {
+            "node": "Check File Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check File Exists": {
+      "main": [
+        [
+          {
+            "node": "Check Authorization",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "File Not Found Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Authorization": {
+      "main": [
+        [
+          {
+            "node": "Soft Delete File",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unauthorized Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Soft Delete File": {
+      "main": [
+        [
+          {
+            "node": "Format Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Success Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Not Found Error": {
+      "main": [
+        [
+          {
+            "node": "Respond Not Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unauthorized Error": {
+      "main": [
+        [
+          {
+            "node": "Respond Unauthorized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

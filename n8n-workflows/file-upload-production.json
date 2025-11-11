@@ -1,0 +1,318 @@
+{
+  "name": "File Upload",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "file-upload",
+        "responseMode": "lastNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "webhook-1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "file-upload"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract file and metadata from multipart form data\nconst body = $input.item.json.body || $input.item.json;\nconst binary = $input.item.binary || {};\n\n// Extract form data\nconst userId = body.userId;\nconst loanIds = body.loanIds ? (typeof body.loanIds === 'string' ? JSON.parse(body.loanIds) : body.loanIds) : [];\nconst tags = body.tags ? (typeof body.tags === 'string' ? JSON.parse(body.tags) : body.tags) : [];\n\n// Validate required fields\nif (!userId) {\n  throw new Error('userId is required');\n}\n\nif (!binary.file) {\n  throw new Error('No file uploaded');\n}\n\n// Get file information from binary data\nconst file = binary.file;\nconst originalFilename = file.fileName || 'untitled';\nconst mimeType = file.mimeType || 'application/octet-stream';\nconst fileSize = file.fileSize || 0;\n\n// Generate unique file identifier\nconst timestamp = Date.now();\nconst randomString = Math.random().toString(36).substring(7);\nconst fileExtension = originalFilename.split('.').pop();\nconst blobName = `${userId}/${timestamp}-${randomString}.${fileExtension}`;\nconst fileId = `${randomString}-${timestamp}`;\n\nreturn {\n  userId,\n  loanIds,\n  tags,\n  fileId,\n  blobName,\n  originalFilename,\n  mimeType,\n  fileSize,\n  uploadedAt: new Date().toISOString(),\n  binary: file\n};"
+      },
+      "id": "function-extract",
+      "name": "Extract File and Metadata",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "upload",
+        "containerName": "loan-files",
+        "blobName": "={{ $json.blobName }}",
+        "binaryPropertyName": "binary",
+        "additionalFields": {
+          "contentType": "={{ $json.mimeType }}"
+        }
+      },
+      "id": "azure-blob-upload",
+      "name": "Upload to Azure Blob Storage",
+      "type": "n8n-nodes-base.microsoftAzureBlobStorage",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "microsoftAzureBlobStorageApi": {
+          "id": "AZURE_BLOB_CREDENTIAL_ID",
+          "name": "Azure Blob Storage Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO Files (FileId, UserId, OriginalFilename, BlobIdentifier, FileSize, ContentType, UploadedAt) VALUES (@fileId, @userId, @originalFilename, @blobName, @fileSize, @mimeType, @uploadedAt); SELECT SCOPE_IDENTITY() AS Id;",
+        "additionalFields": {
+          "parameters": {
+            "parameters": [
+              {
+                "name": "fileId",
+                "value": "={{ $json.fileId }}"
+              },
+              {
+                "name": "userId",
+                "value": "={{ $json.userId }}"
+              },
+              {
+                "name": "originalFilename",
+                "value": "={{ $json.originalFilename }}"
+              },
+              {
+                "name": "blobName",
+                "value": "={{ $json.blobName }}"
+              },
+              {
+                "name": "fileSize",
+                "value": "={{ $json.fileSize }}"
+              },
+              {
+                "name": "mimeType",
+                "value": "={{ $json.mimeType }}"
+              },
+              {
+                "name": "uploadedAt",
+                "value": "={{ $json.uploadedAt }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "sql-insert-file",
+      "name": "Insert File Record",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [850, 300],
+      "credentials": {
+        "microsoftSql": {
+          "id": "AZURE_SQL_CREDENTIAL_ID",
+          "name": "Azure SQL Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.loanIds }}",
+              "operation": "isNotEmpty"
+            }
+          ]
+        }
+      },
+      "id": "if-has-loans",
+      "name": "Check if Loans Exist",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Split loanIds array into separate items for loop processing\nconst loanIds = $json.loanIds || [];\nconst items = loanIds.map(loanId => ({\n  json: {\n    fileId: $json.fileId,\n    loanId: loanId,\n    associatedAt: new Date().toISOString()\n  }\n}));\n\nreturn items;"
+      },
+      "id": "function-split-loans",
+      "name": "Split Loan IDs",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1250, 250]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO FileLoanAssociations (FileId, LoanId, AssociatedAt) VALUES (@fileId, @loanId, @associatedAt);",
+        "additionalFields": {
+          "parameters": {
+            "parameters": [
+              {
+                "name": "fileId",
+                "value": "={{ $json.fileId }}"
+              },
+              {
+                "name": "loanId",
+                "value": "={{ $json.loanId }}"
+              },
+              {
+                "name": "associatedAt",
+                "value": "={{ $json.associatedAt }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "sql-insert-associations",
+      "name": "Insert Loan Associations",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [1450, 250],
+      "credentials": {
+        "microsoftSql": {
+          "id": "AZURE_SQL_CREDENTIAL_ID",
+          "name": "Azure SQL Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Merge results and format final response\nconst fileData = $node['Insert File Record'].json;\nconst extractData = $node['Extract File and Metadata'].json;\nconst blobData = $node['Upload to Azure Blob Storage'].json;\n\nreturn {\n  success: true,\n  fileId: extractData.fileId,\n  filename: extractData.originalFilename,\n  blobIdentifier: extractData.blobName,\n  blobUrl: blobData.url || `https://{storage-account}.blob.core.windows.net/loan-files/${extractData.blobName}`,\n  size: extractData.fileSize,\n  contentType: extractData.mimeType,\n  uploadedAt: extractData.uploadedAt,\n  loanIds: extractData.loanIds,\n  message: 'File uploaded successfully'\n};"
+      },
+      "id": "function-success",
+      "name": "Format Success Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1850, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Format error response\nconst error = $node['Webhook'].json.error || $json.error || {};\nconst message = error.message || 'File upload failed';\n\nreturn {\n  success: false,\n  error: message,\n  details: error\n};"
+      },
+      "id": "function-error",
+      "name": "Format Error Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 500]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1250, 500]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract File and Metadata",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract File and Metadata": {
+      "main": [
+        [
+          {
+            "node": "Upload to Azure Blob Storage",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload to Azure Blob Storage": {
+      "main": [
+        [
+          {
+            "node": "Insert File Record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert File Record": {
+      "main": [
+        [
+          {
+            "node": "Check if Loans Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Loans Exist": {
+      "main": [
+        [
+          {
+            "node": "Split Loan IDs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Loan IDs": {
+      "main": [
+        [
+          {
+            "node": "Insert Loan Associations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Loan Associations": {
+      "main": [
+        [
+          {
+            "node": "Format Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Success Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all",
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true
+  },
+  "staticData": null,
+  "pinData": null
+}

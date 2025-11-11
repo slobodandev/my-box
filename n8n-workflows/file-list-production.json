@@ -1,0 +1,143 @@
+{
+  "name": "File List",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "file-list",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-list",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "file-list"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract filter parameters\nconst body = $input.item.json.body || $input.item.json;\nconst userId = body.userId;\nconst loanId = body.loanId || null;\nconst searchTerm = body.searchTerm || null;\nconst personalOnly = body.personalOnly || false;\nconst page = parseInt(body.page) || 1;\nconst pageSize = parseInt(body.pageSize) || 10;\nconst sortBy = body.sortBy || 'uploadedAt';\nconst sortOrder = body.sortOrder || 'desc';\n\nif (!userId) {\n  throw new Error('userId is required');\n}\n\n// Calculate pagination\nconst offset = (page - 1) * pageSize;\n\n// Build WHERE clause conditions\nlet whereConditions = ['f.IsDeleted = 0', 'f.UserId = @userId'];\n\nif (loanId) {\n  whereConditions.push('EXISTS (SELECT 1 FROM FileLoanAssociations fla WHERE fla.FileId = f.FileId AND fla.LoanId = @loanId)');\n}\n\nif (personalOnly) {\n  whereConditions.push('NOT EXISTS (SELECT 1 FROM FileLoanAssociations fla WHERE fla.FileId = f.FileId)');\n}\n\nif (searchTerm) {\n  whereConditions.push('(f.OriginalFilename LIKE @searchTerm OR f.FileId LIKE @searchTerm)');\n}\n\n// Build ORDER BY clause\nconst orderByColumn = sortBy === 'filename' ? 'f.OriginalFilename' : sortBy === 'size' ? 'f.FileSize' : 'f.UploadedAt';\nconst orderDirection = sortOrder.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';\n\n// Build query\nconst whereClause = whereConditions.join(' AND ');\nconst query = `\nSELECT \n  f.FileId as id,\n  f.OriginalFilename as filename,\n  f.BlobIdentifier as blobUrl,\n  f.FileSize as size,\n  f.ContentType as mimeType,\n  f.UploadedAt as uploadedAt,\n  f.UserId as uploadedBy,\n  STRING_AGG(fla.LoanId, ',') as loanIds\nFROM Files f\nLEFT JOIN FileLoanAssociations fla ON f.FileId = fla.FileId\nWHERE ${whereClause}\nGROUP BY f.FileId, f.OriginalFilename, f.BlobIdentifier, f.FileSize, f.ContentType, f.UploadedAt, f.UserId\nORDER BY ${orderByColumn} ${orderDirection}\nOFFSET @offset ROWS\nFETCH NEXT @pageSize ROWS ONLY;\n\nSELECT COUNT(*) as total FROM Files f WHERE ${whereClause};\n`;\n\nreturn {\n  userId,\n  loanId,\n  searchTerm: searchTerm ? `%${searchTerm}%` : null,\n  personalOnly,\n  page,\n  pageSize,\n  offset,\n  query\n};"
+      },
+      "id": "function-build-query",
+      "name": "Build Query",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.query }}",
+        "additionalFields": {
+          "parameters": {
+            "parameters": [
+              {
+                "name": "userId",
+                "value": "={{ $json.userId }}"
+              },
+              {
+                "name": "loanId",
+                "value": "={{ $json.loanId }}"
+              },
+              {
+                "name": "searchTerm",
+                "value": "={{ $json.searchTerm }}"
+              },
+              {
+                "name": "offset",
+                "value": "={{ $json.offset }}"
+              },
+              {
+                "name": "pageSize",
+                "value": "={{ $json.pageSize }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "sql-execute-query",
+      "name": "Execute Query",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [650, 300],
+      "credentials": {
+        "microsoftSql": {
+          "id": "AZURE_SQL_CREDENTIAL_ID",
+          "name": "Azure SQL Database"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Format response with pagination info\nconst queryParams = $node['Build Query'].json;\nconst results = $input.all();\n\n// Separate file results and count result\nconst files = results.slice(0, -1).map(item => {\n  const json = item.json;\n  return {\n    id: json.id,\n    filename: json.filename,\n    blobUrl: json.blobUrl,\n    size: json.size,\n    mimeType: json.mimeType,\n    uploadedAt: json.uploadedAt,\n    uploadedBy: json.uploadedBy,\n    loanIds: json.loanIds ? json.loanIds.split(',') : []\n  };\n});\n\nconst totalResult = results[results.length - 1].json;\nconst total = totalResult.total || 0;\nconst totalPages = Math.ceil(total / queryParams.pageSize);\n\nreturn {\n  success: true,\n  data: {\n    files,\n    total,\n    page: queryParams.page,\n    pageSize: queryParams.pageSize,\n    totalPages\n  }\n};"
+      },
+      "id": "function-format-response",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Query": {
+      "main": [
+        [
+          {
+            "node": "Execute Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Query": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
