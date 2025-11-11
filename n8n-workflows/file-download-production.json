@@ -88,20 +88,21 @@
     },
     {
       "parameters": {
-        "operation": "download",
+        "resource": "blob",
+        "operation": "get",
         "containerName": "loan-files",
         "blobName": "={{ $json.BlobIdentifier }}",
-        "binaryPropertyName": "data"
+        "dataPropertyName": "data"
       },
       "id": "azure-blob-download",
       "name": "Download from Blob Storage",
-      "type": "n8n-nodes-base.microsoftAzureBlobStorage",
+      "type": "n8n-nodes-base.azureStorage",
       "typeVersion": 1,
       "position": [1250, 200],
       "credentials": {
-        "microsoftAzureBlobStorageApi": {
-          "id": "AZURE_BLOB_CREDENTIAL_ID",
-          "name": "Azure Blob Storage Account"
+        "azureStorage": {
+          "id": "AZURE_STORAGE_CREDENTIAL_ID",
+          "name": "Azure Storage Account"
         }
       }
     },

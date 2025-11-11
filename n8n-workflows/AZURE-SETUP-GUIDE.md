@@ -45,7 +45,7 @@ This guide walks you through setting up Azure Blob Storage and Azure SQL Databas
    - Copy "Connection string" from key1 or key2
    - **Format:** `DefaultEndpointsProtocol=https;AccountName=myboxfilestorage;AccountKey=xxx;EndpointSuffix=core.windows.net`
 
-### Step 2: Add Azure Blob Storage Credential to n8n
+### Step 2: Add Azure Storage Credential to n8n
 
 1. **Go to n8n:** http://48.223.194.241:5678
 2. **Open Credentials:**
@@ -55,17 +55,18 @@ This guide walks you through setting up Azure Blob Storage and Azure SQL Databas
 
 3. **Add New Credential:**
    - Click "Add Credential"
-   - Search for "Microsoft Azure Blob Storage"
-   - Click "Microsoft Azure Blob Storage"
+   - Search for "Azure Storage"
+   - Click "Azure Storage"
 
 4. **Configure Credential:**
-   - **Credential Name:** `Azure Blob Storage Account`
+   - **Credential Name:** `Azure Storage Account`
    - **Connection String:** Paste the connection string from Step 1.5
+   - Click "Test" to verify connection
    - Click "Save"
 
 5. **Copy Credential ID:**
    - After saving, note the credential ID (you'll see it in the URL or credential list)
-   - Save this ID - you'll need it when updating workflows
+   - You can now use this credential in all Azure Storage nodes in your workflows
 
 ---
 
@@ -162,14 +163,19 @@ For each workflow (File Upload, File Download, File List, File Delete, Get Loan 
 
 2. **Replace Mock Nodes with Real Azure Nodes:**
 
-   **For Azure Blob Storage nodes:**
+   **For Azure Storage nodes (File Upload/Download):**
    - Delete any "Simulate Blob Upload" or mock function nodes
-   - Add "Microsoft Azure Blob Storage" node
+   - Add "Azure Storage" node
    - Configure the node:
-     - **Credential:** Select "Azure Blob Storage Account"
-     - **Operation:** upload/download (as needed)
+     - **Credential:** Select "Azure Storage Account"
+     - **Resource:** Blob
+     - **Operation:**
+       - `create` for file upload
+       - `get` for file download
+       - `delete` for file deletion (optional)
      - **Container Name:** `loan-files`
-     - **Blob Name:** Use expression from previous node
+     - **Blob Name:** Use expression from previous node (e.g., `={{ $json.blobName }}`)
+     - **Data Property Name:** `binary` for upload, `data` for download
    - Connect to workflow
 
    **For Azure SQL nodes:**
@@ -198,7 +204,7 @@ For each workflow (File Upload, File Download, File List, File Delete, Get Loan 
 1. **Update Credential IDs in JSON files:**
    - Open each `*-production.json` file
    - Find all instances of:
-     - `"AZURE_BLOB_CREDENTIAL_ID"` → Replace with your Blob Storage credential ID
+     - `"AZURE_STORAGE_CREDENTIAL_ID"` → Replace with your Azure Storage credential ID
      - `"AZURE_SQL_CREDENTIAL_ID"` → Replace with your SQL Database credential ID
    - Save files
 

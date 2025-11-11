@@ -29,23 +29,25 @@
     },
     {
       "parameters": {
-        "operation": "upload",
+        "resource": "blob",
+        "operation": "create",
         "containerName": "loan-files",
         "blobName": "={{ $json.blobName }}",
-        "binaryPropertyName": "binary",
-        "additionalFields": {
+        "dataPropertyName": "binary",
+        "options": {
+          "blobType": "BlockBlob",
           "contentType": "={{ $json.mimeType }}"
         }
       },
       "id": "azure-blob-upload",
       "name": "Upload to Azure Blob Storage",
-      "type": "n8n-nodes-base.microsoftAzureBlobStorage",
+      "type": "n8n-nodes-base.azureStorage",
       "typeVersion": 1,
       "position": [650, 300],
       "credentials": {
-        "microsoftAzureBlobStorageApi": {
-          "id": "AZURE_BLOB_CREDENTIAL_ID",
-          "name": "Azure Blob Storage Account"
+        "azureStorage": {
+          "id": "AZURE_STORAGE_CREDENTIAL_ID",
+          "name": "Azure Storage Account"
         }
       }
     },
