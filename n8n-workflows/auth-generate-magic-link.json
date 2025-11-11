@@ -1,0 +1,353 @@
+{
+  "name": "Auth: Generate Magic Link",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "auth/generate-link",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-generate-link",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "auth-generate-link"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract and validate input\nconst body = $input.item.json.body || $input.item.json;\n\nconst userId = body.userId;\nconst email = body.email;\nconst loanIds = body.loanIds || [];\nconst expirationHours = body.expirationHours || 48;\nconst createdBy = body.createdBy || 'system';\n\n// Validation\nif (!userId) {\n  throw new Error('userId is required');\n}\n\nif (!email) {\n  throw new Error('email is required');\n}\n\n// Validate email format\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nif (!emailRegex.test(email)) {\n  throw new Error('Invalid email format');\n}\n\n// Validate loanIds is array\nif (!Array.isArray(loanIds)) {\n  throw new Error('loanIds must be an array');\n}\n\n// Validate expiration hours\nif (expirationHours < 1 || expirationHours > 168) { // Max 7 days\n  throw new Error('expirationHours must be between 1 and 168 (7 days)');\n}\n\nreturn {\n  userId,\n  email: email.toLowerCase().trim(),\n  loanIds,\n  expirationHours,\n  createdBy\n};"
+      },
+      "id": "function-validate-input",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const crypto = require('crypto');\n\n// Generate secure random magic token (32 bytes = 64 hex characters)\nconst magicToken = crypto.randomBytes(32).toString('hex');\n\n// Generate unique session ID (UUID v4)\nconst sessionId = crypto.randomUUID();\n\n// Hash email with SHA-256\nconst emailHash = crypto.createHash('sha256').update($json.email).digest('hex');\n\n// Calculate expiration timestamp\nconst expiresAt = new Date(Date.now() + ($json.expirationHours * 60 * 60 * 1000));\nconst createdAt = new Date();\n\n// Convert loanIds array to JSON string for database\nconst loanIdsJson = JSON.stringify($json.loanIds);\n\nreturn {\n  sessionId,\n  userId: $json.userId,\n  email: $json.email,\n  emailHash,\n  loanIds: $json.loanIds,\n  loanIdsJson,\n  magicToken,\n  expiresAt: expiresAt.toISOString(),\n  createdAt: createdAt.toISOString(),\n  createdBy: $json.createdBy,\n  expirationHours: $json.expirationHours\n};"
+      },
+      "id": "function-generate-token",
+      "name": "Generate Token and IDs",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Check if user exists\nIF NOT EXISTS (SELECT 1 FROM Users WHERE UserId = @userId)\nBEGIN\n  THROW 50001, 'User not found', 1;\nEND\n\n-- Verify user has access to specified loans\nIF EXISTS (\n  SELECT 1 FROM OPENJSON(@loanIds) WITH (LoanId NVARCHAR(50) '$') AS inputLoans\n  WHERE NOT EXISTS (\n    SELECT 1 FROM Loans WHERE LoanId = inputLoans.LoanId AND UserId = @userId\n  )\n)\nBEGIN\n  THROW 50002, 'User does not have access to one or more specified loans', 1;\nEND\n\nSELECT 1 AS ValidationPassed;",
+        "additionalFields": {
+          "parameters": {
+            "parameters": [
+              {
+                "name": "userId",
+                "value": "={{ $json.userId }}"
+              },
+              {
+                "name": "loanIds",
+                "value": "={{ $json.loanIdsJson }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "sql-validate-user-loans",
+      "name": "Validate User and Loans",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO AuthSessions (\n  SessionId,\n  UserId,\n  LoanIds,\n  EmailHash,\n  MagicToken,\n  TokenType,\n  Status,\n  ExpiresAt,\n  CreatedAt,\n  CreatedBy\n)\nVALUES (\n  @sessionId,\n  @userId,\n  @loanIds,\n  @emailHash,\n  @magicToken,\n  'magic_link',\n  'pending',\n  @expiresAt,\n  @createdAt,\n  @createdBy\n);\n\nSELECT SessionId FROM AuthSessions WHERE SessionId = @sessionId;",
+        "additionalFields": {
+          "parameters": {
+            "parameters": [
+              {
+                "name": "sessionId",
+                "value": "={{ $json.sessionId }}"
+              },
+              {
+                "name": "userId",
+                "value": "={{ $json.userId }}"
+              },
+              {
+                "name": "loanIds",
+                "value": "={{ $json.loanIdsJson }}"
+              },
+              {
+                "name": "emailHash",
+                "value": "={{ $json.emailHash }}"
+              },
+              {
+                "name": "magicToken",
+                "value": "={{ $json.magicToken }}"
+              },
+              {
+                "name": "expiresAt",
+                "value": "={{ $json.expiresAt }}"
+              },
+              {
+                "name": "createdAt",
+                "value": "={{ $json.createdAt }}"
+              },
+              {
+                "name": "createdBy",
+                "value": "={{ $json.createdBy }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "sql-insert-session",
+      "name": "Insert Auth Session",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO AuthAuditLog (\n  SessionId,\n  UserId,\n  EventType,\n  Success,\n  IpAddress,\n  UserAgent,\n  RequestPayload\n)\nVALUES (\n  @sessionId,\n  @userId,\n  'link_generated',\n  1,\n  @ipAddress,\n  @userAgent,\n  @payload\n);",
+        "additionalFields": {
+          "parameters": {
+            "parameters": [
+              {
+                "name": "sessionId",
+                "value": "={{ $node['Generate Token and IDs'].json.sessionId }}"
+              },
+              {
+                "name": "userId",
+                "value": "={{ $node['Generate Token and IDs'].json.userId }}"
+              },
+              {
+                "name": "ipAddress",
+                "value": "={{ $node['Webhook'].json.headers['x-forwarded-for'] || $node['Webhook'].json.headers['x-real-ip'] || 'unknown' }}"
+              },
+              {
+                "name": "userAgent",
+                "value": "={{ $node['Webhook'].json.headers['user-agent'] || 'unknown' }}"
+              },
+              {
+                "name": "payload",
+                "value": "={{ JSON.stringify({loanCount: $node['Generate Token and IDs'].json.loanIds.length, expirationHours: $node['Generate Token and IDs'].json.expirationHours}) }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "sql-log-event",
+      "name": "Log to Audit Trail",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Build magic link URL\nconst baseUrl = 'https://your-domain.com'; // TODO: Update with actual domain\nconst magicLink = `${baseUrl}/auth?token=${$node['Generate Token and IDs'].json.magicToken}`;\n\n// Format expiration time for email\nconst expiresAt = new Date($node['Generate Token and IDs'].json.expiresAt);\nconst expirationText = expiresAt.toLocaleString('en-US', {\n  weekday: 'long',\n  year: 'numeric',\n  month: 'long',\n  day: 'numeric',\n  hour: '2-digit',\n  minute: '2-digit',\n  timeZoneName: 'short'\n});\n\nconst hoursText = $node['Generate Token and IDs'].json.expirationHours;\n\nreturn {\n  to: $node['Generate Token and IDs'].json.email,\n  subject: 'Access Your Loan Documents - MyBox',\n  html: `\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <style>\n    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }\n    .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n    .header { background-color: #135bec; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }\n    .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }\n    .button { display: inline-block; padding: 15px 30px; background-color: #135bec; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }\n    .button:hover { background-color: #0d47b8; }\n    .info-box { background-color: #fff; border-left: 4px solid #135bec; padding: 15px; margin: 20px 0; }\n    .warning { background-color: #fff3cd; border-left: 4px solid: #ffc107; padding: 15px; margin: 20px 0; }\n    .footer { text-align: center; margin-top: 30px; font-size: 12px; color: #666; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1>Access Your Loan Documents</h1>\n    </div>\n    <div class=\"content\">\n      <p>Hello,</p>\n      \n      <p>You've been invited to access and manage your loan documents on MyBox.</p>\n      \n      <p>Click the button below to get started:</p>\n      \n      <p style=\"text-align: center;\">\n        <a href=\"${magicLink}\" class=\"button\">Access My Documents</a>\n      </p>\n      \n      <div class=\"info-box\">\n        <strong>Important Information:</strong>\n        <ul>\n          <li>This link will expire in ${hoursText} hours (${expirationText})</li>\n          <li>You can use this link only once</li>\n          <li>You'll need to verify your email address after clicking</li>\n        </ul>\n      </div>\n      \n      <div class=\"warning\">\n        <strong>⚠️ Security Notice:</strong>\n        <ul>\n          <li>Don't share this link with anyone</li>\n          <li>If you didn't request this, please ignore this email</li>\n          <li>We'll never ask for your password via email</li>\n        </ul>\n      </div>\n      \n      <p>If the button doesn't work, copy and paste this link into your browser:</p>\n      <p style=\"word-break: break-all; font-size: 12px; color: #666;\">${magicLink}</p>\n      \n      <hr style=\"margin: 30px 0; border: none; border-top: 1px solid #ddd;\">\n      \n      <p>Questions? Contact our support team at <strong>support@example.com</strong></p>\n    </div>\n    <div class=\"footer\">\n      <p>&copy; 2025 MyBox. All rights reserved.</p>\n      <p>This is an automated message, please do not reply to this email.</p>\n    </div>\n  </div>\n</body>\n</html>\n  `,\n  magicLink,\n  expiresAt: expirationText\n};"
+      },
+      "id": "function-build-email",
+      "name": "Build Email Content",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// TODO: Replace with actual email sending node (SendGrid, AWS SES, etc.)\n// This is a placeholder that simulates email sending\n\nconst emailData = $json;\n\nconsole.log('📧 Email would be sent to:', emailData.to);\nconsole.log('Subject:', emailData.subject);\nconsole.log('Magic Link:', emailData.magicLink);\n\nreturn {\n  emailSent: true,\n  recipient: emailData.to,\n  subject: emailData.subject,\n  sentAt: new Date().toISOString(),\n  note: 'TODO: Replace this node with actual email service (SendGrid/AWS SES/Mailgun)'\n};"
+      },
+      "id": "function-send-email-placeholder",
+      "name": "Send Email (Placeholder)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Format success response\nconst tokenData = $node['Generate Token and IDs'].json;\nconst emailData = $node['Build Email Content'].json;\n\nreturn {\n  success: true,\n  sessionId: tokenData.sessionId,\n  magicLink: emailData.magicLink,\n  recipient: tokenData.email,\n  expiresAt: tokenData.expiresAt,\n  expirationHours: tokenData.expirationHours,\n  loanCount: tokenData.loanIds.length,\n  message: 'Magic link generated and email sent successfully',\n  createdAt: tokenData.createdAt\n};"
+      },
+      "id": "function-format-response",
+      "name": "Format Success Response",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [2050, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Handle errors and format error response\nconst error = $input.item.json.error || {};\nconst errorMessage = error.message || 'Failed to generate magic link';\n\n// Log error to audit trail (if session was created)\nconst sessionId = $node['Generate Token and IDs']?.json?.sessionId || null;\nconst userId = $node['Validate Input']?.json?.userId || null;\n\nreturn {\n  success: false,\n  error: errorMessage,\n  errorCode: 'LINK_GENERATION_FAILED',\n  sessionId,\n  userId,\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "function-error-handler",
+      "name": "Error Handler",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [1050, 500]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO AuthAuditLog (\n  SessionId,\n  UserId,\n  EventType,\n  Success,\n  ErrorMessage,\n  ErrorCode\n)\nVALUES (\n  @sessionId,\n  @userId,\n  'link_generation_failed',\n  0,\n  @errorMessage,\n  @errorCode\n);",
+        "additionalFields": {
+          "parameters": {
+            "parameters": [
+              {
+                "name": "sessionId",
+                "value": "={{ $json.sessionId }}"
+              },
+              {
+                "name": "userId",
+                "value": "={{ $json.userId }}"
+              },
+              {
+                "name": "errorMessage",
+                "value": "={{ $json.error }}"
+              },
+              {
+                "name": "errorCode",
+                "value": "={{ $json.errorCode }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "sql-log-error",
+      "name": "Log Error to Audit",
+      "type": "n8n-nodes-base.microsoftSql",
+      "typeVersion": 1,
+      "position": [1250, 500]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $node['Error Handler'].json }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond-error",
+      "name": "Respond Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1450, 500]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Generate Token and IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Token and IDs": {
+      "main": [
+        [
+          {
+            "node": "Validate User and Loans",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate User and Loans": {
+      "main": [
+        [
+          {
+            "node": "Insert Auth Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Auth Session": {
+      "main": [
+        [
+          {
+            "node": "Log to Audit Trail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Audit Trail": {
+      "main": [
+        [
+          {
+            "node": "Build Email Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Email Content": {
+      "main": [
+        [
+          {
+            "node": "Send Email (Placeholder)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email (Placeholder)": {
+      "main": [
+        [
+          {
+            "node": "Format Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Success Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
