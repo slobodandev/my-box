@@ -14,6 +14,7 @@ import {
   type User as FirebaseUser,
 } from 'firebase/auth';
 import { auth } from '@/config/firebase';
+import { CloudFunctionUrls } from '@/config/cloudFunctions';
 
 /**
  * User interface
@@ -76,9 +77,6 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 const TOKEN_STORAGE_KEY = 'mybox_session_token';
 const USER_STORAGE_KEY = 'mybox_user';
 const EMAIL_FOR_SIGN_IN = 'mybox_email_for_sign_in';
-
-const CLOUD_FUNCTIONS_BASE_URL = import.meta.env.VITE_CLOUD_FUNCTIONS_BASE_URL;
-const CF_VALIDATE_SESSION = import.meta.env.VITE_CF_VALIDATE_SESSION;
 
 /**
  * Authentication Provider Component
@@ -333,7 +331,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.log('Exchanging Firebase token for session token...');
 
       // Call validateSession Cloud Function
-      const response = await fetch(`${CLOUD_FUNCTIONS_BASE_URL}${CF_VALIDATE_SESSION}`, {
+      const response = await fetch(CloudFunctionUrls.validateSession(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

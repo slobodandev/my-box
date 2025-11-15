@@ -4,9 +4,7 @@
  */
 
 import axios from 'axios';
-
-// Get Firebase Cloud Functions URL from environment
-const FUNCTIONS_URL = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || 'http://localhost:5001/my-box/us-central1';
+import { CloudFunctionUrls } from '@/config/cloudFunctions';
 
 /**
  * Request magic link for email verification
@@ -121,7 +119,7 @@ export const verifyMagicLink = async (
   request: VerifyMagicLinkRequest
 ): Promise<VerifyMagicLinkResponse> => {
   try {
-    const response = await axios.post(`${FUNCTIONS_URL}/verifyMagicLink`, request);
+    const response = await axios.post(CloudFunctionUrls.verifyMagicLink(), request);
     return response.data;
   } catch (error: any) {
     console.error('Error verifying magic link:', error);
@@ -136,7 +134,7 @@ export const sendVerificationCode = async (
   request: SendVerificationCodeRequest
 ): Promise<SendVerificationCodeResponse> => {
   try {
-    const response = await axios.post(`${FUNCTIONS_URL}/sendVerificationCode`, request);
+    const response = await axios.post(CloudFunctionUrls.sendVerificationCode(), request);
     return response.data;
   } catch (error: any) {
     console.error('Error sending verification code:', error);
@@ -151,7 +149,7 @@ export const verifyCode = async (
   request: VerifyCodeRequest
 ): Promise<VerifyCodeResponse> => {
   try {
-    const response = await axios.post(`${FUNCTIONS_URL}/verifyCode`, request);
+    const response = await axios.post(CloudFunctionUrls.verifyCode(), request);
     return response.data;
   } catch (error: any) {
     console.error('Error verifying code:', error);
@@ -167,7 +165,7 @@ export const validateSession = async (
 ): Promise<ValidateSessionResponse> => {
   try {
     const response = await axios.post(
-      `${FUNCTIONS_URL}/validateSession`,
+      CloudFunctionUrls.validateSession(),
       { token },
       {
         headers: {

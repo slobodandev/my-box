@@ -6,10 +6,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-
-const CLOUD_FUNCTIONS_BASE_URL = import.meta.env.VITE_CLOUD_FUNCTIONS_BASE_URL;
-const CF_GENERATE_AUTH_LINK = import.meta.env.VITE_CF_GENERATE_AUTH_LINK;
-const TEST_API_KEY = import.meta.env.VITE_TEST_API_KEY || 'test-api-key-12345';
+import { CloudFunctionUrls, getCloudFunctionHeaders } from '@/config/cloudFunctions';
 
 export const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -49,12 +46,9 @@ export const SignIn: React.FC = () => {
 
     try {
       // Call generateAuthLink Cloud Function (simulating third-party service)
-      const response = await fetch(`${CLOUD_FUNCTIONS_BASE_URL}${CF_GENERATE_AUTH_LINK}`, {
+      const response = await fetch(CloudFunctionUrls.generateAuthLink(), {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': TEST_API_KEY,
-        },
+        headers: getCloudFunctionHeaders(),
         body: JSON.stringify({
           email: email.toLowerCase().trim(),
           loanNumber,

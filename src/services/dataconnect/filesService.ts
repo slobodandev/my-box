@@ -4,9 +4,7 @@
  */
 
 import axios from 'axios';
-
-// Get Firebase Cloud Functions URL from environment
-const FUNCTIONS_URL = import.meta.env.VITE_FIREBASE_FUNCTIONS_URL || 'http://localhost:5001/my-box/us-central1';
+import { CloudFunctionUrls } from '@/config/cloudFunctions';
 
 /**
  * Process uploaded file
@@ -73,7 +71,7 @@ export const processUpload = async (
 ): Promise<ProcessUploadResponse> => {
   try {
     const response = await axios.post(
-      `${FUNCTIONS_URL}/processUpload`,
+      CloudFunctionUrls.processUpload(),
       request,
       {
         headers: {
@@ -98,7 +96,7 @@ export const generateDownloadURL = async (
 ): Promise<GenerateDownloadURLResponse> => {
   try {
     const response = await axios.post(
-      `${FUNCTIONS_URL}/generateDownloadURL`,
+      CloudFunctionUrls.generateDownloadUrl(),
       request,
       {
         headers: {
@@ -123,7 +121,7 @@ export const batchGenerateDownloadURLs = async (
 ): Promise<Array<{ fileId: string; success: boolean; downloadUrl?: string; error?: string }>> => {
   try {
     const response = await axios.post(
-      `${FUNCTIONS_URL}/batchGenerateDownloadURLs`,
+      CloudFunctionUrls.batchGenerateDownloadUrls(),
       { fileIds },
       {
         headers: {
@@ -186,7 +184,7 @@ export const getUserFiles = async (
 ): Promise<ListFilesResponse> => {
   try {
     const response = await axios.post(
-      `${FUNCTIONS_URL}/listFiles`,
+      CloudFunctionUrls.listFiles(),
       request,
       {
         headers: {
@@ -241,7 +239,7 @@ export const softDeleteFile = async (
 ): Promise<DeleteFileResponse> => {
   try {
     const response = await axios.post(
-      `${FUNCTIONS_URL}/deleteFile`,
+      CloudFunctionUrls.deleteFile(),
       { fileId },
       {
         headers: {
