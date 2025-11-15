@@ -69,12 +69,18 @@ async function findOrCreateUser(email: string): Promise<{ userId: string; fireba
     `;
 
     const result = await executeGraphql({
-      
+
       query: getUserQuery,
       variables: { email: email.toLowerCase().trim() },
     });
 
     logger.info('User query result:', result);
+
+    // Check for GraphQL errors
+    if (result.errors) {
+      logger.error('GraphQL errors:', result.errors);
+      throw new Error(`GraphQL query failed: ${JSON.stringify(result.errors)}`);
+    }
 
     // Check if user exists
     if (result.data?.users && result.data.users.length > 0) {
