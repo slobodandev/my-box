@@ -25,8 +25,9 @@ function getDataConnectEndpoint(): string {
 
   if (isEmulator) {
     // Use local Data Connect emulator endpoint
+    // Emulator uses a different path: /emulator/v1alpha instead of /v1beta
     const emulatorHost = process.env.DATACONNECT_EMULATOR_HOST || '127.0.0.1:9399';
-    return `http://${emulatorHost}/v1beta/projects/${projectId}/locations/${location}/services/${service}/connectors/${connector}:executeGraphql`;
+    return `http://${emulatorHost}/emulator/v1alpha/projects/${projectId}/locations/${location}/services/${service}/connectors/${connector}:executeGraphql`;
   }
 
   // Production Data Connect GraphQL endpoint format
