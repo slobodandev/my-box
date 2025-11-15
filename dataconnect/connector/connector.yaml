@@ -1,0 +1,6 @@
+# Connector Configuration
+connectorId: mybox-connector
+generate:
+  javascriptSdk:
+    outputDir: ../src/__generated/dataconnect
+    package: "@mybox/dataconnect"

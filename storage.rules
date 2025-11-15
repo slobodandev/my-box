@@ -1,0 +1,151 @@
+rules_version = '2';
+
+// Firebase Storage Security Rules for MyBox
+// Last updated: 2025-11-13
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ============================================================================
+    // HELPER FUNCTIONS
+    // ============================================================================
+
+    // Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user owns the resource
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Check file size (max 100MB)
+    function isValidSize() {
+      return request.resource.size <= 100 * 1024 * 1024;
+    }
+
+    // Check if file type is allowed
+    function isAllowedType() {
+      return request.resource.contentType.matches('image/.*')
+          || request.resource.contentType.matches('application/pdf')
+          || request.resource.contentType.matches('application/msword')
+          || request.resource.contentType.matches('application/vnd\\..*')
+          || request.resource.contentType.matches('application/vnd\\.openxmlformats-officedocument\\..*')
+          || request.resource.contentType.matches('text/.*')
+          || request.resource.contentType.matches('application/zip')
+          || request.resource.contentType.matches('application/x-zip-compressed');
+    }
+
+    // Check if metadata is valid
+    function hasValidMetadata() {
+      return request.resource.metadata != null
+          && request.resource.metadata.userId != null
+          && request.resource.metadata.originalFilename != null;
+    }
+
+    // ============================================================================
+    // USER PERSONAL FILES
+    // ============================================================================
+
+    // Path: users/{userId}/personal/{fileId}.{ext}
+    match /users/{userId}/personal/{fileId} {
+      // Read: User must be authenticated and own the file
+      allow read: if isAuthenticated() && isOwner(userId);
+
+      // Write: User must be authenticated, own the path, file size/type valid
+      allow write: if isAuthenticated()
+                   && isOwner(userId)
+                   && isValidSize()
+                   && isAllowedType();
+
+      // Delete: User must be authenticated and own the file
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+
+    // ============================================================================
+    // USER LOAN FILES
+    // ============================================================================
+
+    // Path: users/{userId}/loans/{loanId}/{fileId}.{ext}
+    match /users/{userId}/loans/{loanId}/{fileId} {
+      // Read: User must be authenticated and own the file
+      allow read: if isAuthenticated() && isOwner(userId);
+
+      // Write: User must be authenticated, own the path, file size/type valid
+      allow write: if isAuthenticated()
+                   && isOwner(userId)
+                   && isValidSize()
+                   && isAllowedType();
+
+      // Delete: User must be authenticated and own the file
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+
+    // ============================================================================
+    // SHARED LOAN FILES (Multi-user access)
+    // ============================================================================
+
+    // Path: shared/{loanId}/{fileId}.{ext}
+    // These files can be accessed by multiple users
+    // Access control is handled by Cloud Functions checking Data Connect
+    match /shared/{loanId}/{fileId} {
+      // Read: Authenticated users only (Cloud Function validates loan access)
+      allow read: if isAuthenticated();
+
+      // Write: Only Cloud Functions can write
+      // Frontend uploads to user folders, Cloud Function copies to shared
+      allow write: if false;
+
+      // Delete: Only Cloud Functions can delete
+      allow delete: if false;
+    }
+
+    // ============================================================================
+    // TEMPORARY UPLOADS
+    // ============================================================================
+
+    // Path: temp/{uploadId}/{fileId}.{ext}
+    // Used for temporary uploads that get moved by Cloud Functions
+    match /temp/{uploadId}/{fileId} {
+      // Read: User must be authenticated
+      allow read: if isAuthenticated();
+
+      // Write: User must be authenticated, valid size/type
+      allow write: if isAuthenticated()
+                   && isValidSize()
+                   && isAllowedType();
+
+      // Delete: User must be authenticated
+      allow delete: if isAuthenticated();
+    }
+
+    // ============================================================================
+    // PROFILE PICTURES (Future feature)
+    // ============================================================================
+
+    // Path: avatars/{userId}.{ext}
+    match /avatars/{userId} {
+      // Read: Anyone can view avatars
+      allow read: if true;
+
+      // Write: User must own the avatar, max 5MB, must be image
+      allow write: if isAuthenticated()
+                   && isOwner(userId)
+                   && request.resource.size <= 5 * 1024 * 1024
+                   && request.resource.contentType.matches('image/.*');
+
+      // Delete: User must own the avatar
+      allow delete: if isAuthenticated() && isOwner(userId);
+    }
+
+    // ============================================================================
+    // DEFAULT DENY
+    // ============================================================================
+
+    // Deny all other paths by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

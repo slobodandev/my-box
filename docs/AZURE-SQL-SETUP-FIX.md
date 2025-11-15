@@ -147,6 +147,11 @@ Connection Timeout=30;
 
 ## Run Database Schema
 
+**IMPORTANT:** You must run the SQL files in this specific order:
+
+1. **First:** `database/schema.sql` (creates Users, Loans, Files tables)
+2. **Second:** `database/auth-schema.sql` (creates authentication tables)
+
 Once database is created:
 
 ### Method 1: Azure Portal Query Editor
@@ -154,8 +159,13 @@ Once database is created:
 1. Go to your database in Azure Portal
 2. Click "Query editor (preview)" in left menu
 3. Login with your admin credentials
-4. Copy entire contents of `database/auth-schema.sql`
-5. Paste and click "Run"
+4. **Run schema.sql first:**
+   - Copy entire contents of `database/schema.sql`
+   - Paste and click "Run"
+   - Wait for completion
+5. **Then run auth-schema.sql:**
+   - Copy entire contents of `database/auth-schema.sql`
+   - Paste and click "Run"
 
 ### Method 2: Azure Data Studio (Recommended)
 
@@ -167,39 +177,48 @@ Once database is created:
    - Password: [your password]
    - Database: `mybox-auth-db`
    - Encrypt: True
-3. Open `database/auth-schema.sql`
-4. Click "Run"
+3. **Run schema.sql first:**
+   - Open `database/schema.sql`
+   - Click "Run"
+   - Wait for completion (should see success messages)
+4. **Then run auth-schema.sql:**
+   - Open `database/auth-schema.sql`
+   - Click "Run"
 
 ### Method 3: SQL Server Management Studio (SSMS)
 
 1. Download SSMS: https://aka.ms/ssmsfullsetup
 2. Connect with same credentials as Azure Data Studio
-3. Open and execute `database/auth-schema.sql`
+3. **Run in order:**
+   - First: Open and execute `database/schema.sql`
+   - Second: Open and execute `database/auth-schema.sql`
 
 ---
 
 ## Verify Schema Installation
 
-Run this query to verify tables were created:
+Run this query to verify all tables were created:
 
 ```sql
--- Check all authentication tables
+-- Check all tables (core + authentication)
 SELECT
     TABLE_NAME,
     (SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = t.TABLE_NAME) AS ColumnCount
 FROM INFORMATION_SCHEMA.TABLES t
-WHERE TABLE_NAME IN ('AuthSessions', 'VerificationCodes', 'AuthAuditLog', 'RateLimitTracking', 'Users', 'Loans', 'Files', 'FileLoanAssociations')
+WHERE TABLE_NAME IN ('Users', 'Loans', 'Files', 'FileLoanAssociations', 'AuthSessions', 'VerificationCodes', 'AuthAuditLog', 'RateLimitTracking')
 ORDER BY TABLE_NAME;
 
 -- Should return 8 tables:
--- AuthAuditLog
--- AuthSessions
--- Files
--- FileLoanAssociations
--- Loans
--- RateLimitTracking
--- Users
--- VerificationCodes
+-- Core tables (from schema.sql):
+--   Users (11 columns)
+--   Loans (13 columns)
+--   Files (13 columns)
+--   FileLoanAssociations (4 columns)
+-- Authentication tables (from auth-schema.sql):
+--   AuthSessions (17 columns)
+--   VerificationCodes (8 columns)
+--   AuthAuditLog (9 columns)
+--   RateLimitTracking (6 columns)
 ```
 
 ---
@@ -269,13 +288,14 @@ After database is created:
 
 1. ✅ Create Azure SQL Database (Basic tier)
 2. ✅ Configure firewall rules
-3. ✅ Run `database/auth-schema.sql` to create tables
-4. ✅ Run `database/schema.sql` to create Users, Loans, Files tables (if not exists)
-5. ✅ Configure SQL credential in n8n
-6. ✅ Test connection
-7. ✅ Import authentication workflows to n8n
-8. ✅ Configure Azure Storage credential
-9. ✅ Test authentication flow
+3. ✅ Run `database/schema.sql` to create core tables (Users, Loans, Files, FileLoanAssociations)
+4. ✅ Run `database/auth-schema.sql` to create authentication tables
+5. ✅ Verify all 8 tables were created using verification query
+6. ✅ Configure SQL credential in n8n
+7. ✅ Test database connection
+8. ✅ Import authentication workflows to n8n
+9. ✅ Configure Azure Storage credential
+10. ✅ Test authentication flow
 
 ---
 

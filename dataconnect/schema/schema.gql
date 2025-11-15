@@ -1,0 +1,147 @@
+# MyBox Loan File Management System
+# Firebase Data Connect Schema
+
+type User @table {
+  id: UUID! @default(expr: "uuidV4()")
+  email: String! @col(name: "email")
+  firstName: String @col(name: "first_name")
+  lastName: String @col(name: "last_name")
+  role: String! @default(value: "borrower")
+  isActive: Boolean! @default(value: true)
+  phoneNumber: String @col(name: "phone_number")
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+  lastLoginAt: Timestamp @col(name: "last_login_at")
+}
+
+# Index on email for fast lookups
+extend type User @index(fields: ["email"], name: "idx_user_email")
+extend type User @index(fields: ["role"], name: "idx_user_role")
+
+type Loan @table {
+  id: UUID! @default(expr: "uuidV4()")
+  userId: UUID! @col(name: "user_id")
+  loanNumber: String! @col(name: "loan_number")
+  borrowerName: String! @col(name: "borrower_name")
+  borrowerEmail: String @col(name: "borrower_email")
+  loanAmount: Float @col(name: "loan_amount")
+  loanType: String @col(name: "loan_type")
+  status: String! @default(value: "active")
+  propertyAddress: String @col(name: "property_address")
+  loanOfficerId: UUID @col(name: "loan_officer_id")
+  notes: String
+  createdAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+  closedAt: Timestamp @col(name: "closed_at")
+}
+
+extend type Loan @index(fields: ["userId"], name: "idx_loan_user")
+extend type Loan @index(fields: ["loanNumber"], name: "idx_loan_number")
+extend type Loan @index(fields: ["status"], name: "idx_loan_status")
+
+type File @table {
+  id: UUID! @default(expr: "uuidV4()")
+  userId: UUID! @col(name: "user_id")
+  originalFilename: String! @col(name: "original_filename")
+  storagePath: String! @col(name: "storage_path")
+  fileSize: Int! @col(name: "file_size")
+  mimeType: String @col(name: "mime_type")
+  fileExtension: String @col(name: "file_extension")
+  uploadedAt: Timestamp! @default(expr: "request.time")
+  updatedAt: Timestamp! @default(expr: "request.time")
+  isDeleted: Boolean! @default(value: false)
+  deletedAt: Timestamp @col(name: "deleted_at")
+  deletedBy: UUID @col(name: "deleted_by")
+  tags: String @col(name: "tags")
+  description: String
+  downloadUrl: String @col(name: "download_url")
+}
+
+extend type File @index(fields: ["userId"], name: "idx_file_user")
+extend type File @index(fields: ["storagePath"], name: "idx_file_path")
+extend type File @index(fields: ["isDeleted"], name: "idx_file_deleted")
+
+type FileLoanAssociation @table(name: "file_loan_associations") {
+  id: UUID! @default(expr: "uuidV4()")
+  fileId: UUID! @col(name: "file_id")
+  loanId: UUID! @col(name: "loan_id")
+  associatedAt: Timestamp! @default(expr: "request.time")
+  associatedBy: UUID @col(name: "associated_by")
+}
+
+extend type FileLoanAssociation @index(fields: ["fileId"], name: "idx_fla_file")
+extend type FileLoanAssociation @index(fields: ["loanId"], name: "idx_fla_loan")
+
+type AuthSession @table(name: "auth_sessions") {
+  id: UUID! @default(expr: "uuidV4()")
+  sessionId: String! @col(name: "session_id")
+  userId: UUID! @col(name: "user_id")
+  loanIds: String @col(name: "loan_ids")
+  emailHash: String! @col(name: "email_hash")
+  magicToken: String @col(name: "magic_token")
+  sessionToken: String @col(name: "session_token")
+  tokenType: String! @default(value: "magic_link")
+  status: String! @default(value: "pending")
+  expiresAt: Timestamp! @col(name: "expires_at")
+  createdAt: Timestamp! @default(expr: "request.time")
+  verifiedAt: Timestamp @col(name: "verified_at")
+  lastAccessedAt: Timestamp @col(name: "last_accessed_at")
+  revokedAt: Timestamp @col(name: "revoked_at")
+  revokedBy: UUID @col(name: "revoked_by")
+  revokeReason: String @col(name: "revoke_reason")
+  ipAddress: String @col(name: "ip_address")
+  userAgent: String @col(name: "user_agent")
+  createdBy: UUID @col(name: "created_by")
+  # Firebase Email Link Auth fields
+  firebaseUid: String @col(name: "firebase_uid")
+  borrowerContactId: String @col(name: "borrower_contact_id")
+  loanNumber: String @col(name: "loan_number")
+}
+
+extend type AuthSession @index(fields: ["sessionId"], name: "idx_auth_session_id")
+extend type AuthSession @index(fields: ["userId"], name: "idx_auth_user")
+extend type AuthSession @index(fields: ["status"], name: "idx_auth_status")
+extend type AuthSession @index(fields: ["emailHash"], name: "idx_auth_email_hash")
+extend type AuthSession @index(fields: ["firebaseUid"], name: "idx_auth_firebase_uid")
+
+type VerificationCode @table(name: "verification_codes") {
+  id: UUID! @default(expr: "uuidV4()")
+  sessionId: String! @col(name: "session_id")
+  codeHash: String! @col(name: "code_hash")
+  expiresAt: Timestamp! @col(name: "expires_at")
+  createdAt: Timestamp! @default(expr: "request.time")
+  usedAt: Timestamp @col(name: "used_at")
+  attemptCount: Int! @default(value: 0)
+  maxAttempts: Int! @default(value: 3)
+  isUsed: Boolean! @default(value: false)
+}
+
+extend type VerificationCode @index(fields: ["sessionId"], name: "idx_vcode_session")
+
+type AuthAuditLog @table(name: "auth_audit_log") {
+  id: UUID! @default(expr: "uuidV4()")
+  sessionId: String @col(name: "session_id")
+  userId: UUID @col(name: "user_id")
+  eventType: String! @col(name: "event_type")
+  success: Boolean!
+  errorMessage: String @col(name: "error_message")
+  errorCode: String @col(name: "error_code")
+  ipAddress: String @col(name: "ip_address")
+  userAgent: String @col(name: "user_agent")
+  requestPayload: String @col(name: "request_payload")
+  createdAt: Timestamp! @default(expr: "request.time")
+}
+
+extend type AuthAuditLog @index(fields: ["userId"], name: "idx_audit_user")
+extend type AuthAuditLog @index(fields: ["eventType"], name: "idx_audit_event")
+
+type RateLimitTracking @table(name: "rate_limit_tracking") {
+  id: UUID! @default(expr: "uuidV4()")
+  identifier: String!
+  actionType: String! @col(name: "action_type")
+  attemptCount: Int! @default(value: 1)
+  windowStartAt: Timestamp! @default(expr: "request.time")
+  blockedUntil: Timestamp @col(name: "blocked_until")
+}
+
+extend type RateLimitTracking @index(fields: ["identifier", "actionType"], name: "idx_rate_limit")

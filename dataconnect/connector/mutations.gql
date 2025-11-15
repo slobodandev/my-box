@@ -1,0 +1,403 @@
+# ============================================================================
+# USER MUTATIONS
+# ============================================================================
+
+mutation CreateUser(
+  $email: String!
+  $firstName: String
+  $lastName: String
+  $role: String
+  $phoneNumber: String
+) {
+  user_insert(data: {
+    email: $email
+    firstName: $firstName
+    lastName: $lastName
+    role: $role
+    phoneNumber: $phoneNumber
+  })
+}
+
+mutation UpdateUser(
+  $id: UUID!
+  $firstName: String
+  $lastName: String
+  $phoneNumber: String
+  $lastLoginAt: Timestamp
+) {
+  user_update(
+    id: $id
+    data: {
+      firstName: $firstName
+      lastName: $lastName
+      phoneNumber: $phoneNumber
+      lastLoginAt: $lastLoginAt
+    }
+  )
+}
+
+mutation DeactivateUser($id: UUID!) {
+  user_update(
+    id: $id
+    data: {
+      isActive: false
+    }
+  )
+}
+
+# ============================================================================
+# LOAN MUTATIONS
+# ============================================================================
+
+mutation CreateLoan(
+  $userId: UUID!
+  $loanNumber: String!
+  $borrowerName: String!
+  $borrowerEmail: String
+  $loanAmount: Float
+  $loanType: String
+  $propertyAddress: String
+  $loanOfficerId: UUID
+) {
+  loan_insert(data: {
+    userId: $userId
+    loanNumber: $loanNumber
+    borrowerName: $borrowerName
+    borrowerEmail: $borrowerEmail
+    loanAmount: $loanAmount
+    loanType: $loanType
+    propertyAddress: $propertyAddress
+    loanOfficerId: $loanOfficerId
+  })
+}
+
+mutation UpdateLoan(
+  $id: UUID!
+  $status: String
+  $notes: String
+  $loanAmount: Float
+) {
+  loan_update(
+    id: $id
+    data: {
+      status: $status
+      notes: $notes
+      loanAmount: $loanAmount
+    }
+  )
+}
+
+mutation CloseLoan($id: UUID!, $closedAt: Timestamp!) {
+  loan_update(
+    id: $id
+    data: {
+      status: "closed"
+      closedAt: $closedAt
+    }
+  )
+}
+
+mutation DeleteLoan($id: UUID!) {
+  loan_delete(id: $id)
+}
+
+# ============================================================================
+# FILE MUTATIONS
+# ============================================================================
+
+mutation CreateFile(
+  $userId: UUID!
+  $originalFilename: String!
+  $storagePath: String!
+  $fileSize: Int!
+  $mimeType: String
+  $fileExtension: String
+  $tags: String
+  $description: String
+) {
+  file_insert(data: {
+    userId: $userId
+    originalFilename: $originalFilename
+    storagePath: $storagePath
+    fileSize: $fileSize
+    mimeType: $mimeType
+    fileExtension: $fileExtension
+    tags: $tags
+    description: $description
+  })
+}
+
+mutation UpdateFile(
+  $id: UUID!
+  $tags: String
+  $description: String
+  $downloadUrl: String
+) {
+  file_update(
+    id: $id
+    data: {
+      tags: $tags
+      description: $description
+      downloadUrl: $downloadUrl
+    }
+  )
+}
+
+mutation SoftDeleteFile($id: UUID!, $deletedBy: UUID, $deletedAt: Timestamp!) {
+  file_update(
+    id: $id
+    data: {
+      isDeleted: true
+      deletedAt: $deletedAt
+      deletedBy: $deletedBy
+    }
+  )
+}
+
+mutation HardDeleteFile($id: UUID!) {
+  file_delete(id: $id)
+}
+
+# ============================================================================
+# FILE-LOAN ASSOCIATION MUTATIONS
+# ============================================================================
+
+mutation AssociateFileWithLoan(
+  $fileId: UUID!
+  $loanId: UUID!
+  $associatedBy: UUID
+) {
+  fileLoanAssociation_insert(data: {
+    fileId: $fileId
+    loanId: $loanId
+    associatedBy: $associatedBy
+  })
+}
+
+mutation RemoveFileFromLoan($id: UUID!) {
+  fileLoanAssociation_delete(id: $id)
+}
+
+# Note: To associate a file with multiple loans, call AssociateFileWithLoan
+# multiple times from the frontend, once for each loanId
+
+# ============================================================================
+# AUTHENTICATION MUTATIONS
+# ============================================================================
+
+mutation CreateAuthSession(
+  $sessionId: String!
+  $userId: UUID!
+  $loanIds: String
+  $emailHash: String!
+  $magicToken: String
+  $expiresAt: Timestamp!
+  $ipAddress: String
+  $userAgent: String
+  $createdBy: UUID
+) {
+  authSession_insert(data: {
+    sessionId: $sessionId
+    userId: $userId
+    loanIds: $loanIds
+    emailHash: $emailHash
+    magicToken: $magicToken
+    expiresAt: $expiresAt
+    ipAddress: $ipAddress
+    userAgent: $userAgent
+    createdBy: $createdBy
+  })
+}
+
+# Firebase Email Link Auth session creation
+mutation CreateAuthSessionWithFirebase(
+  $sessionId: String!
+  $userId: UUID!
+  $firebaseUid: String!
+  $emailHash: String!
+  $loanIds: String
+  $borrowerContactId: String
+  $loanNumber: String
+  $expiresAt: Timestamp!
+  $ipAddress: String
+  $userAgent: String
+) @auth(level: PUBLIC) {
+  authSession_insert(data: {
+    sessionId: $sessionId
+    userId: $userId
+    firebaseUid: $firebaseUid
+    emailHash: $emailHash
+    loanIds: $loanIds
+    borrowerContactId: $borrowerContactId
+    loanNumber: $loanNumber
+    status: "pending"
+    expiresAt: $expiresAt
+    ipAddress: $ipAddress
+    userAgent: $userAgent
+  })
+}
+
+mutation UpdateAuthSession(
+  $id: UUID!
+  $status: String
+  $sessionToken: String
+  $verifiedAt: Timestamp
+  $lastAccessedAt: Timestamp
+) {
+  authSession_update(
+    id: $id
+    data: {
+      status: $status
+      sessionToken: $sessionToken
+      verifiedAt: $verifiedAt
+      lastAccessedAt: $lastAccessedAt
+    }
+  )
+}
+
+# Verify and activate Firebase auth session
+mutation VerifyAuthSession(
+  $id: UUID!
+  $sessionToken: String!
+  $verifiedAt: Timestamp!
+) @auth(level: PUBLIC) {
+  authSession_update(
+    id: $id
+    data: {
+      status: "active"
+      sessionToken: $sessionToken
+      verifiedAt: $verifiedAt
+      lastAccessedAt: $verifiedAt
+    }
+  )
+}
+
+# Update session last accessed time
+mutation UpdateSessionAccess(
+  $id: UUID!
+  $lastAccessedAt: Timestamp!
+) @auth(level: PUBLIC) {
+  authSession_update(
+    id: $id
+    data: {
+      lastAccessedAt: $lastAccessedAt
+    }
+  )
+}
+
+mutation RevokeAuthSession(
+  $id: UUID!
+  $revokedBy: UUID
+  $revokeReason: String
+  $revokedAt: Timestamp!
+) {
+  authSession_update(
+    id: $id
+    data: {
+      status: "revoked"
+      revokedAt: $revokedAt
+      revokedBy: $revokedBy
+      revokeReason: $revokeReason
+    }
+  )
+}
+
+mutation CreateVerificationCode(
+  $sessionId: String!
+  $codeHash: String!
+  $expiresAt: Timestamp!
+) {
+  verificationCode_insert(data: {
+    sessionId: $sessionId
+    codeHash: $codeHash
+    expiresAt: $expiresAt
+  })
+}
+
+mutation UpdateVerificationCodeAttempts($id: UUID!, $attemptCount: Int!) {
+  verificationCode_update(
+    id: $id
+    data: {
+      attemptCount: $attemptCount
+    }
+  )
+}
+
+mutation MarkVerificationCodeUsed($id: UUID!, $usedAt: Timestamp!) {
+  verificationCode_update(
+    id: $id
+    data: {
+      isUsed: true
+      usedAt: $usedAt
+    }
+  )
+}
+
+mutation LogAuthEvent(
+  $sessionId: String
+  $userId: UUID
+  $eventType: String!
+  $success: Boolean!
+  $errorMessage: String
+  $errorCode: String
+  $ipAddress: String
+  $userAgent: String
+  $requestPayload: String
+) {
+  authAuditLog_insert(data: {
+    sessionId: $sessionId
+    userId: $userId
+    eventType: $eventType
+    success: $success
+    errorMessage: $errorMessage
+    errorCode: $errorCode
+    ipAddress: $ipAddress
+    userAgent: $userAgent
+    requestPayload: $requestPayload
+  })
+}
+
+mutation TrackRateLimit(
+  $identifier: String!
+  $actionType: String!
+  $attemptCount: Int
+  $blockedUntil: Timestamp
+) {
+  rateLimitTracking_insert(data: {
+    identifier: $identifier
+    actionType: $actionType
+    attemptCount: $attemptCount
+    blockedUntil: $blockedUntil
+  })
+}
+
+mutation UpdateRateLimit(
+  $id: UUID!
+  $attemptCount: Int!
+  $blockedUntil: Timestamp
+) {
+  rateLimitTracking_update(
+    id: $id
+    data: {
+      attemptCount: $attemptCount
+      blockedUntil: $blockedUntil
+    }
+  )
+}
+
+mutation DeleteExpiredSessions($currentTime: Timestamp!) {
+  authSession_deleteMany(
+    where: {
+      expiresAt: { lt: $currentTime }
+      status: { eq: "pending" }
+    }
+  )
+}
+
+mutation DeleteExpiredVerificationCodes($currentTime: Timestamp!) {
+  verificationCode_deleteMany(
+    where: {
+      expiresAt: { lt: $currentTime }
+    }
+  )
+}

@@ -1,0 +1,345 @@
+{
+  "name": "Auth: Generate Magic Link v2 (Firebase)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "auth/generate-link",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-generate-link",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "auth-generate-link-v2"
+    },
+    {
+      "parameters": {
+        "functionCode": "// Extract and validate input\nconst body = $input.item.json.body || $input.item.json;\n\nconst email = body.email;\nconst loanIds = body.loanIds || [];\nconst expirationMinutes = body.expirationMinutes || 15;\nconst createdBy = body.createdBy || 'system';\n\n// Validation\nif (!email) {\n  throw new Error('email is required');\n}\n\n// Validate email format\nconst emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;\nif (!emailRegex.test(email)) {\n  throw new Error('Invalid email format');\n}\n\n// Validate loanIds is array\nif (!Array.isArray(loanIds)) {\n  throw new Error('loanIds must be an array');\n}\n\n// Validate expiration minutes (max 60 minutes)\nif (expirationMinutes < 5 || expirationMinutes > 60) {\n  throw new Error('expirationMinutes must be between 5 and 60');\n}\n\nreturn {\n  email: email.toLowerCase().trim(),\n  loanIds,\n  expirationMinutes,\n  createdBy\n};"
+      },
+      "id": "function-validate-input",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.FIREBASE_DATACONNECT_URL || 'http://localhost:9399' }}/mybox-connector/graphql",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "query GetUserByEmail($email: String!) {\n  users(where: { email: { eq: $email } }) {\n    id\n    email\n    firstName\n    lastName\n    role\n    isActive\n  }\n}"
+            },
+            {
+              "name": "variables",
+              "value": "={{ {\"email\": $json.email} }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "http-get-or-create-user",
+      "name": "Get or Create User",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Check if user exists, if not create one\nconst userData = $json.data?.users?.[0];\n\nif (userData) {\n  // User exists\n  if (!userData.isActive) {\n    throw new Error('User account is inactive');\n  }\n  return {\n    userId: userData.id,\n    email: userData.email,\n    firstName: userData.firstName,\n    lastName: userData.lastName,\n    role: userData.role,\n    userExists: true,\n    loanIds: $node['Validate Input'].json.loanIds,\n    expirationMinutes: $node['Validate Input'].json.expirationMinutes\n  };\n} else {\n  // Need to create user\n  return {\n    email: $node['Validate Input'].json.email,\n    userExists: false,\n    needsCreation: true,\n    loanIds: $node['Validate Input'].json.loanIds,\n    expirationMinutes: $node['Validate Input'].json.expirationMinutes\n  };\n}"
+      },
+      "id": "function-check-user",
+      "name": "Check User Exists",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.FIREBASE_DATACONNECT_URL || 'http://localhost:9399' }}/mybox-connector/graphql",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "mutation CreateUser($email: String!, $role: String) {\n  user_insert(data: {\n    email: $email\n    role: $role\n  })\n}"
+            },
+            {
+              "name": "variables",
+              "value": "={{ {\"email\": $json.email, \"role\": \"borrower\"} }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-create-user",
+      "name": "Create User (if needed)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1050, 400]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Generate session ID (UUID v4 format)\nconst sessionId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n  const r = Math.random() * 16 | 0;\n  const v = c === 'x' ? r : (r & 0x3 | 0x8);\n  return v.toString(16);\n});\n\n// SHA-256 hash function for email\nfunction sha256(str) {\n  function rightRotate(value, amount) {\n    return (value >>> amount) | (value << (32 - amount));\n  }\n  \n  const K = [\n    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,\n    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,\n    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,\n    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,\n    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,\n    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,\n    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,\n    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2\n  ];\n  \n  let msg = unescape(encodeURIComponent(str));\n  let msgLen = msg.length;\n  let words = [];\n  \n  for (let i = 0; i < msgLen; i++) {\n    words[i >> 2] |= (msg.charCodeAt(i) & 0xff) << (24 - (i % 4) * 8);\n  }\n  \n  words[msgLen >> 2] |= 0x80 << (24 - (msgLen % 4) * 8);\n  words[(((msgLen + 8) >> 6) << 4) + 15] = msgLen << 3;\n  \n  let H = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19];\n  \n  for (let i = 0; i < words.length; i += 16) {\n    let W = new Array(64);\n    let a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];\n    \n    for (let t = 0; t < 64; t++) {\n      if (t < 16) {\n        W[t] = words[i + t] | 0;\n      } else {\n        let s0 = rightRotate(W[t-15], 7) ^ rightRotate(W[t-15], 18) ^ (W[t-15] >>> 3);\n        let s1 = rightRotate(W[t-2], 17) ^ rightRotate(W[t-2], 19) ^ (W[t-2] >>> 10);\n        W[t] = (W[t-16] + s0 + W[t-7] + s1) | 0;\n      }\n      \n      let S1 = rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25);\n      let ch = (e & f) ^ ((~e) & g);\n      let temp1 = (h + S1 + ch + K[t] + W[t]) | 0;\n      let S0 = rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22);\n      let maj = (a & b) ^ (a & c) ^ (b & c);\n      let temp2 = (S0 + maj) | 0;\n      \n      h = g;\n      g = f;\n      f = e;\n      e = (d + temp1) | 0;\n      d = c;\n      c = b;\n      b = a;\n      a = (temp1 + temp2) | 0;\n    }\n    \n    H[0] = (H[0] + a) | 0;\n    H[1] = (H[1] + b) | 0;\n    H[2] = (H[2] + c) | 0;\n    H[3] = (H[3] + d) | 0;\n    H[4] = (H[4] + e) | 0;\n    H[5] = (H[5] + f) | 0;\n    H[6] = (H[6] + g) | 0;\n    H[7] = (H[7] + h) | 0;\n  }\n  \n  return H.map(h => ('00000000' + h.toString(16)).slice(-8)).join('');\n}\n\nconst emailHash = sha256($json.email);\nconst loanIdsJson = JSON.stringify($json.loanIds || []);\n\nreturn {\n  sessionId,\n  userId: $json.userId,\n  email: $json.email,\n  emailHash,\n  loanIds: $json.loanIds,\n  loanIdsJson,\n  expirationMinutes: $json.expirationMinutes\n};"
+      },
+      "id": "function-generate-ids",
+      "name": "Generate Session ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 300]
+    },
+    {
+      "parameters": {
+        "algorithm": "HS256",
+        "secretPropertyName": "={{ $env.JWT_SECRET }}",
+        "payloadPropertyName": "jwtPayload",
+        "options": {
+          "expiresIn": "={{ $json.expirationMinutes + 'm' }}"
+        }
+      },
+      "id": "jwt-sign",
+      "name": "Sign Magic Link JWT",
+      "type": "n8n-nodes-base.jwt",
+      "typeVersion": 1,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Prepare JWT payload for magic link\nconst payload = {\n  sessionId: $json.sessionId,\n  email: $json.email,\n  userId: $json.userId,\n  loanIds: $json.loanIds,\n  type: 'magic_link'\n};\n\nreturn {\n  ...$json,\n  jwtPayload: payload\n};"
+      },
+      "id": "function-prepare-jwt",
+      "name": "Prepare JWT Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1250, 300],
+      "notesInFlow": true,
+      "notes": "Runs before JWT signing"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.FIREBASE_DATACONNECT_URL || 'http://localhost:9399' }}/mybox-connector/graphql",
+        "authentication": "none",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "mutation CreateAuthSession(\n  $sessionId: String!\n  $userId: UUID!\n  $loanIds: String\n  $emailHash: String!\n  $expiresAt: Timestamp!\n  $ipAddress: String\n  $userAgent: String\n  $createdBy: UUID\n) {\n  authSession_insert(data: {\n    sessionId: $sessionId\n    userId: $userId\n    loanIds: $loanIds\n    emailHash: $emailHash\n    expiresAt: $expiresAt\n    ipAddress: $ipAddress\n    userAgent: $userAgent\n    createdBy: $createdBy\n  })\n}"
+            },
+            {
+              "name": "variables",
+              "value": "={{ {\n  sessionId: $json.sessionId,\n  userId: $json.userId,\n  loanIds: $json.loanIdsJson,\n  emailHash: $json.emailHash,\n  expiresAt: new Date(Date.now() + $json.expirationMinutes * 60 * 1000).toISOString(),\n  ipAddress: $node['Webhook'].json.headers['x-forwarded-for'] || $node['Webhook'].json.headers['x-real-ip'] || 'unknown',\n  userAgent: $node['Webhook'].json.headers['user-agent'] || 'unknown'\n} }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "http-create-session",
+      "name": "Create Auth Session",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Build magic link URL\nconst baseUrl = process.env.APP_BASE_URL || 'http://localhost:5173';\nconst token = $json.token; // JWT from previous node\nconst magicLink = `${baseUrl}/auth/verify?token=${token}`;\n\n// Format expiration time\nconst expiresAt = new Date(Date.now() + $node['Generate Session ID'].json.expirationMinutes * 60 * 1000);\nconst expirationText = expiresAt.toLocaleString('en-US', {\n  weekday: 'long',\n  year: 'numeric',\n  month: 'long',\n  day: 'numeric',\n  hour: '2-digit',\n  minute: '2-digit',\n  timeZoneName: 'short'\n});\n\nconst minutesText = $node['Generate Session ID'].json.expirationMinutes;\n\nreturn {\n  to: $node['Generate Session ID'].json.email,\n  subject: 'Access Your Loan Documents - MyBox',\n  html: `\n<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <style>\n    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; }\n    .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n    .header { background-color: #135bec; color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }\n    .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }\n    .button { display: inline-block; padding: 15px 30px; background-color: #135bec; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }\n    .info-box { background-color: #fff; border-left: 4px solid #135bec; padding: 15px; margin: 20px 0; }\n    .warning { background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1>🔐 Access Your Loan Documents</h1>\n    </div>\n    <div class=\"content\">\n      <p>Hello,</p>\n      \n      <p>Click the button below to securely access your loan documents on MyBox:</p>\n      \n      <p style=\"text-align: center;\">\n        <a href=\"${magicLink}\" class=\"button\">Access My Documents</a>\n      </p>\n      \n      <div class=\"info-box\">\n        <strong>ℹ️ Important:</strong>\n        <ul>\n          <li>This link expires in ${minutesText} minutes (${expirationText})</li>\n          <li>You'll need to verify a 6-digit code sent to your email</li>\n          <li>For security, we use passwordless authentication</li>\n        </ul>\n      </div>\n      \n      <div class=\"warning\">\n        <strong>⚠️ Security Notice:</strong>\n        <ul>\n          <li>Never share this link with anyone</li>\n          <li>If you didn't request this, please ignore this email</li>\n        </ul>\n      </div>\n      \n      <p style=\"font-size: 12px; color: #666;\">If the button doesn't work, copy this link:<br/>${magicLink}</p>\n    </div>\n  </div>\n</body>\n</html>\n  `,\n  magicLink,\n  expiresAt: expirationText,\n  sessionId: $node['Generate Session ID'].json.sessionId\n};"
+      },
+      "id": "function-build-email",
+      "name": "Build Email Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1850, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// TODO: Replace with actual email sending node\n// Options: SendGrid, AWS SES, Mailgun, etc.\n\nconst emailData = $json;\n\nconsole.log('📧 Email would be sent to:', emailData.to);\nconsole.log('Magic Link:', emailData.magicLink);\n\n// For development, return the magic link in the response\nreturn {\n  emailSent: true,\n  recipient: emailData.to,\n  sentAt: new Date().toISOString(),\n  // Only include magic link in development\n  ...(process.env.NODE_ENV === 'development' && { magicLink: emailData.magicLink })\n};"
+      },
+      "id": "function-send-email",
+      "name": "Send Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2050, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Format success response\nconst tokenData = $node['Generate Session ID'].json;\nconst emailData = $node['Build Email Content'].json;\n\nreturn {\n  success: true,\n  sessionId: tokenData.sessionId,\n  recipient: tokenData.email,\n  expirationMinutes: tokenData.expirationMinutes,\n  loanCount: tokenData.loanIds?.length || 0,\n  message: 'Magic link generated and email sent successfully',\n  // Only include magic link in development for testing\n  ...(process.env.NODE_ENV === 'development' && { magicLink: emailData.magicLink })\n};"
+      },
+      "id": "function-format-response",
+      "name": "Format Success Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2250, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Respond Success",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [2450, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Get or Create User",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get or Create User": {
+      "main": [
+        [
+          {
+            "node": "Check User Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check User Exists": {
+      "main": [
+        [
+          {
+            "node": "Generate Session ID",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create User (if needed)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create User (if needed)": {
+      "main": [
+        [
+          {
+            "node": "Generate Session ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Session ID": {
+      "main": [
+        [
+          {
+            "node": "Prepare JWT Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare JWT Payload": {
+      "main": [
+        [
+          {
+            "node": "Sign Magic Link JWT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sign Magic Link JWT": {
+      "main": [
+        [
+          {
+            "node": "Create Auth Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Auth Session": {
+      "main": [
+        [
+          {
+            "node": "Build Email Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Email Content": {
+      "main": [
+        [
+          {
+            "node": "Send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email": {
+      "main": [
+        [
+          {
+            "node": "Format Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Success Response": {
+      "main": [
+        [
+          {
+            "node": "Respond Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

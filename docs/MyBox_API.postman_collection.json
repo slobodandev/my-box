@@ -1,0 +1,159 @@
+{
+  "info": {
+    "name": "MyBox Cloud Functions",
+    "description": "API collection for testing MyBox Cloud Functions",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Generate Auth Link (Third-Party)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "x-api-key",
+            "value": "{{api_key}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{test_email}}\",\n  \"borrowerContactId\": \"CONTACT-12345\",\n  \"loanNumber\": \"LOAN-2024-001\",\n  \"loanIds\": [\n    \"550e8400-e29b-41d4-a716-446655440000\"\n  ],\n  \"expirationHours\": 48\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/generateAuthLink",
+          "host": ["{{base_url}}"],
+          "path": ["generateAuthLink"]
+        }
+      }
+    },
+    {
+      "name": "2. Validate Session",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{firebase_id_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{base_url}}/validateSession",
+          "host": ["{{base_url}}"],
+          "path": ["validateSession"]
+        }
+      }
+    },
+    {
+      "name": "3. List Files",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{session_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"page\": 1,\n  \"pageSize\": 20,\n  \"sortBy\": \"uploadedAt\",\n  \"sortOrder\": \"desc\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/listFiles",
+          "host": ["{{base_url}}"],
+          "path": ["listFiles"]
+        }
+      }
+    },
+    {
+      "name": "4. Process Upload",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{session_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"storagePath\": \"users/{{user_id}}/personal/test-file.pdf\",\n  \"originalFilename\": \"Test_Document.pdf\",\n  \"tags\": [\"test\", \"document\"],\n  \"description\": \"Test file upload\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/processUpload",
+          "host": ["{{base_url}}"],
+          "path": ["processUpload"]
+        }
+      }
+    },
+    {
+      "name": "5. Delete File",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{session_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fileId\": \"{{file_id}}\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/deleteFile",
+          "host": ["{{base_url}}"],
+          "path": ["deleteFile"]
+        }
+      }
+    },
+    {
+      "name": "6. Generate Download URL",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{session_token}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fileId\": \"{{file_id}}\",\n  \"expiryMinutes\": 60\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/generateDownloadURL",
+          "host": ["{{base_url}}"],
+          "path": ["generateDownloadURL"]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,370 @@
+# ============================================================================
+# USER QUERIES
+# ============================================================================
+
+query GetUser($id: UUID!) {
+  user(id: $id) {
+    id
+    email
+    firstName
+    lastName
+    role
+    isActive
+    phoneNumber
+    createdAt
+    lastLoginAt
+  }
+}
+
+query GetUserByEmail($email: String!) {
+  users(where: { email: { eq: $email } }) {
+    id
+    email
+    firstName
+    lastName
+    role
+    isActive
+  }
+}
+
+query ListAllUsers {
+  users(orderBy: { createdAt: DESC }) {
+    id
+    email
+    firstName
+    lastName
+    role
+    isActive
+    createdAt
+  }
+}
+
+# ============================================================================
+# LOAN QUERIES
+# ============================================================================
+
+query GetUserLoans($userId: UUID!) {
+  loans(where: { userId: { eq: $userId } }, orderBy: { createdAt: DESC }) {
+    id
+    loanNumber
+    borrowerName
+    borrowerEmail
+    loanAmount
+    loanType
+    status
+    propertyAddress
+    createdAt
+    closedAt
+  }
+}
+
+query GetLoan($id: UUID!) {
+  loan(id: $id) {
+    id
+    userId
+    loanNumber
+    borrowerName
+    borrowerEmail
+    loanAmount
+    loanType
+    status
+    propertyAddress
+    loanOfficerId
+    notes
+    createdAt
+    updatedAt
+    closedAt
+  }
+}
+
+query GetLoanByNumber($loanNumber: String!) {
+  loans(where: { loanNumber: { eq: $loanNumber } }) {
+    id
+    userId
+    loanNumber
+    borrowerName
+    loanAmount
+    status
+  }
+}
+
+# ============================================================================
+# FILE QUERIES
+# ============================================================================
+
+query GetUserFiles($userId: UUID!, $includeDeleted: Boolean) {
+  files(
+    where: {
+      userId: { eq: $userId }
+      isDeleted: { eq: $includeDeleted }
+    }
+    orderBy: { uploadedAt: DESC }
+  ) {
+    id
+    originalFilename
+    storagePath
+    fileSize
+    mimeType
+    fileExtension
+    uploadedAt
+    tags
+    description
+    downloadUrl
+    isDeleted
+  }
+}
+
+query GetFilesByLoan($loanId: UUID!) {
+  fileLoanAssociations(where: { loanId: { eq: $loanId } }) {
+    id
+    fileId
+    loanId
+    associatedAt
+  }
+}
+
+query GetFile($id: UUID!) {
+  file(id: $id) {
+    id
+    userId
+    originalFilename
+    storagePath
+    fileSize
+    mimeType
+    fileExtension
+    uploadedAt
+    updatedAt
+    tags
+    description
+    downloadUrl
+    isDeleted
+    deletedAt
+    deletedBy
+  }
+}
+
+query GetFilesWithAssociations($userId: UUID!) {
+  files(
+    where: {
+      userId: { eq: $userId }
+      isDeleted: { eq: false }
+    }
+  ) {
+    id
+    originalFilename
+    fileSize
+    uploadedAt
+  }
+}
+
+# ============================================================================
+# FILE-LOAN ASSOCIATION QUERIES
+# ============================================================================
+
+query GetFileAssociations($fileId: UUID!) {
+  fileLoanAssociations(where: { fileId: { eq: $fileId } }) {
+    id
+    loanId
+    associatedAt
+  }
+}
+
+query GetLoanAssociations($loanId: UUID!) {
+  fileLoanAssociations(where: { loanId: { eq: $loanId } }) {
+    id
+    fileId
+    associatedAt
+  }
+}
+
+# ============================================================================
+# AUTHENTICATION QUERIES
+# ============================================================================
+
+query GetAuthSession($sessionId: String!) {
+  authSessions(where: { sessionId: { eq: $sessionId } }) {
+    id
+    sessionId
+    userId
+    loanIds
+    emailHash
+    tokenType
+    status
+    expiresAt
+    createdAt
+    verifiedAt
+    lastAccessedAt
+    ipAddress
+    userAgent
+  }
+}
+
+query GetUserAuthSessions($userId: UUID!) {
+  authSessions(
+    where: {
+      userId: { eq: $userId }
+      status: { eq: "verified" }
+    }
+    orderBy: { createdAt: DESC }
+  ) {
+    sessionId
+    expiresAt
+    lastAccessedAt
+    createdAt
+    ipAddress
+  }
+}
+
+query GetVerificationCode($sessionId: String!) {
+  verificationCodes(
+    where: { sessionId: { eq: $sessionId } }
+    orderBy: { createdAt: DESC }
+    limit: 1
+  ) {
+    id
+    sessionId
+    codeHash
+    expiresAt
+    attemptCount
+    maxAttempts
+    isUsed
+    usedAt
+  }
+}
+
+query GetAuthAuditLogs($userId: UUID, $limit: Int) {
+  authAuditLogs(
+    where: { userId: { eq: $userId } }
+    orderBy: { createdAt: DESC }
+    limit: $limit
+  ) {
+    id
+    sessionId
+    eventType
+    success
+    errorMessage
+    ipAddress
+    createdAt
+  }
+}
+
+# Firebase Email Link Auth queries
+query GetAuthSessionByFirebaseUid($firebaseUid: String!) @auth(level: PUBLIC) {
+  authSessions(
+    where: { firebaseUid: { eq: $firebaseUid } }
+    orderBy: { createdAt: DESC }
+    limit: 1
+  ) {
+    id
+    sessionId
+    userId
+    loanIds
+    emailHash
+    status
+    expiresAt
+    verifiedAt
+    createdAt
+    borrowerContactId
+    loanNumber
+    firebaseUid
+  }
+}
+
+query GetAuthSessionByEmailHash($emailHash: String!) @auth(level: PUBLIC) {
+  authSessions(
+    where: {
+      emailHash: { eq: $emailHash }
+      status: { eq: "active" }
+    }
+    orderBy: { createdAt: DESC }
+    limit: 1
+  ) {
+    id
+    sessionId
+    userId
+    loanIds
+    emailHash
+    status
+    expiresAt
+    verifiedAt
+    borrowerContactId
+    loanNumber
+    firebaseUid
+  }
+}
+
+query GetActiveAuthSessionForUser($userId: UUID!) @auth(level: PUBLIC) {
+  authSessions(
+    where: {
+      userId: { eq: $userId }
+      status: { eq: "active" }
+    }
+    orderBy: { lastAccessedAt: DESC }
+    limit: 1
+  ) {
+    id
+    sessionId
+    userId
+    loanIds
+    status
+    expiresAt
+    lastAccessedAt
+    borrowerContactId
+    loanNumber
+  }
+}
+
+# ============================================================================
+# DASHBOARD / COMPOSITE QUERIES
+# ============================================================================
+
+query GetDashboard($userId: UUID!) {
+  user(id: $userId) {
+    id
+    email
+    firstName
+    lastName
+    role
+  }
+  loans(where: { userId: { eq: $userId } }) {
+    id
+    loanNumber
+    borrowerName
+    loanAmount
+    status
+    createdAt
+  }
+  files(
+    where: {
+      userId: { eq: $userId }
+      isDeleted: { eq: false }
+    }
+    orderBy: { uploadedAt: DESC }
+    limit: 10
+  ) {
+    id
+    originalFilename
+    fileSize
+    uploadedAt
+  }
+}
+
+query GetLoanDetails($loanId: UUID!) {
+  loan(id: $loanId) {
+    id
+    loanNumber
+    borrowerName
+    borrowerEmail
+    loanAmount
+    loanType
+    status
+    propertyAddress
+    notes
+    createdAt
+  }
+  fileLoanAssociations(where: { loanId: { eq: $loanId } }) {
+    id
+    fileId
+    associatedAt
+  }
+}

@@ -1,0 +1,17 @@
+# Firebase Data Connect Configuration
+# MyBox Loan File Management System
+
+specVersion: v1alpha
+serviceId: mybox-dataconnect
+location: us-central1
+
+schema:
+  source: ./schema
+  datasource:
+    postgresql:
+      database: mybox-db
+      cloudSql:
+        instanceId: mybox-sql-instance
+
+connectorDirs:
+  - ./connector
