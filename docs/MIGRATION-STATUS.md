@@ -114,33 +114,6 @@ This Cloud Function will:
 
 ## 🔑 Key Configuration
 
-### Environment Variables Set
-
-**Cloud Functions (`functions/.env`):**
-```env
-JWT_SECRET=mCK+MCyM/yg+es3l5PmYsweWlN6bsIOPAxxUN70NHAjOo/zPXz+cF0XrPYPVVSeiehJRPEjBDI8Vw4rgF/h8Dg==
-APP_BASE_URL=https://my-box-53040.web.app
-NODE_ENV=production
-DATACONNECT_URL=https://firebasedataconnect.googleapis.com/v1alpha/projects/my-box-53040/locations/us-central1/services/mybox-dataconnect
-```
-
-**Frontend (`.env`):**
-```env
-VITE_FIREBASE_API_KEY=AIzaSyCWjKBtz7YNc1AzoowI9avbKOuxeq5lgZA
-VITE_FIREBASE_PROJECT_ID=my-box-53040
-VITE_FIREBASE_STORAGE_BUCKET=my-box-53040.firebasestorage.app
-VITE_FIREBASE_MESSAGING_SENDER_ID=747449094736
-VITE_FIREBASE_APP_ID=1:747449094736:web:5b310dfc96b11dbb277755
-```
-
-### Still Needed:
-```env
-# Cloud Functions
-VALID_API_KEYS=key_los_production_xyz,key_los_staging_abc
-EMAIL_LINK_URL=https://my-box-53040.web.app/auth/signin
-EMAIL_LINK_EXPIRATION_HOURS=48
-```
-
 ---
 
 ## 🎯 Next Steps (Immediate)
