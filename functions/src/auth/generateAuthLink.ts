@@ -9,7 +9,7 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { getAuth } from 'firebase-admin/auth';
 import { logger } from 'firebase-functions/v2';
-import { executeGraphql } from '../dataconnect';
+import { getUserByEmail, createUser, createAuthSessionWithFirebase } from '../dataconnect';
 import * as crypto from 'crypto';
 
 /**
@@ -58,29 +58,10 @@ function sha256(text: string): string {
  */
 async function findOrCreateUser(email: string): Promise<{ userId: string; firebaseUid: string }> {
   try {
-    // Try to find user in Data Connect
-    const getUserQuery = `
-      query GetUserByEmail($email: String!) {
-        users(where: { email: { eq: $email } }) {
-          id
-          email
-        }
-      }
-    `;
-
-    const result = await executeGraphql({
-
-      query: getUserQuery,
-      variables: { email: email.toLowerCase().trim() },
-    });
+    // Try to find user in Data Connect using SDK wrapper
+    const result = await getUserByEmail({ email: email.toLowerCase().trim() });
 
     logger.info('User query result:', result);
-
-    // Check for GraphQL errors
-    if (result.errors) {
-      logger.error('GraphQL errors:', result.errors);
-      throw new Error(`GraphQL query failed: ${JSON.stringify(result.errors)}`);
-    }
 
     // Check if user exists
     if (result.data?.users && result.data.users.length > 0) {
@@ -117,37 +98,16 @@ async function findOrCreateUser(email: string): Promise<{ userId: string; fireba
 
     logger.info('Created Firebase Auth user:', firebaseUser.uid);
 
-    // Create user in Data Connect
-    const createUserMutation = `
-      mutation CreateUser(
-        $email: String!
-        $role: String
-      ) {
-        user_insert(data: {
-          email: $email
-          role: $role
-        })
-      }
-    `;
-
-    const createResult = await executeGraphql({
-      
-      query: createUserMutation,
-      variables: {
-        email: email.toLowerCase().trim(),
-        role: 'borrower',
-      },
+    // Create user in Data Connect using SDK wrapper
+    await createUser({
+      email: email.toLowerCase().trim(),
+      role: 'borrower',
     });
 
-    logger.info('Created user in Data Connect:', createResult);
+    logger.info('Created user in Data Connect');
 
     // Get the created user ID
-    const getUserAgain = await executeGraphql({
-      
-      query: getUserQuery,
-      variables: { email: email.toLowerCase().trim() },
-    });
-
+    const getUserAgain = await getUserByEmail({ email: email.toLowerCase().trim() });
     const newUserId = getUserAgain.data.users[0].id;
 
     return {
@@ -265,51 +225,18 @@ export const generateAuthLink = onRequest(
       // Calculate expiration
       const expiresAt = new Date(Date.now() + expirationHours * 60 * 60 * 1000);
 
-      // Create AuthSession in Data Connect
-      const createSessionMutation = `
-        mutation CreateAuthSessionWithFirebase(
-          $sessionId: String!
-          $userId: UUID!
-          $firebaseUid: String!
-          $emailHash: String!
-          $loanIds: String
-          $borrowerContactId: String
-          $loanNumber: String
-          $expiresAt: Timestamp!
-          $ipAddress: String
-          $userAgent: String
-        ) {
-          authSession_insert(data: {
-            sessionId: $sessionId
-            userId: $userId
-            firebaseUid: $firebaseUid
-            emailHash: $emailHash
-            loanIds: $loanIds
-            borrowerContactId: $borrowerContactId
-            loanNumber: $loanNumber
-            status: "pending"
-            expiresAt: $expiresAt
-            ipAddress: $ipAddress
-            userAgent: $userAgent
-          })
-        }
-      `;
-
-      await executeGraphql({
-        
-        query: createSessionMutation,
-        variables: {
-          sessionId,
-          userId,
-          firebaseUid,
-          emailHash,
-          loanIds: JSON.stringify(loanIds),
-          borrowerContactId: borrowerContactId || null,
-          loanNumber: loanNumber || null,
-          expiresAt: expiresAt.toISOString(),
-          ipAddress: request.ip || request.headers['x-forwarded-for'] as string || 'unknown',
-          userAgent: request.headers['user-agent'] || 'unknown',
-        },
+      // Create AuthSession in Data Connect using SDK wrapper
+      await createAuthSessionWithFirebase({
+        sessionId,
+        userId,
+        firebaseUid,
+        emailHash,
+        loanIds: JSON.stringify(loanIds),
+        borrowerContactId: borrowerContactId || null,
+        loanNumber: loanNumber || null,
+        expiresAt: expiresAt.toISOString(),
+        ipAddress: request.ip || request.headers['x-forwarded-for'] as string || 'unknown',
+        userAgent: request.headers['user-agent'] || 'unknown',
       });
 
       logger.info('Created auth session:', sessionId);
