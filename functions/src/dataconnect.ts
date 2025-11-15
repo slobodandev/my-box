@@ -3,8 +3,6 @@
  * Provides connector config and GraphQL client for executing queries and mutations
  */
 
-import { GraphQLClient } from 'graphql-request';
-
 export const connectorConfig = {
   connector: 'mybox-connector',
   service: 'mybox-dataconnect',
@@ -25,9 +23,10 @@ function getDataConnectEndpoint(): string {
 
   if (isEmulator) {
     // Use local Data Connect emulator endpoint
-    // Emulator uses a different path: /emulator/v1alpha instead of /v1beta
+    // The emulator uses a simpler path format
     const emulatorHost = process.env.DATACONNECT_EMULATOR_HOST || '127.0.0.1:9399';
-    return `http://${emulatorHost}/emulator/v1alpha/projects/${projectId}/locations/${location}/services/${service}/connectors/${connector}:executeGraphql`;
+    // Try simple GraphQL endpoint format
+    return `http://${emulatorHost}/graphql`;
   }
 
   // Production Data Connect GraphQL endpoint format
@@ -47,18 +46,44 @@ export async function executeGraphql(params: {
   console.log('GraphQL Query:', params.query);
   console.log('Variables:', params.variables);
 
-  const client = new GraphQLClient(endpoint);
-
   try {
-    const data = await client.request(params.query, params.variables || {});
-    console.log('GraphQL Response:', JSON.stringify(data, null, 2));
-    return { data };
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: params.query,
+        variables: params.variables || {},
+      }),
+    });
+
+    console.log('Response status:', response.status);
+    console.log('Response headers:', response.headers);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('HTTP Error:', response.status, errorText);
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('GraphQL Response:', JSON.stringify(result, null, 2));
+
+    if (result.errors) {
+      console.error('GraphQL Errors:', result.errors);
+      return {
+        data: result.data || null,
+        errors: result.errors
+      };
+    }
+
+    return { data: result.data };
   } catch (error: any) {
     console.error('GraphQL execution error:', error);
-    console.error('Error response:', error.response);
     return {
       data: null,
-      errors: error.response?.errors || [{ message: error.message }]
+      errors: [{ message: error.message }]
     };
   }
 }
