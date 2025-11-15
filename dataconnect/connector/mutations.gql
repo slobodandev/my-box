@@ -8,7 +8,7 @@ mutation CreateUser(
   $lastName: String
   $role: String
   $phoneNumber: String
-) {
+) @auth(level: PUBLIC) {
   user_insert(data: {
     email: $email
     firstName: $firstName

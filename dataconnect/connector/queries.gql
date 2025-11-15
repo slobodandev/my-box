@@ -2,7 +2,7 @@
 # USER QUERIES
 # ============================================================================
 
-query GetUser($id: UUID!) {
+query GetUser($id: UUID!) @auth(level: PUBLIC) {
   user(id: $id) {
     id
     email
@@ -16,7 +16,7 @@ query GetUser($id: UUID!) {
   }
 }
 
-query GetUserByEmail($email: String!) {
+query GetUserByEmail($email: String!) @auth(level: PUBLIC) {
   users(where: { email: { eq: $email } }) {
     id
     email
