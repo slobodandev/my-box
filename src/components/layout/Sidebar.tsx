@@ -1,7 +1,15 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { useLoans } from '@/hooks'
+// import { useLoans } from '@/hooks' // TODO: Update to use new hooks
 import { MOCK_USER_ID } from '@/constants/app'
+
+// Temporary mock hook until refactored
+const useLoans = (_params?: any) => ({
+  loans: [] as Array<{ id: string; loanNumber: string; fileCount?: number }>,
+  loading: false,
+  error: null as Error | null,
+  refetch: () => {}
+});
 
 export default function Sidebar() {
   const location = useLocation()

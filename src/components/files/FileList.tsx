@@ -1,8 +1,18 @@
 import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
-import { useFiles } from '@/hooks'
+// import { useFiles } from '@/hooks' // TODO: Update to use new useListFiles hook
 import { getFileIcon, formatFileSize } from '@/utils'
 import { MOCK_USER_ID } from '@/constants/app'
+
+// Temporary mock hook until refactored
+const useFiles = (_params?: any) => ({
+  files: [] as Array<any>,
+  total: 0,
+  totalPages: 0,
+  loading: false,
+  error: null as Error | null,
+  fetchFiles: () => {}
+});
 
 interface FileListProps {
   searchTerm: string
@@ -82,7 +92,7 @@ export default function FileList({ searchTerm, selectedLoan, showPersonalOnly }:
                   </td>
                 </tr>
               ) : (
-                files.map((file) => {
+                files.map((file: any) => {
                   const fileIcon = getFileIcon(file.filename)
                   return (
                     <tr key={file.id} className="hover:bg-gray-50 dark:hover:bg-white/5">
@@ -102,7 +112,7 @@ export default function FileList({ searchTerm, selectedLoan, showPersonalOnly }:
                       </td>
                       <td className="h-[72px] px-4 py-2 text-sm font-normal">
                         {file.loanIds.length > 0 ? (
-                          file.loanIds.map((loanId, idx) => (
+                          file.loanIds.map((loanId: string, idx: number) => (
                             <span
                               key={loanId}
                               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

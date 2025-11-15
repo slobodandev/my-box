@@ -1,74 +1,193 @@
-import { useState, useEffect, useCallback } from 'react'
-import { fileService } from '@/services'
-import type { File, FileListParams, FileListResponse } from '@/types'
+/**
+ * File Operation Hooks
+ * Specialized hooks for file management operations
+ */
 
-interface UseFilesOptions {
-  userId: string
-  loanId?: string
-  searchTerm?: string
-  personalOnly?: boolean
-  page?: number
-  pageSize?: number
-  autoFetch?: boolean
+import { useCloudFunctionMutation, useCloudFunctionQuery } from './useCloudFunction';
+import { CloudFunction } from '@/config/cloudFunctions';
+
+/**
+ * List Files Types
+ */
+export interface ListFilesRequest {
+  loanId?: string;
+  searchTerm?: string;
+  personalOnly?: boolean;
+  page?: number;
+  pageSize?: number;
+  sortBy?: 'filename' | 'size' | 'uploadedAt';
+  sortOrder?: 'asc' | 'desc';
 }
 
-export const useFiles = (options: UseFilesOptions) => {
-  const [files, setFiles] = useState<File[]>([])
-  const [total, setTotal] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
+export interface FileItem {
+  id: string;
+  originalFilename: string;
+  storagePath: string;
+  fileSize: number;
+  mimeType: string;
+  fileExtension: string;
+  uploadedAt: string;
+  tags?: string;
+  description?: string;
+  downloadUrl?: string;
+  loanIds: string[];
+}
 
-  const fetchFiles = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+export interface ListFilesResponse {
+  success: boolean;
+  files: FileItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  message?: string;
+}
 
-    try {
-      const params: FileListParams = {
-        userId: options.userId,
-        loanId: options.loanId,
-        searchTerm: options.searchTerm,
-        personalOnly: options.personalOnly,
-        page: options.page || 1,
-        pageSize: options.pageSize || 10,
-      }
+/**
+ * Delete File Types
+ */
+export interface DeleteFileRequest {
+  fileId: string;
+}
 
-      const response: FileListResponse = await fileService.getFiles(params)
+export interface DeleteFileResponse {
+  success: boolean;
+  message: string;
+  fileId?: string;
+}
 
-      setFiles(response.files)
-      setTotal(response.total)
-      setTotalPages(response.totalPages)
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to fetch files'))
-    } finally {
-      setLoading(false)
-    }
-  }, [
-    options.userId,
-    options.loanId,
-    options.searchTerm,
-    options.personalOnly,
-    options.page,
-    options.pageSize,
-  ])
+/**
+ * Process Upload Types
+ */
+export interface ProcessUploadRequest {
+  userId: string;
+  storagePath: string;
+  originalFilename: string;
+  loanIds?: string[];
+  tags?: string[];
+  description?: string;
+}
 
-  useEffect(() => {
-    if (options.autoFetch !== false) {
-      fetchFiles()
-    }
-  }, [fetchFiles, options.autoFetch])
+export interface ProcessUploadResponse {
+  success: boolean;
+  fileId: string;
+  downloadUrl: string;
+  message: string;
+}
 
-  const refresh = useCallback(() => {
-    fetchFiles()
-  }, [fetchFiles])
-
-  return {
-    files,
-    total,
-    totalPages,
-    loading,
-    error,
-    refresh,
-    fetchFiles,
+/**
+ * Hook to list files
+ * Auto-executes by default, can be disabled with enabled: false
+ * 
+ * @example
+ * // Auto-fetch on mount
+ * const { data, loading, error, refetch } = useListFiles({
+ *   page: 1,
+ *   pageSize: 10
+ * });
+ * 
+ * @example
+ * // Manual fetch
+ * const { execute, data, loading } = useListFiles(
+ *   { page: 1 },
+ *   { autoExecute: false }
+ * );
+ * await execute({ page: 1, searchTerm: 'contract' });
+ */
+export function useListFiles(
+  _initialPayload?: ListFilesRequest,
+  options?: {
+    autoExecute?: boolean;
+    enabled?: boolean;
+    onSuccess?: (data: ListFilesResponse) => void;
+    onError?: (error: Error) => void;
   }
+) {
+  const { autoExecute = true, ...restOptions } = options || {};
+
+  return useCloudFunctionQuery<ListFilesResponse, ListFilesRequest>(
+    CloudFunction.LIST_FILES,
+    {
+      autoExecute,
+      requiresAuth: true,
+      ...restOptions,
+    }
+  );
+}
+
+/**
+ * Hook to delete a file (soft delete)
+ * 
+ * @example
+ * const { execute, loading, error } = useDeleteFile({
+ *   onSuccess: () => {
+ *     toast.success('File deleted');
+ *     refetchFiles();
+ *   },
+ * });
+ * 
+ * await execute({ fileId: 'file-123' });
+ */
+export function useDeleteFile(options?: {
+  onSuccess?: (data: DeleteFileResponse) => void;
+  onError?: (error: Error) => void;
+}) {
+  return useCloudFunctionMutation<DeleteFileResponse, DeleteFileRequest>(
+    CloudFunction.DELETE_FILE,
+    {
+      requiresAuth: true,
+      ...options,
+    }
+  );
+}
+
+/**
+ * Hook to process file upload
+ * 
+ * @example
+ * const { execute, loading, error, data } = useProcessUpload({
+ *   onSuccess: (data) => {
+ *     console.log('File uploaded:', data.fileId);
+ *   },
+ * });
+ * 
+ * await execute({
+ *   userId: 'user-123',
+ *   storagePath: 'path/to/file.pdf',
+ *   originalFilename: 'document.pdf',
+ *   tags: ['contract', 'signed'],
+ * });
+ */
+export function useProcessUpload(options?: {
+  onSuccess?: (data: ProcessUploadResponse) => void;
+  onError?: (error: Error) => void;
+}) {
+  return useCloudFunctionMutation<ProcessUploadResponse, ProcessUploadRequest>(
+    CloudFunction.PROCESS_UPLOAD,
+    {
+      requiresAuth: true,
+      ...options,
+    }
+  );
+}
+
+/**
+ * Hook to generate download URL
+ * 
+ * @example
+ * const { execute, data, loading } = useGenerateDownloadUrl();
+ * const result = await execute({ fileId: 'file-123', expiryMinutes: 60 });
+ * window.open(result.downloadUrl);
+ */
+export function useGenerateDownloadUrl(options?: {
+  onSuccess?: (data: any) => void;
+  onError?: (error: Error) => void;
+}) {
+  return useCloudFunctionMutation(
+    CloudFunction.GENERATE_DOWNLOAD_URL,
+    {
+      requiresAuth: true,
+      ...options,
+    }
+  );
 }
