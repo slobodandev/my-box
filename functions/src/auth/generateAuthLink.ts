@@ -205,7 +205,7 @@ export const generateAuthLink = onRequest(
 
       // Generate Firebase Email Link
       const actionCodeSettings = {
-        url: `${process.env.EMAIL_LINK_URL || process.env.APP_BASE_URL}/auth/signin?email=${encodeURIComponent(email)}`,
+        url: `${process.env.EMAIL_LINK_URL || process.env.APP_BASE_URL}/auth/verify?email=${encodeURIComponent(email)}`,
         handleCodeInApp: true,
       };
 
