@@ -209,12 +209,16 @@ export const generateAuthLink = onRequest(
         handleCodeInApp: true,
       };
 
-      await getAuth().generateSignInWithEmailLink(
+      const emailLink = await getAuth().generateSignInWithEmailLink(
         email.toLowerCase().trim(),
         actionCodeSettings
       );
 
       logger.info('Generated Firebase email link and sent to user');
+      logger.info('='.repeat(80));
+      logger.info('🔗 EMULATOR SIGN-IN LINK (for testing):');
+      logger.info(emailLink);
+      logger.info('='.repeat(80));
 
       // Generate session ID
       const sessionId = crypto.randomUUID();
