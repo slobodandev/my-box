@@ -69,6 +69,13 @@ export const SignIn: React.FC = () => {
       }
 
       console.log('Auth link generated successfully:', data);
+
+      // If running in emulator, auto-open the email link in a new tab
+      if (data.emailLink) {
+        console.log('Opening email link in new tab:', data.emailLink);
+        window.open(data.emailLink, '_blank');
+      }
+
       navigate('/auth/email-sent', { state: { email } });
     } catch (err: any) {
       console.error('Error generating auth link:', err);

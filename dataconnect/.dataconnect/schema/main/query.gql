@@ -1,0 +1,426 @@
+extend type Query {
+  """
+  ✨ Look up a single `AuthAuditLog` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  authAuditLog(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: AuthAuditLog_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: AuthAuditLog_FirstRow
+  ): AuthAuditLog @fdc_generated(from: "AuthAuditLog", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `AuthSession` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  authSession(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: AuthSession_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: AuthSession_FirstRow
+  ): AuthSession @fdc_generated(from: "AuthSession", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `File` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  file(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: File_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: File_FirstRow
+  ): File @fdc_generated(from: "File", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `FileLoanAssociation` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  fileLoanAssociation(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: FileLoanAssociation_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: FileLoanAssociation_FirstRow
+  ): FileLoanAssociation @fdc_generated(from: "FileLoanAssociation", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `Loan` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  loan(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Loan_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Loan_FirstRow
+  ): Loan @fdc_generated(from: "Loan", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `RateLimitTracking` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  rateLimitTracking(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: RateLimitTracking_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: RateLimitTracking_FirstRow
+  ): RateLimitTracking @fdc_generated(from: "RateLimitTracking", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `User` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  user(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: User_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: User_FirstRow
+  ): User @fdc_generated(from: "User", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `VerificationCode` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  verificationCode(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: VerificationCode_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: VerificationCode_FirstRow
+  ): VerificationCode @fdc_generated(from: "VerificationCode", purpose: QUERY_SINGLE)
+  """
+  ✨ List `AuthAuditLog` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  authAuditLogs(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: AuthAuditLog_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [AuthAuditLog_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: AuthAuditLog_Having
+  ): [AuthAuditLog!]! @fdc_generated(from: "AuthAuditLog", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `AuthSession` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  authSessions(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: AuthSession_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [AuthSession_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: AuthSession_Having
+  ): [AuthSession!]! @fdc_generated(from: "AuthSession", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `File` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  files(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: File_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [File_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: File_Having
+  ): [File!]! @fdc_generated(from: "File", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `FileLoanAssociation` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  fileLoanAssociations(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: FileLoanAssociation_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [FileLoanAssociation_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: FileLoanAssociation_Having
+  ): [FileLoanAssociation!]! @fdc_generated(from: "FileLoanAssociation", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `Loan` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  loans(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: Loan_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [Loan_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: Loan_Having
+  ): [Loan!]! @fdc_generated(from: "Loan", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `RateLimitTracking` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  rateLimitTrackings(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: RateLimitTracking_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [RateLimitTracking_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: RateLimitTracking_Having
+  ): [RateLimitTracking!]! @fdc_generated(from: "RateLimitTracking", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `User` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  users(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: User_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [User_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: User_Having
+  ): [User!]! @fdc_generated(from: "User", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `VerificationCode` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  verificationCodes(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: VerificationCode_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [VerificationCode_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: VerificationCode_Having
+  ): [VerificationCode!]! @fdc_generated(from: "VerificationCode", purpose: QUERY_MULTIPLE)
+}

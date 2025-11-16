@@ -47,6 +47,9 @@ coverage/
 .temp/
 .tmp/
 
+# Documentation
+docs/
+
 # OS files
 Thumbs.db
 .DS_Store

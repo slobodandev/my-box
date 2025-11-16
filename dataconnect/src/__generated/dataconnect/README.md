@@ -2015,6 +2015,7 @@ The `GetAuthSessionByFirebaseUid` query requires an argument of type `GetAuthSes
 ```typescript
 export interface GetAuthSessionByFirebaseUidVariables {
   firebaseUid: string;
+  email: string;
 }
 ```
 ### Return Type
@@ -2036,6 +2037,13 @@ export interface GetAuthSessionByFirebaseUidData {
     borrowerContactId?: string | null;
     loanNumber?: string | null;
     firebaseUid?: string | null;
+    user: {
+      id: UUIDString;
+      email: string;
+      role: string;
+      firstName?: string | null;
+      lastName?: string | null;
+    } & User_Key;
   } & AuthSession_Key)[];
 }
 ```
@@ -2048,13 +2056,14 @@ import { connectorConfig, getAuthSessionByFirebaseUid, GetAuthSessionByFirebaseU
 // The `GetAuthSessionByFirebaseUid` query requires an argument of type `GetAuthSessionByFirebaseUidVariables`:
 const getAuthSessionByFirebaseUidVars: GetAuthSessionByFirebaseUidVariables = {
   firebaseUid: ..., 
+  email: ..., 
 };
 
 // Call the `getAuthSessionByFirebaseUid()` function to execute the query.
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await getAuthSessionByFirebaseUid(getAuthSessionByFirebaseUidVars);
 // Variables can be defined inline as well.
-const { data } = await getAuthSessionByFirebaseUid({ firebaseUid: ..., });
+const { data } = await getAuthSessionByFirebaseUid({ firebaseUid: ..., email: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2078,12 +2087,13 @@ import { connectorConfig, getAuthSessionByFirebaseUidRef, GetAuthSessionByFireba
 // The `GetAuthSessionByFirebaseUid` query requires an argument of type `GetAuthSessionByFirebaseUidVariables`:
 const getAuthSessionByFirebaseUidVars: GetAuthSessionByFirebaseUidVariables = {
   firebaseUid: ..., 
+  email: ..., 
 };
 
 // Call the `getAuthSessionByFirebaseUidRef()` function to get a reference to the query.
 const ref = getAuthSessionByFirebaseUidRef(getAuthSessionByFirebaseUidVars);
 // Variables can be defined inline as well.
-const ref = getAuthSessionByFirebaseUidRef({ firebaseUid: ..., });
+const ref = getAuthSessionByFirebaseUidRef({ firebaseUid: ..., email: ..., });
 
 // You can also pass in a `DataConnect` instance to the `QueryRef` function.
 const dataConnect = getDataConnect(connectorConfig);

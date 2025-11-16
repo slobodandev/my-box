@@ -1,0 +1,3716 @@
+"""
+✨ `AuthAuditLog_KeyOutput` returns the primary key fields of table type `AuthAuditLog`.
+
+It has the same format as `AuthAuditLog_Key`, but is only used as mutation return value.
+"""
+scalar AuthAuditLog_KeyOutput
+"""
+✨ `AuthSession_KeyOutput` returns the primary key fields of table type `AuthSession`.
+
+It has the same format as `AuthSession_Key`, but is only used as mutation return value.
+"""
+scalar AuthSession_KeyOutput
+"""
+✨ `File_KeyOutput` returns the primary key fields of table type `File`.
+
+It has the same format as `File_Key`, but is only used as mutation return value.
+"""
+scalar File_KeyOutput
+"""
+✨ `FileLoanAssociation_KeyOutput` returns the primary key fields of table type `FileLoanAssociation`.
+
+It has the same format as `FileLoanAssociation_Key`, but is only used as mutation return value.
+"""
+scalar FileLoanAssociation_KeyOutput
+"""
+✨ `Loan_KeyOutput` returns the primary key fields of table type `Loan`.
+
+It has the same format as `Loan_Key`, but is only used as mutation return value.
+"""
+scalar Loan_KeyOutput
+"""
+✨ `RateLimitTracking_KeyOutput` returns the primary key fields of table type `RateLimitTracking`.
+
+It has the same format as `RateLimitTracking_Key`, but is only used as mutation return value.
+"""
+scalar RateLimitTracking_KeyOutput
+"""
+✨ `User_KeyOutput` returns the primary key fields of table type `User`.
+
+It has the same format as `User_Key`, but is only used as mutation return value.
+"""
+scalar User_KeyOutput
+"""
+✨ `VerificationCode_KeyOutput` returns the primary key fields of table type `VerificationCode`.
+
+It has the same format as `VerificationCode_Key`, but is only used as mutation return value.
+"""
+scalar VerificationCode_KeyOutput
+"""
+✨ Generated data input type for table 'AuthAuditLog'. It includes all necessary fields for creating or upserting rows into table.
+"""
+input AuthAuditLog_Data {
+  """
+  ✨ Generated from Field `AuthAuditLog`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `AuthAuditLog`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+  """
+  ✨ Generated from Field `AuthAuditLog`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `createdAt` (✨ Generated from Field `AuthAuditLog`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `createdAt` (✨ Generated from Field `AuthAuditLog`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `createdAt` (✨ Generated from Field `AuthAuditLog`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `AuthAuditLog`.`errorCode` of type `String`
+  """
+  errorCode: String
+  """
+  ✨ `_expr` server value variant of `errorCode` (✨ Generated from Field `AuthAuditLog`.`errorCode` of type `String`)
+  """
+  errorCode_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthAuditLog`.`errorMessage` of type `String`
+  """
+  errorMessage: String
+  """
+  ✨ `_expr` server value variant of `errorMessage` (✨ Generated from Field `AuthAuditLog`.`errorMessage` of type `String`)
+  """
+  errorMessage_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthAuditLog`.`eventType` of type `String!`
+  """
+  eventType: String
+  """
+  ✨ `_expr` server value variant of `eventType` (✨ Generated from Field `AuthAuditLog`.`eventType` of type `String!`)
+  """
+  eventType_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthAuditLog`.`ipAddress` of type `String`
+  """
+  ipAddress: String
+  """
+  ✨ `_expr` server value variant of `ipAddress` (✨ Generated from Field `AuthAuditLog`.`ipAddress` of type `String`)
+  """
+  ipAddress_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthAuditLog`.`requestPayload` of type `String`
+  """
+  requestPayload: String
+  """
+  ✨ `_expr` server value variant of `requestPayload` (✨ Generated from Field `AuthAuditLog`.`requestPayload` of type `String`)
+  """
+  requestPayload_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthAuditLog`.`sessionId` of type `String`
+  """
+  sessionId: String
+  """
+  ✨ `_expr` server value variant of `sessionId` (✨ Generated from Field `AuthAuditLog`.`sessionId` of type `String`)
+  """
+  sessionId_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthAuditLog`.`success` of type `Boolean!`
+  """
+  success: Boolean
+  """
+  ✨ `_expr` server value variant of `success` (✨ Generated from Field `AuthAuditLog`.`success` of type `Boolean!`)
+  """
+  success_expr: Boolean_Expr
+  """
+  ✨ Generated from Field `AuthAuditLog`.`userAgent` of type `String`
+  """
+  userAgent: String
+  """
+  ✨ `_expr` server value variant of `userAgent` (✨ Generated from Field `AuthAuditLog`.`userAgent` of type `String`)
+  """
+  userAgent_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthAuditLog`.`userId` of type `UUID`
+  """
+  userId: UUID
+  """
+  ✨ `_expr` server value variant of `userId` (✨ Generated from Field `AuthAuditLog`.`userId` of type `UUID`)
+  """
+  userId_expr: UUID_Expr
+}
+"""
+✨ Generated filter input type for table 'AuthAuditLog'. This input allows filtering objects using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input AuthAuditLog_Filter {
+  """
+  Apply multiple filter conditions using `AND` logic.
+  """
+  _and: [AuthAuditLog_Filter!]
+  """
+  Negate the result of the provided filter condition.
+  """
+  _not: AuthAuditLog_Filter
+  """
+  Apply multiple filter conditions using `OR` logic.
+  """
+  _or: [AuthAuditLog_Filter!]
+  """
+  ✨ Generated from Field `AuthAuditLog`.`id` of type `UUID!`
+  """
+  id: UUID_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`errorCode` of type `String`
+  """
+  errorCode: String_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`errorMessage` of type `String`
+  """
+  errorMessage: String_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`eventType` of type `String!`
+  """
+  eventType: String_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`ipAddress` of type `String`
+  """
+  ipAddress: String_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`requestPayload` of type `String`
+  """
+  requestPayload: String_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`sessionId` of type `String`
+  """
+  sessionId: String_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`success` of type `Boolean!`
+  """
+  success: Boolean_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`userAgent` of type `String`
+  """
+  userAgent: String_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`userId` of type `UUID`
+  """
+  userId: UUID_Filter
+}
+"""
+✨ Generated first-row input type for table 'AuthAuditLog'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
+"""
+input AuthAuditLog_FirstRow {
+  """
+  Order the result by the specified fields.
+  """
+  orderBy: [AuthAuditLog_Order!]
+  """
+  Filters rows based on the specified conditions.
+  """
+  where: AuthAuditLog_Filter
+}
+"""
+✨ Generated having input type for table 'AuthAuditLog'. This input allows you to filter groups during aggregate queries using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input AuthAuditLog_Having {
+  """
+  Apply multiple Having conditions using `AND` logic.
+  """
+  _and: [AuthAuditLog_Having!]
+  """
+  Whether to apply DISTINCT to the aggregate function.
+  """
+  _distinct: Boolean
+  """
+  Negate the result of the provided Having condition.
+  """
+  _not: AuthAuditLog_Having
+  """
+  Apply multiple Having conditions using `OR` logic.
+  """
+  _or: [AuthAuditLog_Having!]
+  """
+  ✨ Generated from Field `AuthAuditLog`.`_count` of type `Int!`
+  """
+  _count: Int_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`createdAt_count` of type `Int!`
+  """
+  createdAt_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`errorCode_count` of type `Int!`
+  """
+  errorCode_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`errorMessage_count` of type `Int!`
+  """
+  errorMessage_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`eventType_count` of type `Int!`
+  """
+  eventType_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`id_count` of type `Int!`
+  """
+  id_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`ipAddress_count` of type `Int!`
+  """
+  ipAddress_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`requestPayload_count` of type `Int!`
+  """
+  requestPayload_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`sessionId_count` of type `Int!`
+  """
+  sessionId_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`success_count` of type `Int!`
+  """
+  success_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`userAgent_count` of type `Int!`
+  """
+  userAgent_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`userId_count` of type `Int!`
+  """
+  userId_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`createdAt_min` of type `Timestamp`
+  """
+  createdAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthAuditLog`.`createdAt_max` of type `Timestamp`
+  """
+  createdAt_max: Timestamp_Filter
+}
+"""
+✨ Generated key input type for table 'AuthAuditLog'. It represents the primary key fields used to uniquely identify a row in the table.
+"""
+input AuthAuditLog_Key {
+  """
+  ✨ Generated from Field `AuthAuditLog`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `AuthAuditLog`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+}
+"""
+✨ Generated list filter input type for table 'AuthAuditLog'. This input applies filtering logic based on the count or existence of related objects that matches certain criteria.
+"""
+input AuthAuditLog_ListFilter {
+  """
+  The desired number of objects that match the condition (defaults to at least one).
+  """
+  count: Int_Filter = {gt:0}
+  """
+  Condition of the related objects to filter for.
+  """
+  exist: AuthAuditLog_Filter
+}
+"""
+✨ Generated order input type for table 'AuthAuditLog'. This input defines the sorting order of rows in query results based on one or more fields.
+"""
+input AuthAuditLog_Order {
+  """
+  ✨ Generated from Field `AuthAuditLog`.`id` of type `UUID!`
+  """
+  id: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`errorCode` of type `String`
+  """
+  errorCode: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`errorMessage` of type `String`
+  """
+  errorMessage: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`eventType` of type `String!`
+  """
+  eventType: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`ipAddress` of type `String`
+  """
+  ipAddress: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`requestPayload` of type `String`
+  """
+  requestPayload: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`sessionId` of type `String`
+  """
+  sessionId: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`success` of type `Boolean!`
+  """
+  success: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`userAgent` of type `String`
+  """
+  userAgent: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`userId` of type `UUID`
+  """
+  userId: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`_count` of type `Int!`
+  """
+  _count: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`createdAt_count` of type `Int!`
+  """
+  createdAt_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`errorCode_count` of type `Int!`
+  """
+  errorCode_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`errorMessage_count` of type `Int!`
+  """
+  errorMessage_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`eventType_count` of type `Int!`
+  """
+  eventType_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`id_count` of type `Int!`
+  """
+  id_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`ipAddress_count` of type `Int!`
+  """
+  ipAddress_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`requestPayload_count` of type `Int!`
+  """
+  requestPayload_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`sessionId_count` of type `Int!`
+  """
+  sessionId_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`success_count` of type `Int!`
+  """
+  success_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`userAgent_count` of type `Int!`
+  """
+  userAgent_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`userId_count` of type `Int!`
+  """
+  userId_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`createdAt_min` of type `Timestamp`
+  """
+  createdAt_min: OrderDirection
+  """
+  ✨ Generated from Field `AuthAuditLog`.`createdAt_max` of type `Timestamp`
+  """
+  createdAt_max: OrderDirection
+}
+"""
+✨ Generated data input type for table 'AuthSession'. It includes all necessary fields for creating or upserting rows into table.
+"""
+input AuthSession_Data {
+  """
+  ✨ Generated from Field `AuthSession`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `AuthSession`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`userId` of type `UUID!`
+  """
+  userId: UUID
+  """
+  ✨ `_expr` server value variant of `userId` (✨ Generated from Field `AuthSession`.`userId` of type `UUID!`)
+  """
+  userId_expr: UUID_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`user` of type `User!`
+  """
+  user: User_Key
+  """
+  ✨ Generated from Field `AuthSession`.`borrowerContactId` of type `String`
+  """
+  borrowerContactId: String
+  """
+  ✨ `_expr` server value variant of `borrowerContactId` (✨ Generated from Field `AuthSession`.`borrowerContactId` of type `String`)
+  """
+  borrowerContactId_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `createdAt` (✨ Generated from Field `AuthSession`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `createdAt` (✨ Generated from Field `AuthSession`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `createdAt` (✨ Generated from Field `AuthSession`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `AuthSession`.`createdBy` of type `UUID`
+  """
+  createdBy: UUID
+  """
+  ✨ `_expr` server value variant of `createdBy` (✨ Generated from Field `AuthSession`.`createdBy` of type `UUID`)
+  """
+  createdBy_expr: UUID_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`emailHash` of type `String!`
+  """
+  emailHash: String
+  """
+  ✨ `_expr` server value variant of `emailHash` (✨ Generated from Field `AuthSession`.`emailHash` of type `String!`)
+  """
+  emailHash_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`expiresAt` of type `Timestamp!`
+  """
+  expiresAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `expiresAt` (✨ Generated from Field `AuthSession`.`expiresAt` of type `Timestamp!`)
+  """
+  expiresAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `expiresAt` (✨ Generated from Field `AuthSession`.`expiresAt` of type `Timestamp!`)
+  """
+  expiresAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `expiresAt` (✨ Generated from Field `AuthSession`.`expiresAt` of type `Timestamp!`)
+  """
+  expiresAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `AuthSession`.`firebaseUid` of type `String`
+  """
+  firebaseUid: String
+  """
+  ✨ `_expr` server value variant of `firebaseUid` (✨ Generated from Field `AuthSession`.`firebaseUid` of type `String`)
+  """
+  firebaseUid_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`ipAddress` of type `String`
+  """
+  ipAddress: String
+  """
+  ✨ `_expr` server value variant of `ipAddress` (✨ Generated from Field `AuthSession`.`ipAddress` of type `String`)
+  """
+  ipAddress_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`lastAccessedAt` of type `Timestamp`
+  """
+  lastAccessedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `lastAccessedAt` (✨ Generated from Field `AuthSession`.`lastAccessedAt` of type `Timestamp`)
+  """
+  lastAccessedAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `lastAccessedAt` (✨ Generated from Field `AuthSession`.`lastAccessedAt` of type `Timestamp`)
+  """
+  lastAccessedAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `lastAccessedAt` (✨ Generated from Field `AuthSession`.`lastAccessedAt` of type `Timestamp`)
+  """
+  lastAccessedAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `AuthSession`.`loanIds` of type `String`
+  """
+  loanIds: String
+  """
+  ✨ `_expr` server value variant of `loanIds` (✨ Generated from Field `AuthSession`.`loanIds` of type `String`)
+  """
+  loanIds_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`loanNumber` of type `String`
+  """
+  loanNumber: String
+  """
+  ✨ `_expr` server value variant of `loanNumber` (✨ Generated from Field `AuthSession`.`loanNumber` of type `String`)
+  """
+  loanNumber_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`magicToken` of type `String`
+  """
+  magicToken: String
+  """
+  ✨ `_expr` server value variant of `magicToken` (✨ Generated from Field `AuthSession`.`magicToken` of type `String`)
+  """
+  magicToken_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`revokeReason` of type `String`
+  """
+  revokeReason: String
+  """
+  ✨ `_expr` server value variant of `revokeReason` (✨ Generated from Field `AuthSession`.`revokeReason` of type `String`)
+  """
+  revokeReason_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`revokedAt` of type `Timestamp`
+  """
+  revokedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `revokedAt` (✨ Generated from Field `AuthSession`.`revokedAt` of type `Timestamp`)
+  """
+  revokedAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `revokedAt` (✨ Generated from Field `AuthSession`.`revokedAt` of type `Timestamp`)
+  """
+  revokedAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `revokedAt` (✨ Generated from Field `AuthSession`.`revokedAt` of type `Timestamp`)
+  """
+  revokedAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `AuthSession`.`revokedBy` of type `UUID`
+  """
+  revokedBy: UUID
+  """
+  ✨ `_expr` server value variant of `revokedBy` (✨ Generated from Field `AuthSession`.`revokedBy` of type `UUID`)
+  """
+  revokedBy_expr: UUID_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`sessionId` of type `String!`
+  """
+  sessionId: String
+  """
+  ✨ `_expr` server value variant of `sessionId` (✨ Generated from Field `AuthSession`.`sessionId` of type `String!`)
+  """
+  sessionId_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`sessionToken` of type `String`
+  """
+  sessionToken: String
+  """
+  ✨ `_expr` server value variant of `sessionToken` (✨ Generated from Field `AuthSession`.`sessionToken` of type `String`)
+  """
+  sessionToken_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`status` of type `String!`
+  """
+  status: String
+  """
+  ✨ `_expr` server value variant of `status` (✨ Generated from Field `AuthSession`.`status` of type `String!`)
+  """
+  status_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`tokenType` of type `String!`
+  """
+  tokenType: String
+  """
+  ✨ `_expr` server value variant of `tokenType` (✨ Generated from Field `AuthSession`.`tokenType` of type `String!`)
+  """
+  tokenType_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`userAgent` of type `String`
+  """
+  userAgent: String
+  """
+  ✨ `_expr` server value variant of `userAgent` (✨ Generated from Field `AuthSession`.`userAgent` of type `String`)
+  """
+  userAgent_expr: String_Expr
+  """
+  ✨ Generated from Field `AuthSession`.`verifiedAt` of type `Timestamp`
+  """
+  verifiedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `verifiedAt` (✨ Generated from Field `AuthSession`.`verifiedAt` of type `Timestamp`)
+  """
+  verifiedAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `verifiedAt` (✨ Generated from Field `AuthSession`.`verifiedAt` of type `Timestamp`)
+  """
+  verifiedAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `verifiedAt` (✨ Generated from Field `AuthSession`.`verifiedAt` of type `Timestamp`)
+  """
+  verifiedAt_update: [Timestamp_Update!]
+}
+"""
+✨ Generated filter input type for table 'AuthSession'. This input allows filtering objects using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input AuthSession_Filter {
+  """
+  Apply multiple filter conditions using `AND` logic.
+  """
+  _and: [AuthSession_Filter!]
+  """
+  Negate the result of the provided filter condition.
+  """
+  _not: AuthSession_Filter
+  """
+  Apply multiple filter conditions using `OR` logic.
+  """
+  _or: [AuthSession_Filter!]
+  """
+  ✨ Generated from Field `AuthSession`.`id` of type `UUID!`
+  """
+  id: UUID_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`userId` of type `UUID!`
+  """
+  userId: UUID_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`user` of type `User!`
+  """
+  user: User_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`borrowerContactId` of type `String`
+  """
+  borrowerContactId: String_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`createdBy` of type `UUID`
+  """
+  createdBy: UUID_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`emailHash` of type `String!`
+  """
+  emailHash: String_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`expiresAt` of type `Timestamp!`
+  """
+  expiresAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`firebaseUid` of type `String`
+  """
+  firebaseUid: String_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`ipAddress` of type `String`
+  """
+  ipAddress: String_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`lastAccessedAt` of type `Timestamp`
+  """
+  lastAccessedAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`loanIds` of type `String`
+  """
+  loanIds: String_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`loanNumber` of type `String`
+  """
+  loanNumber: String_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`magicToken` of type `String`
+  """
+  magicToken: String_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`revokeReason` of type `String`
+  """
+  revokeReason: String_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`revokedAt` of type `Timestamp`
+  """
+  revokedAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`revokedBy` of type `UUID`
+  """
+  revokedBy: UUID_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`sessionId` of type `String!`
+  """
+  sessionId: String_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`sessionToken` of type `String`
+  """
+  sessionToken: String_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`status` of type `String!`
+  """
+  status: String_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`tokenType` of type `String!`
+  """
+  tokenType: String_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`userAgent` of type `String`
+  """
+  userAgent: String_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`verifiedAt` of type `Timestamp`
+  """
+  verifiedAt: Timestamp_Filter
+}
+"""
+✨ Generated first-row input type for table 'AuthSession'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
+"""
+input AuthSession_FirstRow {
+  """
+  Order the result by the specified fields.
+  """
+  orderBy: [AuthSession_Order!]
+  """
+  Filters rows based on the specified conditions.
+  """
+  where: AuthSession_Filter
+}
+"""
+✨ Generated having input type for table 'AuthSession'. This input allows you to filter groups during aggregate queries using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input AuthSession_Having {
+  """
+  Apply multiple Having conditions using `AND` logic.
+  """
+  _and: [AuthSession_Having!]
+  """
+  Whether to apply DISTINCT to the aggregate function.
+  """
+  _distinct: Boolean
+  """
+  Negate the result of the provided Having condition.
+  """
+  _not: AuthSession_Having
+  """
+  Apply multiple Having conditions using `OR` logic.
+  """
+  _or: [AuthSession_Having!]
+  """
+  ✨ Generated from Field `AuthSession`.`_count` of type `Int!`
+  """
+  _count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`borrowerContactId_count` of type `Int!`
+  """
+  borrowerContactId_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`createdAt_count` of type `Int!`
+  """
+  createdAt_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`createdBy_count` of type `Int!`
+  """
+  createdBy_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`emailHash_count` of type `Int!`
+  """
+  emailHash_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`expiresAt_count` of type `Int!`
+  """
+  expiresAt_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`firebaseUid_count` of type `Int!`
+  """
+  firebaseUid_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`id_count` of type `Int!`
+  """
+  id_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`ipAddress_count` of type `Int!`
+  """
+  ipAddress_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`lastAccessedAt_count` of type `Int!`
+  """
+  lastAccessedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`loanIds_count` of type `Int!`
+  """
+  loanIds_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`loanNumber_count` of type `Int!`
+  """
+  loanNumber_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`magicToken_count` of type `Int!`
+  """
+  magicToken_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`revokeReason_count` of type `Int!`
+  """
+  revokeReason_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`revokedAt_count` of type `Int!`
+  """
+  revokedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`revokedBy_count` of type `Int!`
+  """
+  revokedBy_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`sessionId_count` of type `Int!`
+  """
+  sessionId_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`sessionToken_count` of type `Int!`
+  """
+  sessionToken_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`status_count` of type `Int!`
+  """
+  status_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`tokenType_count` of type `Int!`
+  """
+  tokenType_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`userAgent_count` of type `Int!`
+  """
+  userAgent_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`userId_count` of type `Int!`
+  """
+  userId_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`verifiedAt_count` of type `Int!`
+  """
+  verifiedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`createdAt_min` of type `Timestamp`
+  """
+  createdAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`expiresAt_min` of type `Timestamp`
+  """
+  expiresAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`lastAccessedAt_min` of type `Timestamp`
+  """
+  lastAccessedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`revokedAt_min` of type `Timestamp`
+  """
+  revokedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`verifiedAt_min` of type `Timestamp`
+  """
+  verifiedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`createdAt_max` of type `Timestamp`
+  """
+  createdAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`expiresAt_max` of type `Timestamp`
+  """
+  expiresAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`lastAccessedAt_max` of type `Timestamp`
+  """
+  lastAccessedAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`revokedAt_max` of type `Timestamp`
+  """
+  revokedAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`verifiedAt_max` of type `Timestamp`
+  """
+  verifiedAt_max: Timestamp_Filter
+}
+"""
+✨ Generated key input type for table 'AuthSession'. It represents the primary key fields used to uniquely identify a row in the table.
+"""
+input AuthSession_Key {
+  """
+  ✨ Generated from Field `AuthSession`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `AuthSession`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+}
+"""
+✨ Generated list filter input type for table 'AuthSession'. This input applies filtering logic based on the count or existence of related objects that matches certain criteria.
+"""
+input AuthSession_ListFilter {
+  """
+  The desired number of objects that match the condition (defaults to at least one).
+  """
+  count: Int_Filter = {gt:0}
+  """
+  Condition of the related objects to filter for.
+  """
+  exist: AuthSession_Filter
+}
+"""
+✨ Generated order input type for table 'AuthSession'. This input defines the sorting order of rows in query results based on one or more fields.
+"""
+input AuthSession_Order {
+  """
+  ✨ Generated from Field `AuthSession`.`id` of type `UUID!`
+  """
+  id: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`userId` of type `UUID!`
+  """
+  userId: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`user` of type `User!`
+  """
+  user: User_Order
+  """
+  ✨ Generated from Field `AuthSession`.`borrowerContactId` of type `String`
+  """
+  borrowerContactId: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`createdBy` of type `UUID`
+  """
+  createdBy: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`emailHash` of type `String!`
+  """
+  emailHash: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`expiresAt` of type `Timestamp!`
+  """
+  expiresAt: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`firebaseUid` of type `String`
+  """
+  firebaseUid: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`ipAddress` of type `String`
+  """
+  ipAddress: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`lastAccessedAt` of type `Timestamp`
+  """
+  lastAccessedAt: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`loanIds` of type `String`
+  """
+  loanIds: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`loanNumber` of type `String`
+  """
+  loanNumber: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`magicToken` of type `String`
+  """
+  magicToken: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`revokeReason` of type `String`
+  """
+  revokeReason: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`revokedAt` of type `Timestamp`
+  """
+  revokedAt: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`revokedBy` of type `UUID`
+  """
+  revokedBy: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`sessionId` of type `String!`
+  """
+  sessionId: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`sessionToken` of type `String`
+  """
+  sessionToken: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`status` of type `String!`
+  """
+  status: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`tokenType` of type `String!`
+  """
+  tokenType: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`userAgent` of type `String`
+  """
+  userAgent: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`verifiedAt` of type `Timestamp`
+  """
+  verifiedAt: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`_count` of type `Int!`
+  """
+  _count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`borrowerContactId_count` of type `Int!`
+  """
+  borrowerContactId_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`createdAt_count` of type `Int!`
+  """
+  createdAt_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`createdBy_count` of type `Int!`
+  """
+  createdBy_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`emailHash_count` of type `Int!`
+  """
+  emailHash_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`expiresAt_count` of type `Int!`
+  """
+  expiresAt_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`firebaseUid_count` of type `Int!`
+  """
+  firebaseUid_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`id_count` of type `Int!`
+  """
+  id_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`ipAddress_count` of type `Int!`
+  """
+  ipAddress_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`lastAccessedAt_count` of type `Int!`
+  """
+  lastAccessedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`loanIds_count` of type `Int!`
+  """
+  loanIds_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`loanNumber_count` of type `Int!`
+  """
+  loanNumber_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`magicToken_count` of type `Int!`
+  """
+  magicToken_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`revokeReason_count` of type `Int!`
+  """
+  revokeReason_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`revokedAt_count` of type `Int!`
+  """
+  revokedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`revokedBy_count` of type `Int!`
+  """
+  revokedBy_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`sessionId_count` of type `Int!`
+  """
+  sessionId_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`sessionToken_count` of type `Int!`
+  """
+  sessionToken_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`status_count` of type `Int!`
+  """
+  status_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`tokenType_count` of type `Int!`
+  """
+  tokenType_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`userAgent_count` of type `Int!`
+  """
+  userAgent_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`userId_count` of type `Int!`
+  """
+  userId_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`verifiedAt_count` of type `Int!`
+  """
+  verifiedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`createdAt_min` of type `Timestamp`
+  """
+  createdAt_min: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`expiresAt_min` of type `Timestamp`
+  """
+  expiresAt_min: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`lastAccessedAt_min` of type `Timestamp`
+  """
+  lastAccessedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`revokedAt_min` of type `Timestamp`
+  """
+  revokedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`verifiedAt_min` of type `Timestamp`
+  """
+  verifiedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`createdAt_max` of type `Timestamp`
+  """
+  createdAt_max: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`expiresAt_max` of type `Timestamp`
+  """
+  expiresAt_max: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`lastAccessedAt_max` of type `Timestamp`
+  """
+  lastAccessedAt_max: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`revokedAt_max` of type `Timestamp`
+  """
+  revokedAt_max: OrderDirection
+  """
+  ✨ Generated from Field `AuthSession`.`verifiedAt_max` of type `Timestamp`
+  """
+  verifiedAt_max: OrderDirection
+}
+"""
+✨ Generated data input type for table 'File'. It includes all necessary fields for creating or upserting rows into table.
+"""
+input File_Data {
+  """
+  ✨ Generated from Field `File`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `File`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+  """
+  ✨ Generated from Field `File`.`deletedAt` of type `Timestamp`
+  """
+  deletedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `deletedAt` (✨ Generated from Field `File`.`deletedAt` of type `Timestamp`)
+  """
+  deletedAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `deletedAt` (✨ Generated from Field `File`.`deletedAt` of type `Timestamp`)
+  """
+  deletedAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `deletedAt` (✨ Generated from Field `File`.`deletedAt` of type `Timestamp`)
+  """
+  deletedAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `File`.`deletedBy` of type `UUID`
+  """
+  deletedBy: UUID
+  """
+  ✨ `_expr` server value variant of `deletedBy` (✨ Generated from Field `File`.`deletedBy` of type `UUID`)
+  """
+  deletedBy_expr: UUID_Expr
+  """
+  ✨ Generated from Field `File`.`description` of type `String`
+  """
+  description: String
+  """
+  ✨ `_expr` server value variant of `description` (✨ Generated from Field `File`.`description` of type `String`)
+  """
+  description_expr: String_Expr
+  """
+  ✨ Generated from Field `File`.`downloadUrl` of type `String`
+  """
+  downloadUrl: String
+  """
+  ✨ `_expr` server value variant of `downloadUrl` (✨ Generated from Field `File`.`downloadUrl` of type `String`)
+  """
+  downloadUrl_expr: String_Expr
+  """
+  ✨ Generated from Field `File`.`fileExtension` of type `String`
+  """
+  fileExtension: String
+  """
+  ✨ `_expr` server value variant of `fileExtension` (✨ Generated from Field `File`.`fileExtension` of type `String`)
+  """
+  fileExtension_expr: String_Expr
+  """
+  ✨ Generated from Field `File`.`fileSize` of type `Int!`
+  """
+  fileSize: Int
+  """
+  ✨ `_expr` server value variant of `fileSize` (✨ Generated from Field `File`.`fileSize` of type `Int!`)
+  """
+  fileSize_expr: Int_Expr
+  """
+  ✨ `_update` server value variant of `fileSize` (✨ Generated from Field `File`.`fileSize` of type `Int!`)
+  """
+  fileSize_update: [Int_Update!]
+  """
+  ✨ Generated from Field `File`.`isDeleted` of type `Boolean!`
+  """
+  isDeleted: Boolean
+  """
+  ✨ `_expr` server value variant of `isDeleted` (✨ Generated from Field `File`.`isDeleted` of type `Boolean!`)
+  """
+  isDeleted_expr: Boolean_Expr
+  """
+  ✨ Generated from Field `File`.`mimeType` of type `String`
+  """
+  mimeType: String
+  """
+  ✨ `_expr` server value variant of `mimeType` (✨ Generated from Field `File`.`mimeType` of type `String`)
+  """
+  mimeType_expr: String_Expr
+  """
+  ✨ Generated from Field `File`.`originalFilename` of type `String!`
+  """
+  originalFilename: String
+  """
+  ✨ `_expr` server value variant of `originalFilename` (✨ Generated from Field `File`.`originalFilename` of type `String!`)
+  """
+  originalFilename_expr: String_Expr
+  """
+  ✨ Generated from Field `File`.`storagePath` of type `String!`
+  """
+  storagePath: String
+  """
+  ✨ `_expr` server value variant of `storagePath` (✨ Generated from Field `File`.`storagePath` of type `String!`)
+  """
+  storagePath_expr: String_Expr
+  """
+  ✨ Generated from Field `File`.`tags` of type `String`
+  """
+  tags: String
+  """
+  ✨ `_expr` server value variant of `tags` (✨ Generated from Field `File`.`tags` of type `String`)
+  """
+  tags_expr: String_Expr
+  """
+  ✨ Generated from Field `File`.`updatedAt` of type `Timestamp!`
+  """
+  updatedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `updatedAt` (✨ Generated from Field `File`.`updatedAt` of type `Timestamp!`)
+  """
+  updatedAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `updatedAt` (✨ Generated from Field `File`.`updatedAt` of type `Timestamp!`)
+  """
+  updatedAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `updatedAt` (✨ Generated from Field `File`.`updatedAt` of type `Timestamp!`)
+  """
+  updatedAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `File`.`uploadedAt` of type `Timestamp!`
+  """
+  uploadedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `uploadedAt` (✨ Generated from Field `File`.`uploadedAt` of type `Timestamp!`)
+  """
+  uploadedAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `uploadedAt` (✨ Generated from Field `File`.`uploadedAt` of type `Timestamp!`)
+  """
+  uploadedAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `uploadedAt` (✨ Generated from Field `File`.`uploadedAt` of type `Timestamp!`)
+  """
+  uploadedAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `File`.`userId` of type `UUID!`
+  """
+  userId: UUID
+  """
+  ✨ `_expr` server value variant of `userId` (✨ Generated from Field `File`.`userId` of type `UUID!`)
+  """
+  userId_expr: UUID_Expr
+}
+"""
+✨ Generated filter input type for table 'File'. This input allows filtering objects using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input File_Filter {
+  """
+  Apply multiple filter conditions using `AND` logic.
+  """
+  _and: [File_Filter!]
+  """
+  Negate the result of the provided filter condition.
+  """
+  _not: File_Filter
+  """
+  Apply multiple filter conditions using `OR` logic.
+  """
+  _or: [File_Filter!]
+  """
+  ✨ Generated from Field `File`.`id` of type `UUID!`
+  """
+  id: UUID_Filter
+  """
+  ✨ Generated from Field `File`.`deletedAt` of type `Timestamp`
+  """
+  deletedAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `File`.`deletedBy` of type `UUID`
+  """
+  deletedBy: UUID_Filter
+  """
+  ✨ Generated from Field `File`.`description` of type `String`
+  """
+  description: String_Filter
+  """
+  ✨ Generated from Field `File`.`downloadUrl` of type `String`
+  """
+  downloadUrl: String_Filter
+  """
+  ✨ Generated from Field `File`.`fileExtension` of type `String`
+  """
+  fileExtension: String_Filter
+  """
+  ✨ Generated from Field `File`.`fileSize` of type `Int!`
+  """
+  fileSize: Int_Filter
+  """
+  ✨ Generated from Field `File`.`isDeleted` of type `Boolean!`
+  """
+  isDeleted: Boolean_Filter
+  """
+  ✨ Generated from Field `File`.`mimeType` of type `String`
+  """
+  mimeType: String_Filter
+  """
+  ✨ Generated from Field `File`.`originalFilename` of type `String!`
+  """
+  originalFilename: String_Filter
+  """
+  ✨ Generated from Field `File`.`storagePath` of type `String!`
+  """
+  storagePath: String_Filter
+  """
+  ✨ Generated from Field `File`.`tags` of type `String`
+  """
+  tags: String_Filter
+  """
+  ✨ Generated from Field `File`.`updatedAt` of type `Timestamp!`
+  """
+  updatedAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `File`.`uploadedAt` of type `Timestamp!`
+  """
+  uploadedAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `File`.`userId` of type `UUID!`
+  """
+  userId: UUID_Filter
+}
+"""
+✨ Generated first-row input type for table 'File'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
+"""
+input File_FirstRow {
+  """
+  Order the result by the specified fields.
+  """
+  orderBy: [File_Order!]
+  """
+  Filters rows based on the specified conditions.
+  """
+  where: File_Filter
+}
+"""
+✨ Generated having input type for table 'File'. This input allows you to filter groups during aggregate queries using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input File_Having {
+  """
+  Apply multiple Having conditions using `AND` logic.
+  """
+  _and: [File_Having!]
+  """
+  Whether to apply DISTINCT to the aggregate function.
+  """
+  _distinct: Boolean
+  """
+  Negate the result of the provided Having condition.
+  """
+  _not: File_Having
+  """
+  Apply multiple Having conditions using `OR` logic.
+  """
+  _or: [File_Having!]
+  """
+  ✨ Generated from Field `File`.`_count` of type `Int!`
+  """
+  _count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`deletedAt_count` of type `Int!`
+  """
+  deletedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`deletedBy_count` of type `Int!`
+  """
+  deletedBy_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`description_count` of type `Int!`
+  """
+  description_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`downloadUrl_count` of type `Int!`
+  """
+  downloadUrl_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`fileExtension_count` of type `Int!`
+  """
+  fileExtension_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`fileSize_count` of type `Int!`
+  """
+  fileSize_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`id_count` of type `Int!`
+  """
+  id_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`isDeleted_count` of type `Int!`
+  """
+  isDeleted_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`mimeType_count` of type `Int!`
+  """
+  mimeType_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`originalFilename_count` of type `Int!`
+  """
+  originalFilename_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`storagePath_count` of type `Int!`
+  """
+  storagePath_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`tags_count` of type `Int!`
+  """
+  tags_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`updatedAt_count` of type `Int!`
+  """
+  updatedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`uploadedAt_count` of type `Int!`
+  """
+  uploadedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`userId_count` of type `Int!`
+  """
+  userId_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`fileSize_sum` of type `Int`
+  """
+  fileSize_sum: Int_Filter
+  """
+  ✨ Generated from Field `File`.`fileSize_avg` of type `Float`
+  """
+  fileSize_avg: Float_Filter
+  """
+  ✨ Generated from Field `File`.`deletedAt_min` of type `Timestamp`
+  """
+  deletedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `File`.`fileSize_min` of type `Int`
+  """
+  fileSize_min: Int_Filter
+  """
+  ✨ Generated from Field `File`.`updatedAt_min` of type `Timestamp`
+  """
+  updatedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `File`.`uploadedAt_min` of type `Timestamp`
+  """
+  uploadedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `File`.`deletedAt_max` of type `Timestamp`
+  """
+  deletedAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `File`.`fileSize_max` of type `Int`
+  """
+  fileSize_max: Int_Filter
+  """
+  ✨ Generated from Field `File`.`updatedAt_max` of type `Timestamp`
+  """
+  updatedAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `File`.`uploadedAt_max` of type `Timestamp`
+  """
+  uploadedAt_max: Timestamp_Filter
+}
+"""
+✨ Generated key input type for table 'File'. It represents the primary key fields used to uniquely identify a row in the table.
+"""
+input File_Key {
+  """
+  ✨ Generated from Field `File`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `File`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+}
+"""
+✨ Generated list filter input type for table 'File'. This input applies filtering logic based on the count or existence of related objects that matches certain criteria.
+"""
+input File_ListFilter {
+  """
+  The desired number of objects that match the condition (defaults to at least one).
+  """
+  count: Int_Filter = {gt:0}
+  """
+  Condition of the related objects to filter for.
+  """
+  exist: File_Filter
+}
+"""
+✨ Generated order input type for table 'File'. This input defines the sorting order of rows in query results based on one or more fields.
+"""
+input File_Order {
+  """
+  ✨ Generated from Field `File`.`id` of type `UUID!`
+  """
+  id: OrderDirection
+  """
+  ✨ Generated from Field `File`.`deletedAt` of type `Timestamp`
+  """
+  deletedAt: OrderDirection
+  """
+  ✨ Generated from Field `File`.`deletedBy` of type `UUID`
+  """
+  deletedBy: OrderDirection
+  """
+  ✨ Generated from Field `File`.`description` of type `String`
+  """
+  description: OrderDirection
+  """
+  ✨ Generated from Field `File`.`downloadUrl` of type `String`
+  """
+  downloadUrl: OrderDirection
+  """
+  ✨ Generated from Field `File`.`fileExtension` of type `String`
+  """
+  fileExtension: OrderDirection
+  """
+  ✨ Generated from Field `File`.`fileSize` of type `Int!`
+  """
+  fileSize: OrderDirection
+  """
+  ✨ Generated from Field `File`.`isDeleted` of type `Boolean!`
+  """
+  isDeleted: OrderDirection
+  """
+  ✨ Generated from Field `File`.`mimeType` of type `String`
+  """
+  mimeType: OrderDirection
+  """
+  ✨ Generated from Field `File`.`originalFilename` of type `String!`
+  """
+  originalFilename: OrderDirection
+  """
+  ✨ Generated from Field `File`.`storagePath` of type `String!`
+  """
+  storagePath: OrderDirection
+  """
+  ✨ Generated from Field `File`.`tags` of type `String`
+  """
+  tags: OrderDirection
+  """
+  ✨ Generated from Field `File`.`updatedAt` of type `Timestamp!`
+  """
+  updatedAt: OrderDirection
+  """
+  ✨ Generated from Field `File`.`uploadedAt` of type `Timestamp!`
+  """
+  uploadedAt: OrderDirection
+  """
+  ✨ Generated from Field `File`.`userId` of type `UUID!`
+  """
+  userId: OrderDirection
+  """
+  ✨ Generated from Field `File`.`_count` of type `Int!`
+  """
+  _count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`deletedAt_count` of type `Int!`
+  """
+  deletedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`deletedBy_count` of type `Int!`
+  """
+  deletedBy_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`description_count` of type `Int!`
+  """
+  description_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`downloadUrl_count` of type `Int!`
+  """
+  downloadUrl_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`fileExtension_count` of type `Int!`
+  """
+  fileExtension_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`fileSize_count` of type `Int!`
+  """
+  fileSize_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`id_count` of type `Int!`
+  """
+  id_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`isDeleted_count` of type `Int!`
+  """
+  isDeleted_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`mimeType_count` of type `Int!`
+  """
+  mimeType_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`originalFilename_count` of type `Int!`
+  """
+  originalFilename_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`storagePath_count` of type `Int!`
+  """
+  storagePath_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`tags_count` of type `Int!`
+  """
+  tags_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`updatedAt_count` of type `Int!`
+  """
+  updatedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`uploadedAt_count` of type `Int!`
+  """
+  uploadedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`userId_count` of type `Int!`
+  """
+  userId_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`fileSize_sum` of type `Int`
+  """
+  fileSize_sum: OrderDirection
+  """
+  ✨ Generated from Field `File`.`fileSize_avg` of type `Float`
+  """
+  fileSize_avg: OrderDirection
+  """
+  ✨ Generated from Field `File`.`deletedAt_min` of type `Timestamp`
+  """
+  deletedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `File`.`fileSize_min` of type `Int`
+  """
+  fileSize_min: OrderDirection
+  """
+  ✨ Generated from Field `File`.`updatedAt_min` of type `Timestamp`
+  """
+  updatedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `File`.`uploadedAt_min` of type `Timestamp`
+  """
+  uploadedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `File`.`deletedAt_max` of type `Timestamp`
+  """
+  deletedAt_max: OrderDirection
+  """
+  ✨ Generated from Field `File`.`fileSize_max` of type `Int`
+  """
+  fileSize_max: OrderDirection
+  """
+  ✨ Generated from Field `File`.`updatedAt_max` of type `Timestamp`
+  """
+  updatedAt_max: OrderDirection
+  """
+  ✨ Generated from Field `File`.`uploadedAt_max` of type `Timestamp`
+  """
+  uploadedAt_max: OrderDirection
+}
+"""
+✨ Generated data input type for table 'FileLoanAssociation'. It includes all necessary fields for creating or upserting rows into table.
+"""
+input FileLoanAssociation_Data {
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `FileLoanAssociation`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedAt` of type `Timestamp!`
+  """
+  associatedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `associatedAt` (✨ Generated from Field `FileLoanAssociation`.`associatedAt` of type `Timestamp!`)
+  """
+  associatedAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `associatedAt` (✨ Generated from Field `FileLoanAssociation`.`associatedAt` of type `Timestamp!`)
+  """
+  associatedAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `associatedAt` (✨ Generated from Field `FileLoanAssociation`.`associatedAt` of type `Timestamp!`)
+  """
+  associatedAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedBy` of type `UUID`
+  """
+  associatedBy: UUID
+  """
+  ✨ `_expr` server value variant of `associatedBy` (✨ Generated from Field `FileLoanAssociation`.`associatedBy` of type `UUID`)
+  """
+  associatedBy_expr: UUID_Expr
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`fileId` of type `UUID!`
+  """
+  fileId: UUID
+  """
+  ✨ `_expr` server value variant of `fileId` (✨ Generated from Field `FileLoanAssociation`.`fileId` of type `UUID!`)
+  """
+  fileId_expr: UUID_Expr
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`loanId` of type `UUID!`
+  """
+  loanId: UUID
+  """
+  ✨ `_expr` server value variant of `loanId` (✨ Generated from Field `FileLoanAssociation`.`loanId` of type `UUID!`)
+  """
+  loanId_expr: UUID_Expr
+}
+"""
+✨ Generated filter input type for table 'FileLoanAssociation'. This input allows filtering objects using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input FileLoanAssociation_Filter {
+  """
+  Apply multiple filter conditions using `AND` logic.
+  """
+  _and: [FileLoanAssociation_Filter!]
+  """
+  Negate the result of the provided filter condition.
+  """
+  _not: FileLoanAssociation_Filter
+  """
+  Apply multiple filter conditions using `OR` logic.
+  """
+  _or: [FileLoanAssociation_Filter!]
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`id` of type `UUID!`
+  """
+  id: UUID_Filter
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedAt` of type `Timestamp!`
+  """
+  associatedAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedBy` of type `UUID`
+  """
+  associatedBy: UUID_Filter
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`fileId` of type `UUID!`
+  """
+  fileId: UUID_Filter
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`loanId` of type `UUID!`
+  """
+  loanId: UUID_Filter
+}
+"""
+✨ Generated first-row input type for table 'FileLoanAssociation'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
+"""
+input FileLoanAssociation_FirstRow {
+  """
+  Order the result by the specified fields.
+  """
+  orderBy: [FileLoanAssociation_Order!]
+  """
+  Filters rows based on the specified conditions.
+  """
+  where: FileLoanAssociation_Filter
+}
+"""
+✨ Generated having input type for table 'FileLoanAssociation'. This input allows you to filter groups during aggregate queries using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input FileLoanAssociation_Having {
+  """
+  Apply multiple Having conditions using `AND` logic.
+  """
+  _and: [FileLoanAssociation_Having!]
+  """
+  Whether to apply DISTINCT to the aggregate function.
+  """
+  _distinct: Boolean
+  """
+  Negate the result of the provided Having condition.
+  """
+  _not: FileLoanAssociation_Having
+  """
+  Apply multiple Having conditions using `OR` logic.
+  """
+  _or: [FileLoanAssociation_Having!]
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`_count` of type `Int!`
+  """
+  _count: Int_Filter
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedAt_count` of type `Int!`
+  """
+  associatedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedBy_count` of type `Int!`
+  """
+  associatedBy_count: Int_Filter
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`fileId_count` of type `Int!`
+  """
+  fileId_count: Int_Filter
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`id_count` of type `Int!`
+  """
+  id_count: Int_Filter
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`loanId_count` of type `Int!`
+  """
+  loanId_count: Int_Filter
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedAt_min` of type `Timestamp`
+  """
+  associatedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedAt_max` of type `Timestamp`
+  """
+  associatedAt_max: Timestamp_Filter
+}
+"""
+✨ Generated key input type for table 'FileLoanAssociation'. It represents the primary key fields used to uniquely identify a row in the table.
+"""
+input FileLoanAssociation_Key {
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `FileLoanAssociation`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+}
+"""
+✨ Generated list filter input type for table 'FileLoanAssociation'. This input applies filtering logic based on the count or existence of related objects that matches certain criteria.
+"""
+input FileLoanAssociation_ListFilter {
+  """
+  The desired number of objects that match the condition (defaults to at least one).
+  """
+  count: Int_Filter = {gt:0}
+  """
+  Condition of the related objects to filter for.
+  """
+  exist: FileLoanAssociation_Filter
+}
+"""
+✨ Generated order input type for table 'FileLoanAssociation'. This input defines the sorting order of rows in query results based on one or more fields.
+"""
+input FileLoanAssociation_Order {
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`id` of type `UUID!`
+  """
+  id: OrderDirection
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedAt` of type `Timestamp!`
+  """
+  associatedAt: OrderDirection
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedBy` of type `UUID`
+  """
+  associatedBy: OrderDirection
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`fileId` of type `UUID!`
+  """
+  fileId: OrderDirection
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`loanId` of type `UUID!`
+  """
+  loanId: OrderDirection
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`_count` of type `Int!`
+  """
+  _count: OrderDirection
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedAt_count` of type `Int!`
+  """
+  associatedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedBy_count` of type `Int!`
+  """
+  associatedBy_count: OrderDirection
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`fileId_count` of type `Int!`
+  """
+  fileId_count: OrderDirection
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`id_count` of type `Int!`
+  """
+  id_count: OrderDirection
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`loanId_count` of type `Int!`
+  """
+  loanId_count: OrderDirection
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedAt_min` of type `Timestamp`
+  """
+  associatedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `FileLoanAssociation`.`associatedAt_max` of type `Timestamp`
+  """
+  associatedAt_max: OrderDirection
+}
+"""
+✨ Generated data input type for table 'Loan'. It includes all necessary fields for creating or upserting rows into table.
+"""
+input Loan_Data {
+  """
+  ✨ Generated from Field `Loan`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `Loan`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+  """
+  ✨ Generated from Field `Loan`.`borrowerEmail` of type `String`
+  """
+  borrowerEmail: String
+  """
+  ✨ `_expr` server value variant of `borrowerEmail` (✨ Generated from Field `Loan`.`borrowerEmail` of type `String`)
+  """
+  borrowerEmail_expr: String_Expr
+  """
+  ✨ Generated from Field `Loan`.`borrowerName` of type `String!`
+  """
+  borrowerName: String
+  """
+  ✨ `_expr` server value variant of `borrowerName` (✨ Generated from Field `Loan`.`borrowerName` of type `String!`)
+  """
+  borrowerName_expr: String_Expr
+  """
+  ✨ Generated from Field `Loan`.`closedAt` of type `Timestamp`
+  """
+  closedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `closedAt` (✨ Generated from Field `Loan`.`closedAt` of type `Timestamp`)
+  """
+  closedAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `closedAt` (✨ Generated from Field `Loan`.`closedAt` of type `Timestamp`)
+  """
+  closedAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `closedAt` (✨ Generated from Field `Loan`.`closedAt` of type `Timestamp`)
+  """
+  closedAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `Loan`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `createdAt` (✨ Generated from Field `Loan`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `createdAt` (✨ Generated from Field `Loan`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `createdAt` (✨ Generated from Field `Loan`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `Loan`.`loanAmount` of type `Float`
+  """
+  loanAmount: Float
+  """
+  ✨ `_expr` server value variant of `loanAmount` (✨ Generated from Field `Loan`.`loanAmount` of type `Float`)
+  """
+  loanAmount_expr: Float_Expr
+  """
+  ✨ `_update` server value variant of `loanAmount` (✨ Generated from Field `Loan`.`loanAmount` of type `Float`)
+  """
+  loanAmount_update: [Float_Update!]
+  """
+  ✨ Generated from Field `Loan`.`loanNumber` of type `String!`
+  """
+  loanNumber: String
+  """
+  ✨ `_expr` server value variant of `loanNumber` (✨ Generated from Field `Loan`.`loanNumber` of type `String!`)
+  """
+  loanNumber_expr: String_Expr
+  """
+  ✨ Generated from Field `Loan`.`loanOfficerId` of type `UUID`
+  """
+  loanOfficerId: UUID
+  """
+  ✨ `_expr` server value variant of `loanOfficerId` (✨ Generated from Field `Loan`.`loanOfficerId` of type `UUID`)
+  """
+  loanOfficerId_expr: UUID_Expr
+  """
+  ✨ Generated from Field `Loan`.`loanType` of type `String`
+  """
+  loanType: String
+  """
+  ✨ `_expr` server value variant of `loanType` (✨ Generated from Field `Loan`.`loanType` of type `String`)
+  """
+  loanType_expr: String_Expr
+  """
+  ✨ Generated from Field `Loan`.`notes` of type `String`
+  """
+  notes: String
+  """
+  ✨ `_expr` server value variant of `notes` (✨ Generated from Field `Loan`.`notes` of type `String`)
+  """
+  notes_expr: String_Expr
+  """
+  ✨ Generated from Field `Loan`.`propertyAddress` of type `String`
+  """
+  propertyAddress: String
+  """
+  ✨ `_expr` server value variant of `propertyAddress` (✨ Generated from Field `Loan`.`propertyAddress` of type `String`)
+  """
+  propertyAddress_expr: String_Expr
+  """
+  ✨ Generated from Field `Loan`.`status` of type `String!`
+  """
+  status: String
+  """
+  ✨ `_expr` server value variant of `status` (✨ Generated from Field `Loan`.`status` of type `String!`)
+  """
+  status_expr: String_Expr
+  """
+  ✨ Generated from Field `Loan`.`updatedAt` of type `Timestamp!`
+  """
+  updatedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `updatedAt` (✨ Generated from Field `Loan`.`updatedAt` of type `Timestamp!`)
+  """
+  updatedAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `updatedAt` (✨ Generated from Field `Loan`.`updatedAt` of type `Timestamp!`)
+  """
+  updatedAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `updatedAt` (✨ Generated from Field `Loan`.`updatedAt` of type `Timestamp!`)
+  """
+  updatedAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `Loan`.`userId` of type `UUID!`
+  """
+  userId: UUID
+  """
+  ✨ `_expr` server value variant of `userId` (✨ Generated from Field `Loan`.`userId` of type `UUID!`)
+  """
+  userId_expr: UUID_Expr
+}
+"""
+✨ Generated filter input type for table 'Loan'. This input allows filtering objects using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input Loan_Filter {
+  """
+  Apply multiple filter conditions using `AND` logic.
+  """
+  _and: [Loan_Filter!]
+  """
+  Negate the result of the provided filter condition.
+  """
+  _not: Loan_Filter
+  """
+  Apply multiple filter conditions using `OR` logic.
+  """
+  _or: [Loan_Filter!]
+  """
+  ✨ Generated from Field `Loan`.`id` of type `UUID!`
+  """
+  id: UUID_Filter
+  """
+  ✨ Generated from Field `Loan`.`borrowerEmail` of type `String`
+  """
+  borrowerEmail: String_Filter
+  """
+  ✨ Generated from Field `Loan`.`borrowerName` of type `String!`
+  """
+  borrowerName: String_Filter
+  """
+  ✨ Generated from Field `Loan`.`closedAt` of type `Timestamp`
+  """
+  closedAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `Loan`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `Loan`.`loanAmount` of type `Float`
+  """
+  loanAmount: Float_Filter
+  """
+  ✨ Generated from Field `Loan`.`loanNumber` of type `String!`
+  """
+  loanNumber: String_Filter
+  """
+  ✨ Generated from Field `Loan`.`loanOfficerId` of type `UUID`
+  """
+  loanOfficerId: UUID_Filter
+  """
+  ✨ Generated from Field `Loan`.`loanType` of type `String`
+  """
+  loanType: String_Filter
+  """
+  ✨ Generated from Field `Loan`.`notes` of type `String`
+  """
+  notes: String_Filter
+  """
+  ✨ Generated from Field `Loan`.`propertyAddress` of type `String`
+  """
+  propertyAddress: String_Filter
+  """
+  ✨ Generated from Field `Loan`.`status` of type `String!`
+  """
+  status: String_Filter
+  """
+  ✨ Generated from Field `Loan`.`updatedAt` of type `Timestamp!`
+  """
+  updatedAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `Loan`.`userId` of type `UUID!`
+  """
+  userId: UUID_Filter
+}
+"""
+✨ Generated first-row input type for table 'Loan'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
+"""
+input Loan_FirstRow {
+  """
+  Order the result by the specified fields.
+  """
+  orderBy: [Loan_Order!]
+  """
+  Filters rows based on the specified conditions.
+  """
+  where: Loan_Filter
+}
+"""
+✨ Generated having input type for table 'Loan'. This input allows you to filter groups during aggregate queries using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input Loan_Having {
+  """
+  Apply multiple Having conditions using `AND` logic.
+  """
+  _and: [Loan_Having!]
+  """
+  Whether to apply DISTINCT to the aggregate function.
+  """
+  _distinct: Boolean
+  """
+  Negate the result of the provided Having condition.
+  """
+  _not: Loan_Having
+  """
+  Apply multiple Having conditions using `OR` logic.
+  """
+  _or: [Loan_Having!]
+  """
+  ✨ Generated from Field `Loan`.`_count` of type `Int!`
+  """
+  _count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`borrowerEmail_count` of type `Int!`
+  """
+  borrowerEmail_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`borrowerName_count` of type `Int!`
+  """
+  borrowerName_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`closedAt_count` of type `Int!`
+  """
+  closedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`createdAt_count` of type `Int!`
+  """
+  createdAt_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`id_count` of type `Int!`
+  """
+  id_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`loanAmount_count` of type `Int!`
+  """
+  loanAmount_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`loanNumber_count` of type `Int!`
+  """
+  loanNumber_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`loanOfficerId_count` of type `Int!`
+  """
+  loanOfficerId_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`loanType_count` of type `Int!`
+  """
+  loanType_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`notes_count` of type `Int!`
+  """
+  notes_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`propertyAddress_count` of type `Int!`
+  """
+  propertyAddress_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`status_count` of type `Int!`
+  """
+  status_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`updatedAt_count` of type `Int!`
+  """
+  updatedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`userId_count` of type `Int!`
+  """
+  userId_count: Int_Filter
+  """
+  ✨ Generated from Field `Loan`.`loanAmount_sum` of type `Float`
+  """
+  loanAmount_sum: Float_Filter
+  """
+  ✨ Generated from Field `Loan`.`loanAmount_avg` of type `Float`
+  """
+  loanAmount_avg: Float_Filter
+  """
+  ✨ Generated from Field `Loan`.`closedAt_min` of type `Timestamp`
+  """
+  closedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `Loan`.`createdAt_min` of type `Timestamp`
+  """
+  createdAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `Loan`.`loanAmount_min` of type `Float`
+  """
+  loanAmount_min: Float_Filter
+  """
+  ✨ Generated from Field `Loan`.`updatedAt_min` of type `Timestamp`
+  """
+  updatedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `Loan`.`closedAt_max` of type `Timestamp`
+  """
+  closedAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `Loan`.`createdAt_max` of type `Timestamp`
+  """
+  createdAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `Loan`.`loanAmount_max` of type `Float`
+  """
+  loanAmount_max: Float_Filter
+  """
+  ✨ Generated from Field `Loan`.`updatedAt_max` of type `Timestamp`
+  """
+  updatedAt_max: Timestamp_Filter
+}
+"""
+✨ Generated key input type for table 'Loan'. It represents the primary key fields used to uniquely identify a row in the table.
+"""
+input Loan_Key {
+  """
+  ✨ Generated from Field `Loan`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `Loan`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+}
+"""
+✨ Generated list filter input type for table 'Loan'. This input applies filtering logic based on the count or existence of related objects that matches certain criteria.
+"""
+input Loan_ListFilter {
+  """
+  The desired number of objects that match the condition (defaults to at least one).
+  """
+  count: Int_Filter = {gt:0}
+  """
+  Condition of the related objects to filter for.
+  """
+  exist: Loan_Filter
+}
+"""
+✨ Generated order input type for table 'Loan'. This input defines the sorting order of rows in query results based on one or more fields.
+"""
+input Loan_Order {
+  """
+  ✨ Generated from Field `Loan`.`id` of type `UUID!`
+  """
+  id: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`borrowerEmail` of type `String`
+  """
+  borrowerEmail: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`borrowerName` of type `String!`
+  """
+  borrowerName: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`closedAt` of type `Timestamp`
+  """
+  closedAt: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`loanAmount` of type `Float`
+  """
+  loanAmount: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`loanNumber` of type `String!`
+  """
+  loanNumber: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`loanOfficerId` of type `UUID`
+  """
+  loanOfficerId: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`loanType` of type `String`
+  """
+  loanType: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`notes` of type `String`
+  """
+  notes: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`propertyAddress` of type `String`
+  """
+  propertyAddress: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`status` of type `String!`
+  """
+  status: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`updatedAt` of type `Timestamp!`
+  """
+  updatedAt: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`userId` of type `UUID!`
+  """
+  userId: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`_count` of type `Int!`
+  """
+  _count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`borrowerEmail_count` of type `Int!`
+  """
+  borrowerEmail_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`borrowerName_count` of type `Int!`
+  """
+  borrowerName_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`closedAt_count` of type `Int!`
+  """
+  closedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`createdAt_count` of type `Int!`
+  """
+  createdAt_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`id_count` of type `Int!`
+  """
+  id_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`loanAmount_count` of type `Int!`
+  """
+  loanAmount_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`loanNumber_count` of type `Int!`
+  """
+  loanNumber_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`loanOfficerId_count` of type `Int!`
+  """
+  loanOfficerId_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`loanType_count` of type `Int!`
+  """
+  loanType_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`notes_count` of type `Int!`
+  """
+  notes_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`propertyAddress_count` of type `Int!`
+  """
+  propertyAddress_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`status_count` of type `Int!`
+  """
+  status_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`updatedAt_count` of type `Int!`
+  """
+  updatedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`userId_count` of type `Int!`
+  """
+  userId_count: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`loanAmount_sum` of type `Float`
+  """
+  loanAmount_sum: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`loanAmount_avg` of type `Float`
+  """
+  loanAmount_avg: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`closedAt_min` of type `Timestamp`
+  """
+  closedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`createdAt_min` of type `Timestamp`
+  """
+  createdAt_min: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`loanAmount_min` of type `Float`
+  """
+  loanAmount_min: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`updatedAt_min` of type `Timestamp`
+  """
+  updatedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`closedAt_max` of type `Timestamp`
+  """
+  closedAt_max: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`createdAt_max` of type `Timestamp`
+  """
+  createdAt_max: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`loanAmount_max` of type `Float`
+  """
+  loanAmount_max: OrderDirection
+  """
+  ✨ Generated from Field `Loan`.`updatedAt_max` of type `Timestamp`
+  """
+  updatedAt_max: OrderDirection
+}
+"""
+✨ Generated data input type for table 'RateLimitTracking'. It includes all necessary fields for creating or upserting rows into table.
+"""
+input RateLimitTracking_Data {
+  """
+  ✨ Generated from Field `RateLimitTracking`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `RateLimitTracking`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+  """
+  ✨ Generated from Field `RateLimitTracking`.`actionType` of type `String!`
+  """
+  actionType: String
+  """
+  ✨ `_expr` server value variant of `actionType` (✨ Generated from Field `RateLimitTracking`.`actionType` of type `String!`)
+  """
+  actionType_expr: String_Expr
+  """
+  ✨ Generated from Field `RateLimitTracking`.`attemptCount` of type `Int!`
+  """
+  attemptCount: Int
+  """
+  ✨ `_expr` server value variant of `attemptCount` (✨ Generated from Field `RateLimitTracking`.`attemptCount` of type `Int!`)
+  """
+  attemptCount_expr: Int_Expr
+  """
+  ✨ `_update` server value variant of `attemptCount` (✨ Generated from Field `RateLimitTracking`.`attemptCount` of type `Int!`)
+  """
+  attemptCount_update: [Int_Update!]
+  """
+  ✨ Generated from Field `RateLimitTracking`.`blockedUntil` of type `Timestamp`
+  """
+  blockedUntil: Timestamp
+  """
+  ✨ `_expr` server value variant of `blockedUntil` (✨ Generated from Field `RateLimitTracking`.`blockedUntil` of type `Timestamp`)
+  """
+  blockedUntil_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `blockedUntil` (✨ Generated from Field `RateLimitTracking`.`blockedUntil` of type `Timestamp`)
+  """
+  blockedUntil_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `blockedUntil` (✨ Generated from Field `RateLimitTracking`.`blockedUntil` of type `Timestamp`)
+  """
+  blockedUntil_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `RateLimitTracking`.`identifier` of type `String!`
+  """
+  identifier: String
+  """
+  ✨ `_expr` server value variant of `identifier` (✨ Generated from Field `RateLimitTracking`.`identifier` of type `String!`)
+  """
+  identifier_expr: String_Expr
+  """
+  ✨ Generated from Field `RateLimitTracking`.`windowStartAt` of type `Timestamp!`
+  """
+  windowStartAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `windowStartAt` (✨ Generated from Field `RateLimitTracking`.`windowStartAt` of type `Timestamp!`)
+  """
+  windowStartAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `windowStartAt` (✨ Generated from Field `RateLimitTracking`.`windowStartAt` of type `Timestamp!`)
+  """
+  windowStartAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `windowStartAt` (✨ Generated from Field `RateLimitTracking`.`windowStartAt` of type `Timestamp!`)
+  """
+  windowStartAt_update: [Timestamp_Update!]
+}
+"""
+✨ Generated filter input type for table 'RateLimitTracking'. This input allows filtering objects using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input RateLimitTracking_Filter {
+  """
+  Apply multiple filter conditions using `AND` logic.
+  """
+  _and: [RateLimitTracking_Filter!]
+  """
+  Negate the result of the provided filter condition.
+  """
+  _not: RateLimitTracking_Filter
+  """
+  Apply multiple filter conditions using `OR` logic.
+  """
+  _or: [RateLimitTracking_Filter!]
+  """
+  ✨ Generated from Field `RateLimitTracking`.`id` of type `UUID!`
+  """
+  id: UUID_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`actionType` of type `String!`
+  """
+  actionType: String_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`attemptCount` of type `Int!`
+  """
+  attemptCount: Int_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`blockedUntil` of type `Timestamp`
+  """
+  blockedUntil: Timestamp_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`identifier` of type `String!`
+  """
+  identifier: String_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`windowStartAt` of type `Timestamp!`
+  """
+  windowStartAt: Timestamp_Filter
+}
+"""
+✨ Generated first-row input type for table 'RateLimitTracking'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
+"""
+input RateLimitTracking_FirstRow {
+  """
+  Order the result by the specified fields.
+  """
+  orderBy: [RateLimitTracking_Order!]
+  """
+  Filters rows based on the specified conditions.
+  """
+  where: RateLimitTracking_Filter
+}
+"""
+✨ Generated having input type for table 'RateLimitTracking'. This input allows you to filter groups during aggregate queries using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input RateLimitTracking_Having {
+  """
+  Apply multiple Having conditions using `AND` logic.
+  """
+  _and: [RateLimitTracking_Having!]
+  """
+  Whether to apply DISTINCT to the aggregate function.
+  """
+  _distinct: Boolean
+  """
+  Negate the result of the provided Having condition.
+  """
+  _not: RateLimitTracking_Having
+  """
+  Apply multiple Having conditions using `OR` logic.
+  """
+  _or: [RateLimitTracking_Having!]
+  """
+  ✨ Generated from Field `RateLimitTracking`.`_count` of type `Int!`
+  """
+  _count: Int_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`actionType_count` of type `Int!`
+  """
+  actionType_count: Int_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`attemptCount_count` of type `Int!`
+  """
+  attemptCount_count: Int_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`blockedUntil_count` of type `Int!`
+  """
+  blockedUntil_count: Int_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`id_count` of type `Int!`
+  """
+  id_count: Int_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`identifier_count` of type `Int!`
+  """
+  identifier_count: Int_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`windowStartAt_count` of type `Int!`
+  """
+  windowStartAt_count: Int_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`attemptCount_sum` of type `Int`
+  """
+  attemptCount_sum: Int_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`attemptCount_avg` of type `Float`
+  """
+  attemptCount_avg: Float_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`attemptCount_min` of type `Int`
+  """
+  attemptCount_min: Int_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`blockedUntil_min` of type `Timestamp`
+  """
+  blockedUntil_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`windowStartAt_min` of type `Timestamp`
+  """
+  windowStartAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`attemptCount_max` of type `Int`
+  """
+  attemptCount_max: Int_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`blockedUntil_max` of type `Timestamp`
+  """
+  blockedUntil_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `RateLimitTracking`.`windowStartAt_max` of type `Timestamp`
+  """
+  windowStartAt_max: Timestamp_Filter
+}
+"""
+✨ Generated key input type for table 'RateLimitTracking'. It represents the primary key fields used to uniquely identify a row in the table.
+"""
+input RateLimitTracking_Key {
+  """
+  ✨ Generated from Field `RateLimitTracking`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `RateLimitTracking`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+}
+"""
+✨ Generated list filter input type for table 'RateLimitTracking'. This input applies filtering logic based on the count or existence of related objects that matches certain criteria.
+"""
+input RateLimitTracking_ListFilter {
+  """
+  The desired number of objects that match the condition (defaults to at least one).
+  """
+  count: Int_Filter = {gt:0}
+  """
+  Condition of the related objects to filter for.
+  """
+  exist: RateLimitTracking_Filter
+}
+"""
+✨ Generated order input type for table 'RateLimitTracking'. This input defines the sorting order of rows in query results based on one or more fields.
+"""
+input RateLimitTracking_Order {
+  """
+  ✨ Generated from Field `RateLimitTracking`.`id` of type `UUID!`
+  """
+  id: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`actionType` of type `String!`
+  """
+  actionType: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`attemptCount` of type `Int!`
+  """
+  attemptCount: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`blockedUntil` of type `Timestamp`
+  """
+  blockedUntil: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`identifier` of type `String!`
+  """
+  identifier: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`windowStartAt` of type `Timestamp!`
+  """
+  windowStartAt: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`_count` of type `Int!`
+  """
+  _count: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`actionType_count` of type `Int!`
+  """
+  actionType_count: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`attemptCount_count` of type `Int!`
+  """
+  attemptCount_count: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`blockedUntil_count` of type `Int!`
+  """
+  blockedUntil_count: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`id_count` of type `Int!`
+  """
+  id_count: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`identifier_count` of type `Int!`
+  """
+  identifier_count: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`windowStartAt_count` of type `Int!`
+  """
+  windowStartAt_count: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`attemptCount_sum` of type `Int`
+  """
+  attemptCount_sum: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`attemptCount_avg` of type `Float`
+  """
+  attemptCount_avg: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`attemptCount_min` of type `Int`
+  """
+  attemptCount_min: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`blockedUntil_min` of type `Timestamp`
+  """
+  blockedUntil_min: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`windowStartAt_min` of type `Timestamp`
+  """
+  windowStartAt_min: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`attemptCount_max` of type `Int`
+  """
+  attemptCount_max: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`blockedUntil_max` of type `Timestamp`
+  """
+  blockedUntil_max: OrderDirection
+  """
+  ✨ Generated from Field `RateLimitTracking`.`windowStartAt_max` of type `Timestamp`
+  """
+  windowStartAt_max: OrderDirection
+}
+"""
+✨ Generated data input type for table 'User'. It includes all necessary fields for creating or upserting rows into table.
+"""
+input User_Data {
+  """
+  ✨ Generated from Field `User`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `User`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+  """
+  ✨ Generated from Field `User`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `createdAt` (✨ Generated from Field `User`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `createdAt` (✨ Generated from Field `User`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `createdAt` (✨ Generated from Field `User`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `User`.`email` of type `String!`
+  """
+  email: String
+  """
+  ✨ `_expr` server value variant of `email` (✨ Generated from Field `User`.`email` of type `String!`)
+  """
+  email_expr: String_Expr
+  """
+  ✨ Generated from Field `User`.`firstName` of type `String`
+  """
+  firstName: String
+  """
+  ✨ `_expr` server value variant of `firstName` (✨ Generated from Field `User`.`firstName` of type `String`)
+  """
+  firstName_expr: String_Expr
+  """
+  ✨ Generated from Field `User`.`isActive` of type `Boolean!`
+  """
+  isActive: Boolean
+  """
+  ✨ `_expr` server value variant of `isActive` (✨ Generated from Field `User`.`isActive` of type `Boolean!`)
+  """
+  isActive_expr: Boolean_Expr
+  """
+  ✨ Generated from Field `User`.`lastLoginAt` of type `Timestamp`
+  """
+  lastLoginAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `lastLoginAt` (✨ Generated from Field `User`.`lastLoginAt` of type `Timestamp`)
+  """
+  lastLoginAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `lastLoginAt` (✨ Generated from Field `User`.`lastLoginAt` of type `Timestamp`)
+  """
+  lastLoginAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `lastLoginAt` (✨ Generated from Field `User`.`lastLoginAt` of type `Timestamp`)
+  """
+  lastLoginAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `User`.`lastName` of type `String`
+  """
+  lastName: String
+  """
+  ✨ `_expr` server value variant of `lastName` (✨ Generated from Field `User`.`lastName` of type `String`)
+  """
+  lastName_expr: String_Expr
+  """
+  ✨ Generated from Field `User`.`phoneNumber` of type `String`
+  """
+  phoneNumber: String
+  """
+  ✨ `_expr` server value variant of `phoneNumber` (✨ Generated from Field `User`.`phoneNumber` of type `String`)
+  """
+  phoneNumber_expr: String_Expr
+  """
+  ✨ Generated from Field `User`.`role` of type `String!`
+  """
+  role: String
+  """
+  ✨ `_expr` server value variant of `role` (✨ Generated from Field `User`.`role` of type `String!`)
+  """
+  role_expr: String_Expr
+  """
+  ✨ Generated from Field `User`.`updatedAt` of type `Timestamp!`
+  """
+  updatedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `updatedAt` (✨ Generated from Field `User`.`updatedAt` of type `Timestamp!`)
+  """
+  updatedAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `updatedAt` (✨ Generated from Field `User`.`updatedAt` of type `Timestamp!`)
+  """
+  updatedAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `updatedAt` (✨ Generated from Field `User`.`updatedAt` of type `Timestamp!`)
+  """
+  updatedAt_update: [Timestamp_Update!]
+}
+"""
+✨ Generated filter input type for table 'User'. This input allows filtering objects using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input User_Filter {
+  """
+  Apply multiple filter conditions using `AND` logic.
+  """
+  _and: [User_Filter!]
+  """
+  Negate the result of the provided filter condition.
+  """
+  _not: User_Filter
+  """
+  Apply multiple filter conditions using `OR` logic.
+  """
+  _or: [User_Filter!]
+  """
+  ✨ Generated from Field `User`.`id` of type `UUID!`
+  """
+  id: UUID_Filter
+  """
+  ✨ Generated from Field `User`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `User`.`email` of type `String!`
+  """
+  email: String_Filter
+  """
+  ✨ Generated from Field `User`.`firstName` of type `String`
+  """
+  firstName: String_Filter
+  """
+  ✨ Generated from Field `User`.`isActive` of type `Boolean!`
+  """
+  isActive: Boolean_Filter
+  """
+  ✨ Generated from Field `User`.`lastLoginAt` of type `Timestamp`
+  """
+  lastLoginAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `User`.`lastName` of type `String`
+  """
+  lastName: String_Filter
+  """
+  ✨ Generated from Field `User`.`phoneNumber` of type `String`
+  """
+  phoneNumber: String_Filter
+  """
+  ✨ Generated from Field `User`.`role` of type `String!`
+  """
+  role: String_Filter
+  """
+  ✨ Generated from Field `User`.`updatedAt` of type `Timestamp!`
+  """
+  updatedAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `User`.`authSessions_on_user` of type `[AuthSession!]!`
+  """
+  authSessions_on_user: AuthSession_ListFilter
+}
+"""
+✨ Generated first-row input type for table 'User'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
+"""
+input User_FirstRow {
+  """
+  Order the result by the specified fields.
+  """
+  orderBy: [User_Order!]
+  """
+  Filters rows based on the specified conditions.
+  """
+  where: User_Filter
+}
+"""
+✨ Generated having input type for table 'User'. This input allows you to filter groups during aggregate queries using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input User_Having {
+  """
+  Apply multiple Having conditions using `AND` logic.
+  """
+  _and: [User_Having!]
+  """
+  Whether to apply DISTINCT to the aggregate function.
+  """
+  _distinct: Boolean
+  """
+  Negate the result of the provided Having condition.
+  """
+  _not: User_Having
+  """
+  Apply multiple Having conditions using `OR` logic.
+  """
+  _or: [User_Having!]
+  """
+  ✨ Generated from Field `User`.`_count` of type `Int!`
+  """
+  _count: Int_Filter
+  """
+  ✨ Generated from Field `User`.`createdAt_count` of type `Int!`
+  """
+  createdAt_count: Int_Filter
+  """
+  ✨ Generated from Field `User`.`email_count` of type `Int!`
+  """
+  email_count: Int_Filter
+  """
+  ✨ Generated from Field `User`.`firstName_count` of type `Int!`
+  """
+  firstName_count: Int_Filter
+  """
+  ✨ Generated from Field `User`.`id_count` of type `Int!`
+  """
+  id_count: Int_Filter
+  """
+  ✨ Generated from Field `User`.`isActive_count` of type `Int!`
+  """
+  isActive_count: Int_Filter
+  """
+  ✨ Generated from Field `User`.`lastLoginAt_count` of type `Int!`
+  """
+  lastLoginAt_count: Int_Filter
+  """
+  ✨ Generated from Field `User`.`lastName_count` of type `Int!`
+  """
+  lastName_count: Int_Filter
+  """
+  ✨ Generated from Field `User`.`phoneNumber_count` of type `Int!`
+  """
+  phoneNumber_count: Int_Filter
+  """
+  ✨ Generated from Field `User`.`role_count` of type `Int!`
+  """
+  role_count: Int_Filter
+  """
+  ✨ Generated from Field `User`.`updatedAt_count` of type `Int!`
+  """
+  updatedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `User`.`createdAt_min` of type `Timestamp`
+  """
+  createdAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `User`.`lastLoginAt_min` of type `Timestamp`
+  """
+  lastLoginAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `User`.`updatedAt_min` of type `Timestamp`
+  """
+  updatedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `User`.`createdAt_max` of type `Timestamp`
+  """
+  createdAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `User`.`lastLoginAt_max` of type `Timestamp`
+  """
+  lastLoginAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `User`.`updatedAt_max` of type `Timestamp`
+  """
+  updatedAt_max: Timestamp_Filter
+}
+"""
+✨ Generated key input type for table 'User'. It represents the primary key fields used to uniquely identify a row in the table.
+"""
+input User_Key {
+  """
+  ✨ Generated from Field `User`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `User`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+}
+"""
+✨ Generated list filter input type for table 'User'. This input applies filtering logic based on the count or existence of related objects that matches certain criteria.
+"""
+input User_ListFilter {
+  """
+  The desired number of objects that match the condition (defaults to at least one).
+  """
+  count: Int_Filter = {gt:0}
+  """
+  Condition of the related objects to filter for.
+  """
+  exist: User_Filter
+}
+"""
+✨ Generated order input type for table 'User'. This input defines the sorting order of rows in query results based on one or more fields.
+"""
+input User_Order {
+  """
+  ✨ Generated from Field `User`.`id` of type `UUID!`
+  """
+  id: OrderDirection
+  """
+  ✨ Generated from Field `User`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: OrderDirection
+  """
+  ✨ Generated from Field `User`.`email` of type `String!`
+  """
+  email: OrderDirection
+  """
+  ✨ Generated from Field `User`.`firstName` of type `String`
+  """
+  firstName: OrderDirection
+  """
+  ✨ Generated from Field `User`.`isActive` of type `Boolean!`
+  """
+  isActive: OrderDirection
+  """
+  ✨ Generated from Field `User`.`lastLoginAt` of type `Timestamp`
+  """
+  lastLoginAt: OrderDirection
+  """
+  ✨ Generated from Field `User`.`lastName` of type `String`
+  """
+  lastName: OrderDirection
+  """
+  ✨ Generated from Field `User`.`phoneNumber` of type `String`
+  """
+  phoneNumber: OrderDirection
+  """
+  ✨ Generated from Field `User`.`role` of type `String!`
+  """
+  role: OrderDirection
+  """
+  ✨ Generated from Field `User`.`updatedAt` of type `Timestamp!`
+  """
+  updatedAt: OrderDirection
+  """
+  ✨ Generated from Field `User`.`_count` of type `Int!`
+  """
+  _count: OrderDirection
+  """
+  ✨ Generated from Field `User`.`createdAt_count` of type `Int!`
+  """
+  createdAt_count: OrderDirection
+  """
+  ✨ Generated from Field `User`.`email_count` of type `Int!`
+  """
+  email_count: OrderDirection
+  """
+  ✨ Generated from Field `User`.`firstName_count` of type `Int!`
+  """
+  firstName_count: OrderDirection
+  """
+  ✨ Generated from Field `User`.`id_count` of type `Int!`
+  """
+  id_count: OrderDirection
+  """
+  ✨ Generated from Field `User`.`isActive_count` of type `Int!`
+  """
+  isActive_count: OrderDirection
+  """
+  ✨ Generated from Field `User`.`lastLoginAt_count` of type `Int!`
+  """
+  lastLoginAt_count: OrderDirection
+  """
+  ✨ Generated from Field `User`.`lastName_count` of type `Int!`
+  """
+  lastName_count: OrderDirection
+  """
+  ✨ Generated from Field `User`.`phoneNumber_count` of type `Int!`
+  """
+  phoneNumber_count: OrderDirection
+  """
+  ✨ Generated from Field `User`.`role_count` of type `Int!`
+  """
+  role_count: OrderDirection
+  """
+  ✨ Generated from Field `User`.`updatedAt_count` of type `Int!`
+  """
+  updatedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `User`.`createdAt_min` of type `Timestamp`
+  """
+  createdAt_min: OrderDirection
+  """
+  ✨ Generated from Field `User`.`lastLoginAt_min` of type `Timestamp`
+  """
+  lastLoginAt_min: OrderDirection
+  """
+  ✨ Generated from Field `User`.`updatedAt_min` of type `Timestamp`
+  """
+  updatedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `User`.`createdAt_max` of type `Timestamp`
+  """
+  createdAt_max: OrderDirection
+  """
+  ✨ Generated from Field `User`.`lastLoginAt_max` of type `Timestamp`
+  """
+  lastLoginAt_max: OrderDirection
+  """
+  ✨ Generated from Field `User`.`updatedAt_max` of type `Timestamp`
+  """
+  updatedAt_max: OrderDirection
+}
+"""
+✨ Generated data input type for table 'VerificationCode'. It includes all necessary fields for creating or upserting rows into table.
+"""
+input VerificationCode_Data {
+  """
+  ✨ Generated from Field `VerificationCode`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `VerificationCode`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+  """
+  ✨ Generated from Field `VerificationCode`.`attemptCount` of type `Int!`
+  """
+  attemptCount: Int
+  """
+  ✨ `_expr` server value variant of `attemptCount` (✨ Generated from Field `VerificationCode`.`attemptCount` of type `Int!`)
+  """
+  attemptCount_expr: Int_Expr
+  """
+  ✨ `_update` server value variant of `attemptCount` (✨ Generated from Field `VerificationCode`.`attemptCount` of type `Int!`)
+  """
+  attemptCount_update: [Int_Update!]
+  """
+  ✨ Generated from Field `VerificationCode`.`codeHash` of type `String!`
+  """
+  codeHash: String
+  """
+  ✨ `_expr` server value variant of `codeHash` (✨ Generated from Field `VerificationCode`.`codeHash` of type `String!`)
+  """
+  codeHash_expr: String_Expr
+  """
+  ✨ Generated from Field `VerificationCode`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `createdAt` (✨ Generated from Field `VerificationCode`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `createdAt` (✨ Generated from Field `VerificationCode`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `createdAt` (✨ Generated from Field `VerificationCode`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `VerificationCode`.`expiresAt` of type `Timestamp!`
+  """
+  expiresAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `expiresAt` (✨ Generated from Field `VerificationCode`.`expiresAt` of type `Timestamp!`)
+  """
+  expiresAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `expiresAt` (✨ Generated from Field `VerificationCode`.`expiresAt` of type `Timestamp!`)
+  """
+  expiresAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `expiresAt` (✨ Generated from Field `VerificationCode`.`expiresAt` of type `Timestamp!`)
+  """
+  expiresAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `VerificationCode`.`isUsed` of type `Boolean!`
+  """
+  isUsed: Boolean
+  """
+  ✨ `_expr` server value variant of `isUsed` (✨ Generated from Field `VerificationCode`.`isUsed` of type `Boolean!`)
+  """
+  isUsed_expr: Boolean_Expr
+  """
+  ✨ Generated from Field `VerificationCode`.`maxAttempts` of type `Int!`
+  """
+  maxAttempts: Int
+  """
+  ✨ `_expr` server value variant of `maxAttempts` (✨ Generated from Field `VerificationCode`.`maxAttempts` of type `Int!`)
+  """
+  maxAttempts_expr: Int_Expr
+  """
+  ✨ `_update` server value variant of `maxAttempts` (✨ Generated from Field `VerificationCode`.`maxAttempts` of type `Int!`)
+  """
+  maxAttempts_update: [Int_Update!]
+  """
+  ✨ Generated from Field `VerificationCode`.`sessionId` of type `String!`
+  """
+  sessionId: String
+  """
+  ✨ `_expr` server value variant of `sessionId` (✨ Generated from Field `VerificationCode`.`sessionId` of type `String!`)
+  """
+  sessionId_expr: String_Expr
+  """
+  ✨ Generated from Field `VerificationCode`.`usedAt` of type `Timestamp`
+  """
+  usedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `usedAt` (✨ Generated from Field `VerificationCode`.`usedAt` of type `Timestamp`)
+  """
+  usedAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `usedAt` (✨ Generated from Field `VerificationCode`.`usedAt` of type `Timestamp`)
+  """
+  usedAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `usedAt` (✨ Generated from Field `VerificationCode`.`usedAt` of type `Timestamp`)
+  """
+  usedAt_update: [Timestamp_Update!]
+}
+"""
+✨ Generated filter input type for table 'VerificationCode'. This input allows filtering objects using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input VerificationCode_Filter {
+  """
+  Apply multiple filter conditions using `AND` logic.
+  """
+  _and: [VerificationCode_Filter!]
+  """
+  Negate the result of the provided filter condition.
+  """
+  _not: VerificationCode_Filter
+  """
+  Apply multiple filter conditions using `OR` logic.
+  """
+  _or: [VerificationCode_Filter!]
+  """
+  ✨ Generated from Field `VerificationCode`.`id` of type `UUID!`
+  """
+  id: UUID_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`attemptCount` of type `Int!`
+  """
+  attemptCount: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`codeHash` of type `String!`
+  """
+  codeHash: String_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`expiresAt` of type `Timestamp!`
+  """
+  expiresAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`isUsed` of type `Boolean!`
+  """
+  isUsed: Boolean_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`maxAttempts` of type `Int!`
+  """
+  maxAttempts: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`sessionId` of type `String!`
+  """
+  sessionId: String_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`usedAt` of type `Timestamp`
+  """
+  usedAt: Timestamp_Filter
+}
+"""
+✨ Generated first-row input type for table 'VerificationCode'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
+"""
+input VerificationCode_FirstRow {
+  """
+  Order the result by the specified fields.
+  """
+  orderBy: [VerificationCode_Order!]
+  """
+  Filters rows based on the specified conditions.
+  """
+  where: VerificationCode_Filter
+}
+"""
+✨ Generated having input type for table 'VerificationCode'. This input allows you to filter groups during aggregate queries using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input VerificationCode_Having {
+  """
+  Apply multiple Having conditions using `AND` logic.
+  """
+  _and: [VerificationCode_Having!]
+  """
+  Whether to apply DISTINCT to the aggregate function.
+  """
+  _distinct: Boolean
+  """
+  Negate the result of the provided Having condition.
+  """
+  _not: VerificationCode_Having
+  """
+  Apply multiple Having conditions using `OR` logic.
+  """
+  _or: [VerificationCode_Having!]
+  """
+  ✨ Generated from Field `VerificationCode`.`_count` of type `Int!`
+  """
+  _count: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`attemptCount_count` of type `Int!`
+  """
+  attemptCount_count: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`codeHash_count` of type `Int!`
+  """
+  codeHash_count: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`createdAt_count` of type `Int!`
+  """
+  createdAt_count: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`expiresAt_count` of type `Int!`
+  """
+  expiresAt_count: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`id_count` of type `Int!`
+  """
+  id_count: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`isUsed_count` of type `Int!`
+  """
+  isUsed_count: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`maxAttempts_count` of type `Int!`
+  """
+  maxAttempts_count: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`sessionId_count` of type `Int!`
+  """
+  sessionId_count: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`usedAt_count` of type `Int!`
+  """
+  usedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`attemptCount_sum` of type `Int`
+  """
+  attemptCount_sum: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`maxAttempts_sum` of type `Int`
+  """
+  maxAttempts_sum: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`attemptCount_avg` of type `Float`
+  """
+  attemptCount_avg: Float_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`maxAttempts_avg` of type `Float`
+  """
+  maxAttempts_avg: Float_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`attemptCount_min` of type `Int`
+  """
+  attemptCount_min: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`createdAt_min` of type `Timestamp`
+  """
+  createdAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`expiresAt_min` of type `Timestamp`
+  """
+  expiresAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`maxAttempts_min` of type `Int`
+  """
+  maxAttempts_min: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`usedAt_min` of type `Timestamp`
+  """
+  usedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`attemptCount_max` of type `Int`
+  """
+  attemptCount_max: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`createdAt_max` of type `Timestamp`
+  """
+  createdAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`expiresAt_max` of type `Timestamp`
+  """
+  expiresAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`maxAttempts_max` of type `Int`
+  """
+  maxAttempts_max: Int_Filter
+  """
+  ✨ Generated from Field `VerificationCode`.`usedAt_max` of type `Timestamp`
+  """
+  usedAt_max: Timestamp_Filter
+}
+"""
+✨ Generated key input type for table 'VerificationCode'. It represents the primary key fields used to uniquely identify a row in the table.
+"""
+input VerificationCode_Key {
+  """
+  ✨ Generated from Field `VerificationCode`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `VerificationCode`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+}
+"""
+✨ Generated list filter input type for table 'VerificationCode'. This input applies filtering logic based on the count or existence of related objects that matches certain criteria.
+"""
+input VerificationCode_ListFilter {
+  """
+  The desired number of objects that match the condition (defaults to at least one).
+  """
+  count: Int_Filter = {gt:0}
+  """
+  Condition of the related objects to filter for.
+  """
+  exist: VerificationCode_Filter
+}
+"""
+✨ Generated order input type for table 'VerificationCode'. This input defines the sorting order of rows in query results based on one or more fields.
+"""
+input VerificationCode_Order {
+  """
+  ✨ Generated from Field `VerificationCode`.`id` of type `UUID!`
+  """
+  id: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`attemptCount` of type `Int!`
+  """
+  attemptCount: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`codeHash` of type `String!`
+  """
+  codeHash: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`expiresAt` of type `Timestamp!`
+  """
+  expiresAt: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`isUsed` of type `Boolean!`
+  """
+  isUsed: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`maxAttempts` of type `Int!`
+  """
+  maxAttempts: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`sessionId` of type `String!`
+  """
+  sessionId: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`usedAt` of type `Timestamp`
+  """
+  usedAt: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`_count` of type `Int!`
+  """
+  _count: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`attemptCount_count` of type `Int!`
+  """
+  attemptCount_count: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`codeHash_count` of type `Int!`
+  """
+  codeHash_count: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`createdAt_count` of type `Int!`
+  """
+  createdAt_count: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`expiresAt_count` of type `Int!`
+  """
+  expiresAt_count: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`id_count` of type `Int!`
+  """
+  id_count: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`isUsed_count` of type `Int!`
+  """
+  isUsed_count: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`maxAttempts_count` of type `Int!`
+  """
+  maxAttempts_count: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`sessionId_count` of type `Int!`
+  """
+  sessionId_count: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`usedAt_count` of type `Int!`
+  """
+  usedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`attemptCount_sum` of type `Int`
+  """
+  attemptCount_sum: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`maxAttempts_sum` of type `Int`
+  """
+  maxAttempts_sum: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`attemptCount_avg` of type `Float`
+  """
+  attemptCount_avg: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`maxAttempts_avg` of type `Float`
+  """
+  maxAttempts_avg: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`attemptCount_min` of type `Int`
+  """
+  attemptCount_min: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`createdAt_min` of type `Timestamp`
+  """
+  createdAt_min: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`expiresAt_min` of type `Timestamp`
+  """
+  expiresAt_min: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`maxAttempts_min` of type `Int`
+  """
+  maxAttempts_min: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`usedAt_min` of type `Timestamp`
+  """
+  usedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`attemptCount_max` of type `Int`
+  """
+  attemptCount_max: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`createdAt_max` of type `Timestamp`
+  """
+  createdAt_max: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`expiresAt_max` of type `Timestamp`
+  """
+  expiresAt_max: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`maxAttempts_max` of type `Int`
+  """
+  maxAttempts_max: OrderDirection
+  """
+  ✨ Generated from Field `VerificationCode`.`usedAt_max` of type `Timestamp`
+  """
+  usedAt_max: OrderDirection
+}

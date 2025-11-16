@@ -67,6 +67,49 @@ export async function createAuthSessionWithFirebase(variables: {
   return result as any;
 }
 
+export async function getAuthSessionByFirebaseUid(variables: {
+  firebaseUid: string;
+  email: string;
+}): Promise<{
+  data: {
+    authSessions: Array<{
+      id: string;
+      sessionId: string;
+      userId: string;
+      loanIds?: string | null;
+      emailHash: string;
+      status: string;
+      expiresAt: string;
+      verifiedAt?: string | null;
+      createdAt: string;
+      borrowerContactId?: string | null;
+      loanNumber?: string | null;
+      firebaseUid: string;
+      user: {
+        id: string;
+        email: string;
+        role: string;
+        firstName?: string | null;
+        lastName?: string | null;
+      };
+    }>;
+  };
+}> {
+  const ref = queryRef(dataConnect, 'GetAuthSessionByFirebaseUid', variables);
+  const result = await executeQuery(ref);
+  return result as any;
+}
+
+export async function verifyAuthSession(variables: {
+  id: string;
+  sessionToken: string;
+  verifiedAt: string;
+}): Promise<{ data: any }> {
+  const ref = mutationRef(dataConnect, 'VerifyAuthSession', variables);
+  const result = await executeMutation(ref);
+  return result as any;
+}
+
 // For backward compatibility with other Cloud Functions
 export async function executeGraphql(params: {
   query: string;

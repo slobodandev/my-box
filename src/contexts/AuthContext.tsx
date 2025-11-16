@@ -330,8 +330,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       console.log('Exchanging Firebase token for session token...');
 
-      // Call validateSession Cloud Function
-      const response = await fetch(CloudFunctionUrls.validateSession(), {
+      // Call verifyEmailLink Cloud Function
+      const response = await fetch(CloudFunctionUrls.verifyEmailLink(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -340,7 +340,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       });
 
       if (!response.ok) {
-        throw new Error(`Session validation failed: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Email link verification failed: ${response.statusText}`);
       }
 
       const data = await response.json();

@@ -1,0 +1,898 @@
+extend type Mutation {
+  """
+  ✨ Insert a single `AuthAuditLog` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  authAuditLog_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: AuthAuditLog_Data!
+  ): AuthAuditLog_KeyOutput! @fdc_generated(from: "AuthAuditLog", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `AuthSession` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  authSession_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: AuthSession_Data!
+  ): AuthSession_KeyOutput! @fdc_generated(from: "AuthSession", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `File` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  file_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: File_Data!
+  ): File_KeyOutput! @fdc_generated(from: "File", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `FileLoanAssociation` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  fileLoanAssociation_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: FileLoanAssociation_Data!
+  ): FileLoanAssociation_KeyOutput! @fdc_generated(from: "FileLoanAssociation", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `Loan` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  loan_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: Loan_Data!
+  ): Loan_KeyOutput! @fdc_generated(from: "Loan", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `RateLimitTracking` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  rateLimitTracking_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: RateLimitTracking_Data!
+  ): RateLimitTracking_KeyOutput! @fdc_generated(from: "RateLimitTracking", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `User` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  user_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: User_Data!
+  ): User_KeyOutput! @fdc_generated(from: "User", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `VerificationCode` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  verificationCode_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: VerificationCode_Data!
+  ): VerificationCode_KeyOutput! @fdc_generated(from: "VerificationCode", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert `AuthAuditLog` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  authAuditLog_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [AuthAuditLog_Data!]!
+  ): [AuthAuditLog_KeyOutput!]! @fdc_generated(from: "AuthAuditLog", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `AuthSession` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  authSession_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [AuthSession_Data!]!
+  ): [AuthSession_KeyOutput!]! @fdc_generated(from: "AuthSession", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `File` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  file_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [File_Data!]!
+  ): [File_KeyOutput!]! @fdc_generated(from: "File", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `FileLoanAssociation` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  fileLoanAssociation_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [FileLoanAssociation_Data!]!
+  ): [FileLoanAssociation_KeyOutput!]! @fdc_generated(from: "FileLoanAssociation", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `Loan` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  loan_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [Loan_Data!]!
+  ): [Loan_KeyOutput!]! @fdc_generated(from: "Loan", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `RateLimitTracking` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  rateLimitTracking_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [RateLimitTracking_Data!]!
+  ): [RateLimitTracking_KeyOutput!]! @fdc_generated(from: "RateLimitTracking", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `User` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  user_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [User_Data!]!
+  ): [User_KeyOutput!]! @fdc_generated(from: "User", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `VerificationCode` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  verificationCode_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [VerificationCode_Data!]!
+  ): [VerificationCode_KeyOutput!]! @fdc_generated(from: "VerificationCode", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert or update a single `AuthAuditLog` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `AuthAuditLog`.
+  """
+  authAuditLog_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: AuthAuditLog_Data!
+  ): AuthAuditLog_KeyOutput! @fdc_generated(from: "AuthAuditLog", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `AuthSession` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `AuthSession`.
+  """
+  authSession_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: AuthSession_Data!
+  ): AuthSession_KeyOutput! @fdc_generated(from: "AuthSession", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `File` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `File`.
+  """
+  file_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: File_Data!
+  ): File_KeyOutput! @fdc_generated(from: "File", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `FileLoanAssociation` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `FileLoanAssociation`.
+  """
+  fileLoanAssociation_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: FileLoanAssociation_Data!
+  ): FileLoanAssociation_KeyOutput! @fdc_generated(from: "FileLoanAssociation", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `Loan` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Loan`.
+  """
+  loan_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: Loan_Data!
+  ): Loan_KeyOutput! @fdc_generated(from: "Loan", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `RateLimitTracking` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `RateLimitTracking`.
+  """
+  rateLimitTracking_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: RateLimitTracking_Data!
+  ): RateLimitTracking_KeyOutput! @fdc_generated(from: "RateLimitTracking", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `User` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `User`.
+  """
+  user_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: User_Data!
+  ): User_KeyOutput! @fdc_generated(from: "User", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `VerificationCode` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `VerificationCode`.
+  """
+  verificationCode_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: VerificationCode_Data!
+  ): VerificationCode_KeyOutput! @fdc_generated(from: "VerificationCode", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update `AuthAuditLog` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `AuthAuditLog`.
+  """
+  authAuditLog_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [AuthAuditLog_Data!]!
+  ): [AuthAuditLog_KeyOutput!]! @fdc_generated(from: "AuthAuditLog", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `AuthSession` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `AuthSession`.
+  """
+  authSession_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [AuthSession_Data!]!
+  ): [AuthSession_KeyOutput!]! @fdc_generated(from: "AuthSession", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `File` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `File`.
+  """
+  file_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [File_Data!]!
+  ): [File_KeyOutput!]! @fdc_generated(from: "File", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `FileLoanAssociation` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `FileLoanAssociation`.
+  """
+  fileLoanAssociation_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [FileLoanAssociation_Data!]!
+  ): [FileLoanAssociation_KeyOutput!]! @fdc_generated(from: "FileLoanAssociation", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `Loan` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `Loan`.
+  """
+  loan_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [Loan_Data!]!
+  ): [Loan_KeyOutput!]! @fdc_generated(from: "Loan", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `RateLimitTracking` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `RateLimitTracking`.
+  """
+  rateLimitTracking_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [RateLimitTracking_Data!]!
+  ): [RateLimitTracking_KeyOutput!]! @fdc_generated(from: "RateLimitTracking", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `User` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `User`.
+  """
+  user_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [User_Data!]!
+  ): [User_KeyOutput!]! @fdc_generated(from: "User", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `VerificationCode` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `VerificationCode`.
+  """
+  verificationCode_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [VerificationCode_Data!]!
+  ): [VerificationCode_KeyOutput!]! @fdc_generated(from: "VerificationCode", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Update a single `AuthAuditLog` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `AuthAuditLog` or `null` if not found.
+  """
+  authAuditLog_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: AuthAuditLog_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: AuthAuditLog_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: AuthAuditLog_Data!
+  ): AuthAuditLog_KeyOutput @fdc_generated(from: "AuthAuditLog", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `AuthSession` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `AuthSession` or `null` if not found.
+  """
+  authSession_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: AuthSession_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: AuthSession_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: AuthSession_Data!
+  ): AuthSession_KeyOutput @fdc_generated(from: "AuthSession", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `File` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `File` or `null` if not found.
+  """
+  file_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: File_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: File_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: File_Data!
+  ): File_KeyOutput @fdc_generated(from: "File", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `FileLoanAssociation` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `FileLoanAssociation` or `null` if not found.
+  """
+  fileLoanAssociation_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: FileLoanAssociation_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: FileLoanAssociation_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: FileLoanAssociation_Data!
+  ): FileLoanAssociation_KeyOutput @fdc_generated(from: "FileLoanAssociation", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `Loan` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `Loan` or `null` if not found.
+  """
+  loan_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Loan_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Loan_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: Loan_Data!
+  ): Loan_KeyOutput @fdc_generated(from: "Loan", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `RateLimitTracking` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `RateLimitTracking` or `null` if not found.
+  """
+  rateLimitTracking_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: RateLimitTracking_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: RateLimitTracking_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: RateLimitTracking_Data!
+  ): RateLimitTracking_KeyOutput @fdc_generated(from: "RateLimitTracking", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `User` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `User` or `null` if not found.
+  """
+  user_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: User_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: User_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: User_Data!
+  ): User_KeyOutput @fdc_generated(from: "User", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `VerificationCode` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `VerificationCode` or `null` if not found.
+  """
+  verificationCode_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: VerificationCode_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: VerificationCode_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: VerificationCode_Data!
+  ): VerificationCode_KeyOutput @fdc_generated(from: "VerificationCode", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update `AuthAuditLog` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  authAuditLog_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: AuthAuditLog_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: AuthAuditLog_Data!
+  ): Int! @fdc_generated(from: "AuthAuditLog", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `AuthSession` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  authSession_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: AuthSession_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: AuthSession_Data!
+  ): Int! @fdc_generated(from: "AuthSession", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `File` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  file_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: File_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: File_Data!
+  ): Int! @fdc_generated(from: "File", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `FileLoanAssociation` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  fileLoanAssociation_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: FileLoanAssociation_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: FileLoanAssociation_Data!
+  ): Int! @fdc_generated(from: "FileLoanAssociation", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `Loan` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  loan_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: Loan_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: Loan_Data!
+  ): Int! @fdc_generated(from: "Loan", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `RateLimitTracking` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  rateLimitTracking_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: RateLimitTracking_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: RateLimitTracking_Data!
+  ): Int! @fdc_generated(from: "RateLimitTracking", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `User` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  user_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: User_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: User_Data!
+  ): Int! @fdc_generated(from: "User", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `VerificationCode` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  verificationCode_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: VerificationCode_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: VerificationCode_Data!
+  ): Int! @fdc_generated(from: "VerificationCode", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Delete a single `AuthAuditLog` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  authAuditLog_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: AuthAuditLog_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: AuthAuditLog_FirstRow
+  ): AuthAuditLog_KeyOutput @fdc_generated(from: "AuthAuditLog", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `AuthSession` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  authSession_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: AuthSession_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: AuthSession_FirstRow
+  ): AuthSession_KeyOutput @fdc_generated(from: "AuthSession", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `File` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  file_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: File_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: File_FirstRow
+  ): File_KeyOutput @fdc_generated(from: "File", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `FileLoanAssociation` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  fileLoanAssociation_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: FileLoanAssociation_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: FileLoanAssociation_FirstRow
+  ): FileLoanAssociation_KeyOutput @fdc_generated(from: "FileLoanAssociation", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `Loan` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  loan_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: Loan_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: Loan_FirstRow
+  ): Loan_KeyOutput @fdc_generated(from: "Loan", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `RateLimitTracking` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  rateLimitTracking_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: RateLimitTracking_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: RateLimitTracking_FirstRow
+  ): RateLimitTracking_KeyOutput @fdc_generated(from: "RateLimitTracking", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `User` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  user_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: User_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: User_FirstRow
+  ): User_KeyOutput @fdc_generated(from: "User", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `VerificationCode` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  verificationCode_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: VerificationCode_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: VerificationCode_FirstRow
+  ): VerificationCode_KeyOutput @fdc_generated(from: "VerificationCode", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete `AuthAuditLog` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  authAuditLog_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: AuthAuditLog_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "AuthAuditLog", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `AuthSession` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  authSession_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: AuthSession_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "AuthSession", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `File` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  file_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: File_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "File", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `FileLoanAssociation` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  fileLoanAssociation_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: FileLoanAssociation_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "FileLoanAssociation", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `Loan` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  loan_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: Loan_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "Loan", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `RateLimitTracking` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  rateLimitTracking_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: RateLimitTracking_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "RateLimitTracking", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `User` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  user_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: User_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "User", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `VerificationCode` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  verificationCode_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: VerificationCode_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "VerificationCode", purpose: DELETE_MULTIPLE)
+}

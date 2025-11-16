@@ -235,11 +235,19 @@ export interface GetAuthSessionByFirebaseUidData {
     borrowerContactId?: string | null;
     loanNumber?: string | null;
     firebaseUid?: string | null;
+    user: {
+      id: UUIDString;
+      email: string;
+      role: string;
+      firstName?: string | null;
+      lastName?: string | null;
+    } & User_Key;
   } & AuthSession_Key)[];
 }
 
 export interface GetAuthSessionByFirebaseUidVariables {
   firebaseUid: string;
+  email: string;
 }
 
 export interface GetAuthSessionData {

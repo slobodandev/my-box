@@ -9,18 +9,19 @@
 export enum CloudFunction {
   // Authentication
   GENERATE_AUTH_LINK = 'generateAuthLink',
+  VERIFY_EMAIL_LINK = 'verifyEmailLink',
   VALIDATE_SESSION = 'validateSession',
   VERIFY_CODE = 'verifyCode',
   SEND_VERIFICATION_CODE = 'sendVerificationCode',
   VERIFY_MAGIC_LINK = 'verifyMagicLink',
-  
+
   // File Operations
   PROCESS_UPLOAD = 'processUpload',
   LIST_FILES = 'listFiles',
   DELETE_FILE = 'deleteFile',
   GENERATE_DOWNLOAD_URL = 'generateDownloadURL',
   BATCH_GENERATE_DOWNLOAD_URLS = 'batchGenerateDownloadURLs',
-  
+
   // Cleanup
   CLEANUP_DELETED_FILES = 'cleanupDeletedFiles',
 }
@@ -58,18 +59,19 @@ export const getCloudFunctionUrl = (functionName: CloudFunction): string => {
 export const CloudFunctionUrls = {
   // Authentication
   generateAuthLink: () => getCloudFunctionUrl(CloudFunction.GENERATE_AUTH_LINK),
+  verifyEmailLink: () => getCloudFunctionUrl(CloudFunction.VERIFY_EMAIL_LINK),
   validateSession: () => getCloudFunctionUrl(CloudFunction.VALIDATE_SESSION),
   verifyCode: () => getCloudFunctionUrl(CloudFunction.VERIFY_CODE),
   sendVerificationCode: () => getCloudFunctionUrl(CloudFunction.SEND_VERIFICATION_CODE),
   verifyMagicLink: () => getCloudFunctionUrl(CloudFunction.VERIFY_MAGIC_LINK),
-  
+
   // File Operations
   processUpload: () => getCloudFunctionUrl(CloudFunction.PROCESS_UPLOAD),
   listFiles: () => getCloudFunctionUrl(CloudFunction.LIST_FILES),
   deleteFile: () => getCloudFunctionUrl(CloudFunction.DELETE_FILE),
   generateDownloadUrl: () => getCloudFunctionUrl(CloudFunction.GENERATE_DOWNLOAD_URL),
   batchGenerateDownloadUrls: () => getCloudFunctionUrl(CloudFunction.BATCH_GENERATE_DOWNLOAD_URLS),
-  
+
   // Cleanup
   cleanupDeletedFiles: () => getCloudFunctionUrl(CloudFunction.CLEANUP_DELETED_FILES),
 } as const;

@@ -76,6 +76,7 @@ type AuthSession @table(name: "auth_sessions") {
   id: UUID! @default(expr: "uuidV4()")
   sessionId: String! @col(name: "session_id")
   userId: UUID! @col(name: "user_id")
+  user: User! @ref(fields: "userId")
   loanIds: String @col(name: "loan_ids")
   emailHash: String! @col(name: "email_hash")
   magicToken: String @col(name: "magic_token")

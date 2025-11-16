@@ -22,6 +22,10 @@ export {
 } from './auth/generateAuthLink';
 
 export {
+  verifyEmailLink,
+} from './auth/verifyEmailLink';
+
+export {
   verifyMagicLink,
 } from './auth/verifyMagicLink';
 

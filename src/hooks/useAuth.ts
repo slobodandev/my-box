@@ -20,7 +20,9 @@ export interface GenerateAuthLinkResponse {
   success: boolean;
   message: string;
   sessionId: string;
-  userId: string;
+  emailSent: boolean;
+  expiresAt: string;
+  emailLink?: string; // Only included in emulator mode for testing
 }
 
 /**

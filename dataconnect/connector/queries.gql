@@ -249,7 +249,7 @@ query GetAuthAuditLogs($userId: UUID, $limit: Int) {
 }
 
 # Firebase Email Link Auth queries
-query GetAuthSessionByFirebaseUid($firebaseUid: String!) @auth(level: PUBLIC) {
+query GetAuthSessionByFirebaseUid($firebaseUid: String!, $email: String!) @auth(level: PUBLIC) {
   authSessions(
     where: { firebaseUid: { eq: $firebaseUid } }
     orderBy: { createdAt: DESC }
@@ -267,6 +267,13 @@ query GetAuthSessionByFirebaseUid($firebaseUid: String!) @auth(level: PUBLIC) {
     borrowerContactId
     loanNumber
     firebaseUid
+    user {
+      id
+      email
+      role
+      firstName
+      lastName
+    }
   }
 }
 

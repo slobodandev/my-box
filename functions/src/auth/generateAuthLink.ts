@@ -32,6 +32,7 @@ interface GenerateAuthLinkResponse {
   emailSent: boolean;
   expiresAt: string;
   message: string;
+  emailLink?: string; // Only included in emulator mode for testing
 }
 
 /**
@@ -255,6 +256,13 @@ export const generateAuthLink = onRequest(
         expiresAt: expiresAt.toISOString(),
         message: `Authentication email sent to ${email}`,
       };
+
+      // Include email link in response for emulator testing
+      const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true';
+      if (isEmulator) {
+        responseData.emailLink = emailLink;
+        logger.info('Including emailLink in response for emulator testing');
+      }
 
       response.status(200).json(responseData);
     } catch (error: any) {

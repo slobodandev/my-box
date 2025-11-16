@@ -69,8 +69,12 @@ try {
   db = getFirestore(app);
   storage = getStorage(app);
 
-  // Connect to emulators in development mode
-  if (import.meta.env.DEV) {
+  // Connect to emulators if enabled via environment variable
+  const useEmulators = import.meta.env.VITE_USE_FIREBASE_EMULATORS === 'true';
+
+  if (useEmulators) {
+    console.log('🔧 Firebase Emulators Mode Enabled');
+
     // Import emulator connection functions
     const { connectAuthEmulator } = await import('firebase/auth');
     const { connectFirestoreEmulator } = await import('firebase/firestore');
@@ -79,26 +83,28 @@ try {
     // Connect to Auth emulator
     try {
       connectAuthEmulator(auth, 'http://127.0.0.1:9099', { disableWarnings: true });
-      console.log('Connected to Auth emulator on port 9099');
+      console.log('✅ Connected to Auth emulator on port 9099');
     } catch (error) {
-      console.warn('Auth emulator connection failed:', error);
+      console.warn('⚠️ Auth emulator connection failed:', error);
     }
 
     // Connect to Firestore emulator
     try {
-      connectFirestoreEmulator(db, '127.0.0.1', 8080);
-      console.log('Connected to Firestore emulator on port 8080');
+      connectFirestoreEmulator(db, '127.0.0.1', 8081);
+      console.log('✅ Connected to Firestore emulator on port 8081');
     } catch (error) {
-      console.warn('Firestore emulator connection failed:', error);
+      console.warn('⚠️ Firestore emulator connection failed:', error);
     }
 
     // Connect to Storage emulator
     try {
       connectStorageEmulator(storage, '127.0.0.1', 9199);
-      console.log('Connected to Storage emulator on port 9199');
+      console.log('✅ Connected to Storage emulator on port 9199');
     } catch (error) {
-      console.warn('Storage emulator connection failed:', error);
+      console.warn('⚠️ Storage emulator connection failed:', error);
     }
+  } else {
+    console.log('🌐 Firebase Production Mode');
   }
 
   // Initialize Analytics (only in production and if supported)
