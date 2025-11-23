@@ -300,6 +300,15 @@ extend type AuthSession {
     distinct: Boolean = false
   ): Int! @fdc_generated(from: "AuthSession.tokenType", purpose: QUERY_COUNT)
   """
+  ✨ Count the number of rows in the `AuthSession` table where the `usedForPasswordCreation` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  usedForPasswordCreation_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "AuthSession.usedForPasswordCreation", purpose: QUERY_COUNT)
+  """
   ✨ Count the number of rows in the `AuthSession` table where the `userAgent` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
   """
   userAgent_count(
@@ -452,6 +461,15 @@ extend type File {
     """
     distinct: Boolean = false
   ): Int! @fdc_generated(from: "File.isDeleted", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `File` table where the `loanId` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  loanId_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "File.loanId", purpose: QUERY_COUNT)
   """
   ✨ Count the number of rows in the `File` table where the `mimeType` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
   """
@@ -638,6 +656,40 @@ extend type FileLoanAssociation {
   _id: ID! @fdc_generated(from: "FileLoanAssociation.id", purpose: GLOBAL_ID)
 }
 extend type Loan {
+  """
+  ✨ List `File` objects in a one-to-many relationship (where `File`.`loan` is this object).
+  """
+  files_on_loan(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: File_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [File_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: File_Having
+  ): [File!]! @fdc_generated(from: "File.loan", purpose: QUERY_MULTIPLE_ONE_TO_MANY)
   """
   Implicit metadata field that cannot be written. It provides extra information about query results.
   """
@@ -827,6 +879,247 @@ extend type Loan {
   """
   _id: ID! @fdc_generated(from: "Loan.id", purpose: GLOBAL_ID)
 }
+extend type MagicLink {
+  """
+  Implicit metadata field that cannot be written. It provides extra information about query results.
+  """
+  _metadata: _Metadata @fdc_generated(from: "MagicLink", purpose: METADATA_FIELD)
+  """
+  ✨ Count the number of rows in the `MagicLink` table.
+  """
+  _count: Int! @fdc_generated(from: "MagicLink.", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `borrowerEmail` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  borrowerEmail_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.borrowerEmail", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `createdAt` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  createdAt_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.createdAt", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `createdBy` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  createdBy_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.createdBy", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `expiresAt` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  expiresAt_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.expiresAt", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `id` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  id_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.id", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `isActive` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  isActive_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.isActive", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `lastSentAt` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  lastSentAt_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.lastSentAt", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `magicLinkUrl` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  magicLinkUrl_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.magicLinkUrl", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `revokeReason` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  revokeReason_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.revokeReason", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `revokedAt` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  revokedAt_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.revokedAt", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `revokedBy` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  revokedBy_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.revokedBy", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `sendCount` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  sendCount_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.sendCount", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `sendToEmail` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  sendToEmail_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.sendToEmail", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `sentAt` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  sentAt_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.sentAt", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `sessionId` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  sessionId_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.sessionId", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `usedAt` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  usedAt_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.usedAt", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `MagicLink` table where the `userId` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  userId_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink.userId", purpose: QUERY_COUNT)
+  """
+  ✨ Sum the `sendCount` field in the `MagicLink` table.
+  """
+  sendCount_sum(
+    """
+    Set to true to sum the distinct values.
+    """
+    distinct: Boolean = false
+  ): Int @fdc_generated(from: "MagicLink.sendCount", purpose: QUERY_SUM)
+  """
+  ✨ Average the `sendCount` field in the `MagicLink` table.
+  """
+  sendCount_avg(
+    """
+    Set to true to average the distinct values.
+    """
+    distinct: Boolean = false
+  ): Float @fdc_generated(from: "MagicLink.sendCount", purpose: QUERY_AVG)
+  """
+  ✨ Minimum of the `createdAt` field in the `MagicLink` table.
+  """
+  createdAt_min: Timestamp @fdc_generated(from: "MagicLink.createdAt", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `expiresAt` field in the `MagicLink` table.
+  """
+  expiresAt_min: Timestamp @fdc_generated(from: "MagicLink.expiresAt", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `lastSentAt` field in the `MagicLink` table.
+  """
+  lastSentAt_min: Timestamp @fdc_generated(from: "MagicLink.lastSentAt", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `revokedAt` field in the `MagicLink` table.
+  """
+  revokedAt_min: Timestamp @fdc_generated(from: "MagicLink.revokedAt", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `sendCount` field in the `MagicLink` table.
+  """
+  sendCount_min: Int @fdc_generated(from: "MagicLink.sendCount", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `sentAt` field in the `MagicLink` table.
+  """
+  sentAt_min: Timestamp @fdc_generated(from: "MagicLink.sentAt", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `usedAt` field in the `MagicLink` table.
+  """
+  usedAt_min: Timestamp @fdc_generated(from: "MagicLink.usedAt", purpose: QUERY_MIN)
+  """
+  ✨ Maximum of the `createdAt` field in the `MagicLink` table.
+  """
+  createdAt_max: Timestamp @fdc_generated(from: "MagicLink.createdAt", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `expiresAt` field in the `MagicLink` table.
+  """
+  expiresAt_max: Timestamp @fdc_generated(from: "MagicLink.expiresAt", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `lastSentAt` field in the `MagicLink` table.
+  """
+  lastSentAt_max: Timestamp @fdc_generated(from: "MagicLink.lastSentAt", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `revokedAt` field in the `MagicLink` table.
+  """
+  revokedAt_max: Timestamp @fdc_generated(from: "MagicLink.revokedAt", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `sendCount` field in the `MagicLink` table.
+  """
+  sendCount_max: Int @fdc_generated(from: "MagicLink.sendCount", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `sentAt` field in the `MagicLink` table.
+  """
+  sentAt_max: Timestamp @fdc_generated(from: "MagicLink.sentAt", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `usedAt` field in the `MagicLink` table.
+  """
+  usedAt_max: Timestamp @fdc_generated(from: "MagicLink.usedAt", purpose: QUERY_MAX)
+  """
+  A generated field that is used for caching results in SDKs.
+  """
+  _id: ID! @fdc_generated(from: "MagicLink.id", purpose: GLOBAL_ID)
+}
 extend type RateLimitTracking {
   """
   Implicit metadata field that cannot be written. It provides extra information about query results.
@@ -973,6 +1266,40 @@ extend type User {
     having: AuthSession_Having
   ): [AuthSession!]! @fdc_generated(from: "AuthSession.user", purpose: QUERY_MULTIPLE_ONE_TO_MANY)
   """
+  ✨ List `MagicLink` objects in a one-to-many relationship (where `MagicLink`.`user` is this object).
+  """
+  magicLinks_on_user(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: MagicLink_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [MagicLink_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: MagicLink_Having
+  ): [MagicLink!]! @fdc_generated(from: "MagicLink.user", purpose: QUERY_MULTIPLE_ONE_TO_MANY)
+  """
   Implicit metadata field that cannot be written. It provides extra information about query results.
   """
   _metadata: _Metadata @fdc_generated(from: "User", purpose: METADATA_FIELD)
@@ -1008,6 +1335,24 @@ extend type User {
     distinct: Boolean = false
   ): Int! @fdc_generated(from: "User.firstName", purpose: QUERY_COUNT)
   """
+  ✨ Count the number of rows in the `User` table where the `googleAuthUid` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  googleAuthUid_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "User.googleAuthUid", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `User` table where the `hasPassword` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  hasPassword_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "User.hasPassword", purpose: QUERY_COUNT)
+  """
   ✨ Count the number of rows in the `User` table where the `id` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
   """
   id_count(
@@ -1025,6 +1370,15 @@ extend type User {
     """
     distinct: Boolean = false
   ): Int! @fdc_generated(from: "User.isActive", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `User` table where the `isTemporary` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  isTemporary_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "User.isTemporary", purpose: QUERY_COUNT)
   """
   ✨ Count the number of rows in the `User` table where the `lastLoginAt` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
   """

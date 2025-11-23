@@ -43,4 +43,5 @@ export type FileType = 'pdf' | 'doc' | 'docx' | 'xls' | 'xlsx' | 'jpg' | 'jpeg' 
 export interface FileIcon {
   icon: string
   color: string
+  bgColor?: string
 }

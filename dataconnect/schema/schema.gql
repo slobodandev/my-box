@@ -6,9 +6,13 @@ type User @table {
   email: String! @col(name: "email")
   firstName: String @col(name: "first_name")
   lastName: String @col(name: "last_name")
-  role: String! @default(value: "borrower")
+  role: String! @default(value: "borrower") # 'admin' or 'borrower'
   isActive: Boolean! @default(value: true)
   phoneNumber: String @col(name: "phone_number")
+  # Authentication fields
+  hasPassword: Boolean! @default(value: false) @col(name: "has_password")
+  googleAuthUid: String @col(name: "google_auth_uid") # Google Sign-In UID
+  isTemporary: Boolean! @default(value: true) @col(name: "is_temporary") # True for magic link users without password
   createdAt: Timestamp! @default(expr: "request.time")
   updatedAt: Timestamp! @default(expr: "request.time")
   lastLoginAt: Timestamp @col(name: "last_login_at")
@@ -17,6 +21,7 @@ type User @table {
 # Index on email for fast lookups
 extend type User @index(fields: ["email"], name: "idx_user_email")
 extend type User @index(fields: ["role"], name: "idx_user_role")
+extend type User @index(fields: ["googleAuthUid"], name: "idx_user_google_uid")
 
 type Loan @table {
   id: UUID! @default(expr: "uuidV4()")
@@ -42,6 +47,8 @@ extend type Loan @index(fields: ["status"], name: "idx_loan_status")
 type File @table {
   id: UUID! @default(expr: "uuidV4()")
   userId: UUID! @col(name: "user_id")
+  loanId: UUID @col(name: "loan_id") # Nullable - null means personal file
+  loan: Loan @ref(fields: "loanId") # Relationship to Loan
   originalFilename: String! @col(name: "original_filename")
   storagePath: String! @col(name: "storage_path")
   fileSize: Int! @col(name: "file_size")
@@ -58,6 +65,7 @@ type File @table {
 }
 
 extend type File @index(fields: ["userId"], name: "idx_file_user")
+extend type File @index(fields: ["loanId"], name: "idx_file_loan")
 extend type File @index(fields: ["storagePath"], name: "idx_file_path")
 extend type File @index(fields: ["isDeleted"], name: "idx_file_deleted")
 
@@ -77,7 +85,7 @@ type AuthSession @table(name: "auth_sessions") {
   sessionId: String! @col(name: "session_id")
   userId: UUID! @col(name: "user_id")
   user: User! @ref(fields: "userId")
-  loanIds: String @col(name: "loan_ids")
+  loanIds: String @col(name: "loan_ids") # JSON array of loan UUIDs borrower can access
   emailHash: String! @col(name: "email_hash")
   magicToken: String @col(name: "magic_token")
   sessionToken: String @col(name: "session_token")
@@ -97,6 +105,8 @@ type AuthSession @table(name: "auth_sessions") {
   firebaseUid: String @col(name: "firebase_uid")
   borrowerContactId: String @col(name: "borrower_contact_id")
   loanNumber: String @col(name: "loan_number")
+  # Password creation tracking
+  usedForPasswordCreation: Boolean! @default(value: false) @col(name: "used_for_password_creation")
 }
 
 extend type AuthSession @index(fields: ["sessionId"], name: "idx_auth_session_id")
@@ -104,6 +114,32 @@ extend type AuthSession @index(fields: ["userId"], name: "idx_auth_user")
 extend type AuthSession @index(fields: ["status"], name: "idx_auth_status")
 extend type AuthSession @index(fields: ["emailHash"], name: "idx_auth_email_hash")
 extend type AuthSession @index(fields: ["firebaseUid"], name: "idx_auth_firebase_uid")
+
+type MagicLink @table(name: "magic_links") {
+  id: UUID! @default(expr: "uuidV4()")
+  userId: UUID! @col(name: "user_id")
+  user: User! @ref(fields: "userId")
+  borrowerEmail: String! @col(name: "borrower_email")
+  sendToEmail: String! @col(name: "send_to_email")
+  magicLinkUrl: String! @col(name: "magic_link_url")
+  sessionId: String @col(name: "session_id")
+  expiresAt: Timestamp! @col(name: "expires_at")
+  createdAt: Timestamp! @default(expr: "request.time")
+  createdBy: UUID @col(name: "created_by")
+  sentAt: Timestamp @col(name: "sent_at")
+  lastSentAt: Timestamp @col(name: "last_sent_at")
+  sendCount: Int! @default(value: 0) @col(name: "send_count")
+  usedAt: Timestamp @col(name: "used_at")
+  isActive: Boolean! @default(value: true) @col(name: "is_active")
+  revokedAt: Timestamp @col(name: "revoked_at")
+  revokedBy: UUID @col(name: "revoked_by")
+  revokeReason: String @col(name: "revoke_reason")
+}
+
+extend type MagicLink @index(fields: ["userId"], name: "idx_magic_link_user")
+extend type MagicLink @index(fields: ["sessionId"], name: "idx_magic_link_session")
+extend type MagicLink @index(fields: ["expiresAt"], name: "idx_magic_link_expires")
+extend type MagicLink @index(fields: ["isActive"], name: "idx_magic_link_active")
 
 type VerificationCode @table(name: "verification_codes") {
   id: UUID! @default(expr: "uuidV4()")

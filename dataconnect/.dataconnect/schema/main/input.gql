@@ -29,6 +29,12 @@ It has the same format as `Loan_Key`, but is only used as mutation return value.
 """
 scalar Loan_KeyOutput
 """
+✨ `MagicLink_KeyOutput` returns the primary key fields of table type `MagicLink`.
+
+It has the same format as `MagicLink_Key`, but is only used as mutation return value.
+"""
+scalar MagicLink_KeyOutput
+"""
 ✨ `RateLimitTracking_KeyOutput` returns the primary key fields of table type `RateLimitTracking`.
 
 It has the same format as `RateLimitTracking_Key`, but is only used as mutation return value.
@@ -630,6 +636,14 @@ input AuthSession_Data {
   """
   tokenType_expr: String_Expr
   """
+  ✨ Generated from Field `AuthSession`.`usedForPasswordCreation` of type `Boolean!`
+  """
+  usedForPasswordCreation: Boolean
+  """
+  ✨ `_expr` server value variant of `usedForPasswordCreation` (✨ Generated from Field `AuthSession`.`usedForPasswordCreation` of type `Boolean!`)
+  """
+  usedForPasswordCreation_expr: Boolean_Expr
+  """
   ✨ Generated from Field `AuthSession`.`userAgent` of type `String`
   """
   userAgent: String
@@ -755,6 +769,10 @@ input AuthSession_Filter {
   """
   tokenType: String_Filter
   """
+  ✨ Generated from Field `AuthSession`.`usedForPasswordCreation` of type `Boolean!`
+  """
+  usedForPasswordCreation: Boolean_Filter
+  """
   ✨ Generated from Field `AuthSession`.`userAgent` of type `String`
   """
   userAgent: String_Filter
@@ -876,6 +894,10 @@ input AuthSession_Having {
   ✨ Generated from Field `AuthSession`.`tokenType_count` of type `Int!`
   """
   tokenType_count: Int_Filter
+  """
+  ✨ Generated from Field `AuthSession`.`usedForPasswordCreation_count` of type `Int!`
+  """
+  usedForPasswordCreation_count: Int_Filter
   """
   ✨ Generated from Field `AuthSession`.`userAgent_count` of type `Int!`
   """
@@ -1044,6 +1066,10 @@ input AuthSession_Order {
   """
   tokenType: OrderDirection
   """
+  ✨ Generated from Field `AuthSession`.`usedForPasswordCreation` of type `Boolean!`
+  """
+  usedForPasswordCreation: OrderDirection
+  """
   ✨ Generated from Field `AuthSession`.`userAgent` of type `String`
   """
   userAgent: OrderDirection
@@ -1132,6 +1158,10 @@ input AuthSession_Order {
   """
   tokenType_count: OrderDirection
   """
+  ✨ Generated from Field `AuthSession`.`usedForPasswordCreation_count` of type `Int!`
+  """
+  usedForPasswordCreation_count: OrderDirection
+  """
   ✨ Generated from Field `AuthSession`.`userAgent_count` of type `Int!`
   """
   userAgent_count: OrderDirection
@@ -1196,6 +1226,18 @@ input File_Data {
   ✨ `_expr` server value variant of `id` (✨ Generated from Field `File`.`id` of type `UUID!`)
   """
   id_expr: UUID_Expr
+  """
+  ✨ Generated from Field `File`.`loanId` of type `UUID`
+  """
+  loanId: UUID
+  """
+  ✨ `_expr` server value variant of `loanId` (✨ Generated from Field `File`.`loanId` of type `UUID`)
+  """
+  loanId_expr: UUID_Expr
+  """
+  ✨ Generated from Field `File`.`loan` of type `Loan`
+  """
+  loan: Loan_Key
   """
   ✨ Generated from Field `File`.`deletedAt` of type `Timestamp`
   """
@@ -1358,6 +1400,14 @@ input File_Filter {
   """
   id: UUID_Filter
   """
+  ✨ Generated from Field `File`.`loanId` of type `UUID`
+  """
+  loanId: UUID_Filter
+  """
+  ✨ Generated from Field `File`.`loan` of type `Loan`
+  """
+  loan: Loan_Filter
+  """
   ✨ Generated from Field `File`.`deletedAt` of type `Timestamp`
   """
   deletedAt: Timestamp_Filter
@@ -1484,6 +1534,10 @@ input File_Having {
   """
   isDeleted_count: Int_Filter
   """
+  ✨ Generated from Field `File`.`loanId_count` of type `Int!`
+  """
+  loanId_count: Int_Filter
+  """
   ✨ Generated from Field `File`.`mimeType_count` of type `Int!`
   """
   mimeType_count: Int_Filter
@@ -1587,6 +1641,14 @@ input File_Order {
   """
   id: OrderDirection
   """
+  ✨ Generated from Field `File`.`loanId` of type `UUID`
+  """
+  loanId: OrderDirection
+  """
+  ✨ Generated from Field `File`.`loan` of type `Loan`
+  """
+  loan: Loan_Order
+  """
   ✨ Generated from Field `File`.`deletedAt` of type `Timestamp`
   """
   deletedAt: OrderDirection
@@ -1678,6 +1740,10 @@ input File_Order {
   ✨ Generated from Field `File`.`isDeleted_count` of type `Int!`
   """
   isDeleted_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`loanId_count` of type `Int!`
+  """
+  loanId_count: OrderDirection
   """
   ✨ Generated from Field `File`.`mimeType_count` of type `Int!`
   """
@@ -2203,6 +2269,10 @@ input Loan_Filter {
   ✨ Generated from Field `Loan`.`userId` of type `UUID!`
   """
   userId: UUID_Filter
+  """
+  ✨ Generated from Field `Loan`.`files_on_loan` of type `[File!]!`
+  """
+  files_on_loan: File_ListFilter
 }
 """
 ✨ Generated first-row input type for table 'Loan'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
@@ -2524,6 +2594,701 @@ input Loan_Order {
   ✨ Generated from Field `Loan`.`updatedAt_max` of type `Timestamp`
   """
   updatedAt_max: OrderDirection
+}
+"""
+✨ Generated data input type for table 'MagicLink'. It includes all necessary fields for creating or upserting rows into table.
+"""
+input MagicLink_Data {
+  """
+  ✨ Generated from Field `MagicLink`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `MagicLink`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+  """
+  ✨ Generated from Field `MagicLink`.`userId` of type `UUID!`
+  """
+  userId: UUID
+  """
+  ✨ `_expr` server value variant of `userId` (✨ Generated from Field `MagicLink`.`userId` of type `UUID!`)
+  """
+  userId_expr: UUID_Expr
+  """
+  ✨ Generated from Field `MagicLink`.`user` of type `User!`
+  """
+  user: User_Key
+  """
+  ✨ Generated from Field `MagicLink`.`borrowerEmail` of type `String!`
+  """
+  borrowerEmail: String
+  """
+  ✨ `_expr` server value variant of `borrowerEmail` (✨ Generated from Field `MagicLink`.`borrowerEmail` of type `String!`)
+  """
+  borrowerEmail_expr: String_Expr
+  """
+  ✨ Generated from Field `MagicLink`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `createdAt` (✨ Generated from Field `MagicLink`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `createdAt` (✨ Generated from Field `MagicLink`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `createdAt` (✨ Generated from Field `MagicLink`.`createdAt` of type `Timestamp!`)
+  """
+  createdAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `MagicLink`.`createdBy` of type `UUID`
+  """
+  createdBy: UUID
+  """
+  ✨ `_expr` server value variant of `createdBy` (✨ Generated from Field `MagicLink`.`createdBy` of type `UUID`)
+  """
+  createdBy_expr: UUID_Expr
+  """
+  ✨ Generated from Field `MagicLink`.`expiresAt` of type `Timestamp!`
+  """
+  expiresAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `expiresAt` (✨ Generated from Field `MagicLink`.`expiresAt` of type `Timestamp!`)
+  """
+  expiresAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `expiresAt` (✨ Generated from Field `MagicLink`.`expiresAt` of type `Timestamp!`)
+  """
+  expiresAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `expiresAt` (✨ Generated from Field `MagicLink`.`expiresAt` of type `Timestamp!`)
+  """
+  expiresAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `MagicLink`.`isActive` of type `Boolean!`
+  """
+  isActive: Boolean
+  """
+  ✨ `_expr` server value variant of `isActive` (✨ Generated from Field `MagicLink`.`isActive` of type `Boolean!`)
+  """
+  isActive_expr: Boolean_Expr
+  """
+  ✨ Generated from Field `MagicLink`.`lastSentAt` of type `Timestamp`
+  """
+  lastSentAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `lastSentAt` (✨ Generated from Field `MagicLink`.`lastSentAt` of type `Timestamp`)
+  """
+  lastSentAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `lastSentAt` (✨ Generated from Field `MagicLink`.`lastSentAt` of type `Timestamp`)
+  """
+  lastSentAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `lastSentAt` (✨ Generated from Field `MagicLink`.`lastSentAt` of type `Timestamp`)
+  """
+  lastSentAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `MagicLink`.`magicLinkUrl` of type `String!`
+  """
+  magicLinkUrl: String
+  """
+  ✨ `_expr` server value variant of `magicLinkUrl` (✨ Generated from Field `MagicLink`.`magicLinkUrl` of type `String!`)
+  """
+  magicLinkUrl_expr: String_Expr
+  """
+  ✨ Generated from Field `MagicLink`.`revokeReason` of type `String`
+  """
+  revokeReason: String
+  """
+  ✨ `_expr` server value variant of `revokeReason` (✨ Generated from Field `MagicLink`.`revokeReason` of type `String`)
+  """
+  revokeReason_expr: String_Expr
+  """
+  ✨ Generated from Field `MagicLink`.`revokedAt` of type `Timestamp`
+  """
+  revokedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `revokedAt` (✨ Generated from Field `MagicLink`.`revokedAt` of type `Timestamp`)
+  """
+  revokedAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `revokedAt` (✨ Generated from Field `MagicLink`.`revokedAt` of type `Timestamp`)
+  """
+  revokedAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `revokedAt` (✨ Generated from Field `MagicLink`.`revokedAt` of type `Timestamp`)
+  """
+  revokedAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `MagicLink`.`revokedBy` of type `UUID`
+  """
+  revokedBy: UUID
+  """
+  ✨ `_expr` server value variant of `revokedBy` (✨ Generated from Field `MagicLink`.`revokedBy` of type `UUID`)
+  """
+  revokedBy_expr: UUID_Expr
+  """
+  ✨ Generated from Field `MagicLink`.`sendCount` of type `Int!`
+  """
+  sendCount: Int
+  """
+  ✨ `_expr` server value variant of `sendCount` (✨ Generated from Field `MagicLink`.`sendCount` of type `Int!`)
+  """
+  sendCount_expr: Int_Expr
+  """
+  ✨ `_update` server value variant of `sendCount` (✨ Generated from Field `MagicLink`.`sendCount` of type `Int!`)
+  """
+  sendCount_update: [Int_Update!]
+  """
+  ✨ Generated from Field `MagicLink`.`sendToEmail` of type `String!`
+  """
+  sendToEmail: String
+  """
+  ✨ `_expr` server value variant of `sendToEmail` (✨ Generated from Field `MagicLink`.`sendToEmail` of type `String!`)
+  """
+  sendToEmail_expr: String_Expr
+  """
+  ✨ Generated from Field `MagicLink`.`sentAt` of type `Timestamp`
+  """
+  sentAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `sentAt` (✨ Generated from Field `MagicLink`.`sentAt` of type `Timestamp`)
+  """
+  sentAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `sentAt` (✨ Generated from Field `MagicLink`.`sentAt` of type `Timestamp`)
+  """
+  sentAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `sentAt` (✨ Generated from Field `MagicLink`.`sentAt` of type `Timestamp`)
+  """
+  sentAt_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `MagicLink`.`sessionId` of type `String`
+  """
+  sessionId: String
+  """
+  ✨ `_expr` server value variant of `sessionId` (✨ Generated from Field `MagicLink`.`sessionId` of type `String`)
+  """
+  sessionId_expr: String_Expr
+  """
+  ✨ Generated from Field `MagicLink`.`usedAt` of type `Timestamp`
+  """
+  usedAt: Timestamp
+  """
+  ✨ `_expr` server value variant of `usedAt` (✨ Generated from Field `MagicLink`.`usedAt` of type `Timestamp`)
+  """
+  usedAt_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `usedAt` (✨ Generated from Field `MagicLink`.`usedAt` of type `Timestamp`)
+  """
+  usedAt_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `usedAt` (✨ Generated from Field `MagicLink`.`usedAt` of type `Timestamp`)
+  """
+  usedAt_update: [Timestamp_Update!]
+}
+"""
+✨ Generated filter input type for table 'MagicLink'. This input allows filtering objects using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input MagicLink_Filter {
+  """
+  Apply multiple filter conditions using `AND` logic.
+  """
+  _and: [MagicLink_Filter!]
+  """
+  Negate the result of the provided filter condition.
+  """
+  _not: MagicLink_Filter
+  """
+  Apply multiple filter conditions using `OR` logic.
+  """
+  _or: [MagicLink_Filter!]
+  """
+  ✨ Generated from Field `MagicLink`.`id` of type `UUID!`
+  """
+  id: UUID_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`userId` of type `UUID!`
+  """
+  userId: UUID_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`user` of type `User!`
+  """
+  user: User_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`borrowerEmail` of type `String!`
+  """
+  borrowerEmail: String_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`createdBy` of type `UUID`
+  """
+  createdBy: UUID_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`expiresAt` of type `Timestamp!`
+  """
+  expiresAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`isActive` of type `Boolean!`
+  """
+  isActive: Boolean_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`lastSentAt` of type `Timestamp`
+  """
+  lastSentAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`magicLinkUrl` of type `String!`
+  """
+  magicLinkUrl: String_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`revokeReason` of type `String`
+  """
+  revokeReason: String_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`revokedAt` of type `Timestamp`
+  """
+  revokedAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`revokedBy` of type `UUID`
+  """
+  revokedBy: UUID_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sendCount` of type `Int!`
+  """
+  sendCount: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sendToEmail` of type `String!`
+  """
+  sendToEmail: String_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sentAt` of type `Timestamp`
+  """
+  sentAt: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sessionId` of type `String`
+  """
+  sessionId: String_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`usedAt` of type `Timestamp`
+  """
+  usedAt: Timestamp_Filter
+}
+"""
+✨ Generated first-row input type for table 'MagicLink'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
+"""
+input MagicLink_FirstRow {
+  """
+  Order the result by the specified fields.
+  """
+  orderBy: [MagicLink_Order!]
+  """
+  Filters rows based on the specified conditions.
+  """
+  where: MagicLink_Filter
+}
+"""
+✨ Generated having input type for table 'MagicLink'. This input allows you to filter groups during aggregate queries using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input MagicLink_Having {
+  """
+  Apply multiple Having conditions using `AND` logic.
+  """
+  _and: [MagicLink_Having!]
+  """
+  Whether to apply DISTINCT to the aggregate function.
+  """
+  _distinct: Boolean
+  """
+  Negate the result of the provided Having condition.
+  """
+  _not: MagicLink_Having
+  """
+  Apply multiple Having conditions using `OR` logic.
+  """
+  _or: [MagicLink_Having!]
+  """
+  ✨ Generated from Field `MagicLink`.`_count` of type `Int!`
+  """
+  _count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`borrowerEmail_count` of type `Int!`
+  """
+  borrowerEmail_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`createdAt_count` of type `Int!`
+  """
+  createdAt_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`createdBy_count` of type `Int!`
+  """
+  createdBy_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`expiresAt_count` of type `Int!`
+  """
+  expiresAt_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`id_count` of type `Int!`
+  """
+  id_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`isActive_count` of type `Int!`
+  """
+  isActive_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`lastSentAt_count` of type `Int!`
+  """
+  lastSentAt_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`magicLinkUrl_count` of type `Int!`
+  """
+  magicLinkUrl_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`revokeReason_count` of type `Int!`
+  """
+  revokeReason_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`revokedAt_count` of type `Int!`
+  """
+  revokedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`revokedBy_count` of type `Int!`
+  """
+  revokedBy_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sendCount_count` of type `Int!`
+  """
+  sendCount_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sendToEmail_count` of type `Int!`
+  """
+  sendToEmail_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sentAt_count` of type `Int!`
+  """
+  sentAt_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sessionId_count` of type `Int!`
+  """
+  sessionId_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`usedAt_count` of type `Int!`
+  """
+  usedAt_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`userId_count` of type `Int!`
+  """
+  userId_count: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sendCount_sum` of type `Int`
+  """
+  sendCount_sum: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sendCount_avg` of type `Float`
+  """
+  sendCount_avg: Float_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`createdAt_min` of type `Timestamp`
+  """
+  createdAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`expiresAt_min` of type `Timestamp`
+  """
+  expiresAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`lastSentAt_min` of type `Timestamp`
+  """
+  lastSentAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`revokedAt_min` of type `Timestamp`
+  """
+  revokedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sendCount_min` of type `Int`
+  """
+  sendCount_min: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sentAt_min` of type `Timestamp`
+  """
+  sentAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`usedAt_min` of type `Timestamp`
+  """
+  usedAt_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`createdAt_max` of type `Timestamp`
+  """
+  createdAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`expiresAt_max` of type `Timestamp`
+  """
+  expiresAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`lastSentAt_max` of type `Timestamp`
+  """
+  lastSentAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`revokedAt_max` of type `Timestamp`
+  """
+  revokedAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sendCount_max` of type `Int`
+  """
+  sendCount_max: Int_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`sentAt_max` of type `Timestamp`
+  """
+  sentAt_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `MagicLink`.`usedAt_max` of type `Timestamp`
+  """
+  usedAt_max: Timestamp_Filter
+}
+"""
+✨ Generated key input type for table 'MagicLink'. It represents the primary key fields used to uniquely identify a row in the table.
+"""
+input MagicLink_Key {
+  """
+  ✨ Generated from Field `MagicLink`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `MagicLink`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+}
+"""
+✨ Generated list filter input type for table 'MagicLink'. This input applies filtering logic based on the count or existence of related objects that matches certain criteria.
+"""
+input MagicLink_ListFilter {
+  """
+  The desired number of objects that match the condition (defaults to at least one).
+  """
+  count: Int_Filter = {gt:0}
+  """
+  Condition of the related objects to filter for.
+  """
+  exist: MagicLink_Filter
+}
+"""
+✨ Generated order input type for table 'MagicLink'. This input defines the sorting order of rows in query results based on one or more fields.
+"""
+input MagicLink_Order {
+  """
+  ✨ Generated from Field `MagicLink`.`id` of type `UUID!`
+  """
+  id: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`userId` of type `UUID!`
+  """
+  userId: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`user` of type `User!`
+  """
+  user: User_Order
+  """
+  ✨ Generated from Field `MagicLink`.`borrowerEmail` of type `String!`
+  """
+  borrowerEmail: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`createdAt` of type `Timestamp!`
+  """
+  createdAt: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`createdBy` of type `UUID`
+  """
+  createdBy: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`expiresAt` of type `Timestamp!`
+  """
+  expiresAt: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`isActive` of type `Boolean!`
+  """
+  isActive: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`lastSentAt` of type `Timestamp`
+  """
+  lastSentAt: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`magicLinkUrl` of type `String!`
+  """
+  magicLinkUrl: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`revokeReason` of type `String`
+  """
+  revokeReason: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`revokedAt` of type `Timestamp`
+  """
+  revokedAt: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`revokedBy` of type `UUID`
+  """
+  revokedBy: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sendCount` of type `Int!`
+  """
+  sendCount: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sendToEmail` of type `String!`
+  """
+  sendToEmail: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sentAt` of type `Timestamp`
+  """
+  sentAt: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sessionId` of type `String`
+  """
+  sessionId: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`usedAt` of type `Timestamp`
+  """
+  usedAt: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`_count` of type `Int!`
+  """
+  _count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`borrowerEmail_count` of type `Int!`
+  """
+  borrowerEmail_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`createdAt_count` of type `Int!`
+  """
+  createdAt_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`createdBy_count` of type `Int!`
+  """
+  createdBy_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`expiresAt_count` of type `Int!`
+  """
+  expiresAt_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`id_count` of type `Int!`
+  """
+  id_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`isActive_count` of type `Int!`
+  """
+  isActive_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`lastSentAt_count` of type `Int!`
+  """
+  lastSentAt_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`magicLinkUrl_count` of type `Int!`
+  """
+  magicLinkUrl_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`revokeReason_count` of type `Int!`
+  """
+  revokeReason_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`revokedAt_count` of type `Int!`
+  """
+  revokedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`revokedBy_count` of type `Int!`
+  """
+  revokedBy_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sendCount_count` of type `Int!`
+  """
+  sendCount_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sendToEmail_count` of type `Int!`
+  """
+  sendToEmail_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sentAt_count` of type `Int!`
+  """
+  sentAt_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sessionId_count` of type `Int!`
+  """
+  sessionId_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`usedAt_count` of type `Int!`
+  """
+  usedAt_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`userId_count` of type `Int!`
+  """
+  userId_count: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sendCount_sum` of type `Int`
+  """
+  sendCount_sum: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sendCount_avg` of type `Float`
+  """
+  sendCount_avg: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`createdAt_min` of type `Timestamp`
+  """
+  createdAt_min: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`expiresAt_min` of type `Timestamp`
+  """
+  expiresAt_min: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`lastSentAt_min` of type `Timestamp`
+  """
+  lastSentAt_min: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`revokedAt_min` of type `Timestamp`
+  """
+  revokedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sendCount_min` of type `Int`
+  """
+  sendCount_min: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sentAt_min` of type `Timestamp`
+  """
+  sentAt_min: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`usedAt_min` of type `Timestamp`
+  """
+  usedAt_min: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`createdAt_max` of type `Timestamp`
+  """
+  createdAt_max: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`expiresAt_max` of type `Timestamp`
+  """
+  expiresAt_max: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`lastSentAt_max` of type `Timestamp`
+  """
+  lastSentAt_max: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`revokedAt_max` of type `Timestamp`
+  """
+  revokedAt_max: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sendCount_max` of type `Int`
+  """
+  sendCount_max: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`sentAt_max` of type `Timestamp`
+  """
+  sentAt_max: OrderDirection
+  """
+  ✨ Generated from Field `MagicLink`.`usedAt_max` of type `Timestamp`
+  """
+  usedAt_max: OrderDirection
 }
 """
 ✨ Generated data input type for table 'RateLimitTracking'. It includes all necessary fields for creating or upserting rows into table.
@@ -2893,6 +3658,22 @@ input User_Data {
   """
   firstName_expr: String_Expr
   """
+  ✨ Generated from Field `User`.`googleAuthUid` of type `String`
+  """
+  googleAuthUid: String
+  """
+  ✨ `_expr` server value variant of `googleAuthUid` (✨ Generated from Field `User`.`googleAuthUid` of type `String`)
+  """
+  googleAuthUid_expr: String_Expr
+  """
+  ✨ Generated from Field `User`.`hasPassword` of type `Boolean!`
+  """
+  hasPassword: Boolean
+  """
+  ✨ `_expr` server value variant of `hasPassword` (✨ Generated from Field `User`.`hasPassword` of type `Boolean!`)
+  """
+  hasPassword_expr: Boolean_Expr
+  """
   ✨ Generated from Field `User`.`isActive` of type `Boolean!`
   """
   isActive: Boolean
@@ -2900,6 +3681,14 @@ input User_Data {
   ✨ `_expr` server value variant of `isActive` (✨ Generated from Field `User`.`isActive` of type `Boolean!`)
   """
   isActive_expr: Boolean_Expr
+  """
+  ✨ Generated from Field `User`.`isTemporary` of type `Boolean!`
+  """
+  isTemporary: Boolean
+  """
+  ✨ `_expr` server value variant of `isTemporary` (✨ Generated from Field `User`.`isTemporary` of type `Boolean!`)
+  """
+  isTemporary_expr: Boolean_Expr
   """
   ✨ Generated from Field `User`.`lastLoginAt` of type `Timestamp`
   """
@@ -2990,9 +3779,21 @@ input User_Filter {
   """
   firstName: String_Filter
   """
+  ✨ Generated from Field `User`.`googleAuthUid` of type `String`
+  """
+  googleAuthUid: String_Filter
+  """
+  ✨ Generated from Field `User`.`hasPassword` of type `Boolean!`
+  """
+  hasPassword: Boolean_Filter
+  """
   ✨ Generated from Field `User`.`isActive` of type `Boolean!`
   """
   isActive: Boolean_Filter
+  """
+  ✨ Generated from Field `User`.`isTemporary` of type `Boolean!`
+  """
+  isTemporary: Boolean_Filter
   """
   ✨ Generated from Field `User`.`lastLoginAt` of type `Timestamp`
   """
@@ -3017,6 +3818,10 @@ input User_Filter {
   ✨ Generated from Field `User`.`authSessions_on_user` of type `[AuthSession!]!`
   """
   authSessions_on_user: AuthSession_ListFilter
+  """
+  ✨ Generated from Field `User`.`magicLinks_on_user` of type `[MagicLink!]!`
+  """
+  magicLinks_on_user: MagicLink_ListFilter
 }
 """
 ✨ Generated first-row input type for table 'User'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
@@ -3068,6 +3873,14 @@ input User_Having {
   """
   firstName_count: Int_Filter
   """
+  ✨ Generated from Field `User`.`googleAuthUid_count` of type `Int!`
+  """
+  googleAuthUid_count: Int_Filter
+  """
+  ✨ Generated from Field `User`.`hasPassword_count` of type `Int!`
+  """
+  hasPassword_count: Int_Filter
+  """
   ✨ Generated from Field `User`.`id_count` of type `Int!`
   """
   id_count: Int_Filter
@@ -3075,6 +3888,10 @@ input User_Having {
   ✨ Generated from Field `User`.`isActive_count` of type `Int!`
   """
   isActive_count: Int_Filter
+  """
+  ✨ Generated from Field `User`.`isTemporary_count` of type `Int!`
+  """
+  isTemporary_count: Int_Filter
   """
   ✨ Generated from Field `User`.`lastLoginAt_count` of type `Int!`
   """
@@ -3167,9 +3984,21 @@ input User_Order {
   """
   firstName: OrderDirection
   """
+  ✨ Generated from Field `User`.`googleAuthUid` of type `String`
+  """
+  googleAuthUid: OrderDirection
+  """
+  ✨ Generated from Field `User`.`hasPassword` of type `Boolean!`
+  """
+  hasPassword: OrderDirection
+  """
   ✨ Generated from Field `User`.`isActive` of type `Boolean!`
   """
   isActive: OrderDirection
+  """
+  ✨ Generated from Field `User`.`isTemporary` of type `Boolean!`
+  """
+  isTemporary: OrderDirection
   """
   ✨ Generated from Field `User`.`lastLoginAt` of type `Timestamp`
   """
@@ -3207,6 +4036,14 @@ input User_Order {
   """
   firstName_count: OrderDirection
   """
+  ✨ Generated from Field `User`.`googleAuthUid_count` of type `Int!`
+  """
+  googleAuthUid_count: OrderDirection
+  """
+  ✨ Generated from Field `User`.`hasPassword_count` of type `Int!`
+  """
+  hasPassword_count: OrderDirection
+  """
   ✨ Generated from Field `User`.`id_count` of type `Int!`
   """
   id_count: OrderDirection
@@ -3214,6 +4051,10 @@ input User_Order {
   ✨ Generated from Field `User`.`isActive_count` of type `Int!`
   """
   isActive_count: OrderDirection
+  """
+  ✨ Generated from Field `User`.`isTemporary_count` of type `Int!`
+  """
+  isTemporary_count: OrderDirection
   """
   ✨ Generated from Field `User`.`lastLoginAt_count` of type `Int!`
   """

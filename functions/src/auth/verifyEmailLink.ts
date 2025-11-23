@@ -14,7 +14,7 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { getAuth } from 'firebase-admin/auth';
 import { logger } from 'firebase-functions/v2';
 import { generateSessionToken } from '../utils/jwt';
-import { getAuthSessionByFirebaseUid, verifyAuthSession } from '../dataconnect';
+import { getAuthSessionByFirebaseUid, verifyAuthSession, updateUserPasswordStatus, markMagicLinkUsed } from '../dataconnect';
 
 /**
  * Request body interface
@@ -36,6 +36,11 @@ interface VerifyEmailLinkResponse {
     role: string;
     sessionId: string;
     loanIds?: string[];
+    hasPassword?: boolean;
+    googleAuthUid?: string;
+    isTemporary?: boolean;
+    firstName?: string;
+    lastName?: string;
   };
   error?: string;
 }
@@ -122,6 +127,31 @@ export const verifyEmailLink = onRequest(
         status: authSession.status,
       });
 
+      // Check if user has password set in Firebase and update database if needed
+      try {
+        const firebaseUser = await getAuth().getUser(firebaseUid);
+        const hasPasswordProvider = firebaseUser.providerData.some(
+          (provider) => provider.providerId === 'password'
+        );
+
+        // If user has password in Firebase but database shows hasPassword: false, update it
+        if (hasPasswordProvider && !(authSession.user as any).hasPassword) {
+          logger.info('User has password in Firebase, updating database', { userId: authSession.userId });
+          await updateUserPasswordStatus({
+            userId: authSession.userId,
+            hasPassword: true,
+            isTemporary: false,
+          });
+          logger.info('Database updated with hasPassword: true');
+          // Update the local authSession object for the response
+          (authSession.user as any).hasPassword = true;
+          (authSession.user as any).isTemporary = false;
+        }
+      } catch (error) {
+        logger.warn('Error checking user password status', { error });
+        // Continue anyway - this is not critical
+      }
+
       // Check if session is already verified or active
       if (authSession.status === 'active' || authSession.status === 'verified') {
         logger.info('Session already verified, generating new token');
@@ -181,6 +211,18 @@ export const verifyEmailLink = onRequest(
 
       logger.info('Session marked as active', { sessionId: authSession.sessionId });
 
+      // Mark the magic link as used in the database
+      try {
+        await markMagicLinkUsed({
+          sessionId: authSession.sessionId,
+          usedAt: now.toISOString(),
+        });
+        logger.info('Magic link marked as used');
+      } catch (dbError) {
+        // Log the error but don't fail the request - the session is still valid
+        logger.error('Failed to mark magic link as used:', dbError);
+      }
+
       const responseData: VerifyEmailLinkResponse = {
         success: true,
         message: 'Email link verified successfully',
@@ -191,6 +233,11 @@ export const verifyEmailLink = onRequest(
           role: authSession.user.role,
           sessionId: authSession.sessionId,
           loanIds: loanIdsArray,
+          hasPassword: (authSession.user as any).hasPassword,
+          googleAuthUid: (authSession.user as any).googleAuthUid || undefined,
+          isTemporary: (authSession.user as any).isTemporary,
+          firstName: authSession.user.firstName || undefined,
+          lastName: authSession.user.lastName || undefined,
         },
       };
 

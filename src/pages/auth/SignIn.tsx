@@ -1,37 +1,36 @@
 /**
- * Test Simulator Page
- * Simulates a third-party service calling the generateAuthLink API
- * This page allows testing the complete auth flow by mimicking an external system
+ * Unified Sign-In Page
+ * Supports multiple authentication methods:
+ * - Email/Password
+ * - Google Sign-In
+ * - Email link (via magic link sent by admin)
  */
 
 import React, { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CloudFunctionUrls, getCloudFunctionHeaders } from '@/config/cloudFunctions';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showAdvanced, setShowAdvanced] = useState(false);
-  const [loanNumber, setLoanNumber] = useState('LOAN-TEST-001');
-  const [borrowerContactId, setBorrowerContactId] = useState('CONTACT-TEST-001');
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const { signInWithPassword, signInWithGoogle, isAuthenticated } = useAuth();
 
-  // Pre-fill email from query params if present
+  // Redirect to home if already authenticated
   React.useEffect(() => {
-    const emailParam = searchParams.get('email');
-    if (emailParam) {
-      setEmail(decodeURIComponent(emailParam));
+    if (isAuthenticated) {
+      navigate('/');
     }
-  }, [searchParams]);
+  }, [isAuthenticated, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleEmailPasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
-    if (!email) {
-      setError('Please enter your email address');
+    if (!email || !password) {
+      setError('Please enter both email and password');
       return;
     }
 
@@ -45,41 +44,43 @@ export const SignIn: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Call generateAuthLink Cloud Function (simulating third-party service)
-      const response = await fetch(CloudFunctionUrls.generateAuthLink(), {
-        method: 'POST',
-        headers: getCloudFunctionHeaders(),
-        body: JSON.stringify({
-          email: email.toLowerCase().trim(),
-          loanNumber,
-          borrowerContactId,
-          expirationHours: 48,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Failed to generate auth link: ${response.statusText}`);
-      }
-
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.message || 'Failed to generate auth link');
-      }
-
-      console.log('Auth link generated successfully:', data);
-
-      // If running in emulator, auto-open the email link in a new tab
-      if (data.emailLink) {
-        console.log('Opening email link in new tab:', data.emailLink);
-        window.open(data.emailLink, '_blank');
-      }
-
-      navigate('/auth/email-sent', { state: { email } });
+      await signInWithPassword(email.toLowerCase().trim(), password);
+      // Navigation will happen automatically when auth state updates
     } catch (err: any) {
-      console.error('Error generating auth link:', err);
-      setError(err.message || 'Failed to send sign-in link. Please try again.');
+      console.error('Error signing in with password:', err);
+
+      // Handle specific Firebase error codes
+      if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+        setError('Invalid email or password');
+      } else if (err.code === 'auth/too-many-requests') {
+        setError('Too many failed attempts. Please try again later.');
+      } else if (err.code === 'auth/invalid-credential') {
+        setError('Invalid credentials. Please check your email and password.');
+      } else {
+        setError(err.message || 'Failed to sign in. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      await signInWithGoogle();
+      // Navigation will happen automatically when auth state updates
+    } catch (err: any) {
+      console.error('Error signing in with Google:', err);
+
+      if (err.code === 'auth/popup-closed-by-user') {
+        setError('Sign-in cancelled. Please try again.');
+      } else if (err.code === 'auth/popup-blocked') {
+        setError('Pop-up blocked. Please allow pop-ups and try again.');
+      } else {
+        setError(err.message || 'Failed to sign in with Google. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -98,23 +99,61 @@ export const SignIn: React.FC = () => {
           </p>
         </div>
 
-        {/* Test Simulator Card */}
+        {/* Sign-In Card */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
-          <div className="flex items-center gap-2 mb-2">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Sign In
-            </h2>
-            <span className="px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200 text-xs font-medium rounded">
-              TEST MODE
-            </span>
-          </div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Sign In
+          </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            Enter your email to receive a sign-in link
+            Sign in to access your account
           </p>
 
-          <form onSubmit={handleSubmit}>
+          {/* Google Sign-In Button */}
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={isLoading}
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-6"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path
+                fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              />
+            </svg>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Continue with Google
+            </span>
+          </button>
+
+          {/* Divider */}
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                Or continue with email
+              </span>
+            </div>
+          </div>
+
+          {/* Email/Password Form */}
+          <form onSubmit={handleEmailPasswordSubmit} className="space-y-4">
             {/* Email Input */}
-            <div className="mb-4">
+            <div>
               <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
@@ -134,66 +173,40 @@ export const SignIn: React.FC = () => {
                   disabled={isLoading}
                   className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg text-gray-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 h-full placeholder:text-gray-500 dark:placeholder-gray-400 px-4 border-l-0 text-sm font-normal disabled:opacity-50 disabled:cursor-not-allowed"
                   required
+                  autoComplete="email"
                 />
               </div>
             </div>
 
-            {/* Advanced Options Toggle */}
-            <button
-              type="button"
-              onClick={() => setShowAdvanced(!showAdvanced)}
-              className="mb-4 text-sm text-primary hover:text-primary/80 flex items-center gap-1"
-            >
-              <span className="material-symbols-outlined text-base">
-                {showAdvanced ? 'expand_less' : 'expand_more'}
-              </span>
-              Advanced Options (Loan Context)
-            </button>
-
-            {/* Advanced Fields */}
-            {showAdvanced && (
-              <div className="space-y-4 mb-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
-                <div>
-                  <label
-                    htmlFor="loanNumber"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Loan Number
-                  </label>
-                  <input
-                    id="loanNumber"
-                    type="text"
-                    value={loanNumber}
-                    onChange={(e) => setLoanNumber(e.target.value)}
-                    placeholder="LOAN-TEST-001"
-                    disabled={isLoading}
-                    className="w-full px-4 h-10 rounded-lg text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-0 focus:ring-2 focus:ring-primary/50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
+            {/* Password Input */}
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Password
+              </label>
+              <div className="flex w-full flex-1 items-stretch rounded-lg h-12">
+                <div className="text-gray-500 dark:text-gray-400 flex border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 items-center justify-center pl-4 rounded-l-lg border-r-0">
+                  <span className="material-symbols-outlined text-base">lock</span>
                 </div>
-
-                <div>
-                  <label
-                    htmlFor="borrowerContactId"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-                  >
-                    Borrower Contact ID
-                  </label>
-                  <input
-                    id="borrowerContactId"
-                    type="text"
-                    value={borrowerContactId}
-                    onChange={(e) => setBorrowerContactId(e.target.value)}
-                    placeholder="CONTACT-TEST-001"
-                    disabled={isLoading}
-                    className="w-full px-4 h-10 rounded-lg text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-0 focus:ring-2 focus:ring-primary/50 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
-                </div>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  disabled={isLoading}
+                  className="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-r-lg text-gray-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 h-full placeholder:text-gray-500 dark:placeholder-gray-400 px-4 border-l-0 text-sm font-normal disabled:opacity-50 disabled:cursor-not-allowed"
+                  required
+                  autoComplete="current-password"
+                />
               </div>
-            )}
+            </div>
 
             {/* Error Message */}
             {error && (
-              <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
                 <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
                   <span className="material-symbols-outlined text-base">error</span>
                   {error}
@@ -210,12 +223,12 @@ export const SignIn: React.FC = () => {
               {isLoading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Sending...</span>
+                  <span>Signing in...</span>
                 </>
               ) : (
                 <>
-                  <span className="material-symbols-outlined text-base">send</span>
-                  <span>Send Sign-In Link</span>
+                  <span className="material-symbols-outlined text-base">login</span>
+                  <span>Sign In</span>
                 </>
               )}
             </button>
@@ -226,17 +239,7 @@ export const SignIn: React.FC = () => {
             <p className="text-sm text-blue-600 dark:text-blue-400 flex items-start gap-2">
               <span className="material-symbols-outlined text-base mt-0.5">info</span>
               <span>
-                We'll send you a secure link to your email. Click the link to sign in without a password.
-              </span>
-            </p>
-          </div>
-
-          {/* Test Mode Notice */}
-          <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-            <p className="text-xs text-yellow-700 dark:text-yellow-300 flex items-start gap-2">
-              <span className="material-symbols-outlined text-sm mt-0.5">science</span>
-              <span>
-                <strong>Test Mode:</strong> This form simulates a third-party system (like a Loan Origination System) calling the generateAuthLink API endpoint. In production, external systems would trigger this flow programmatically.
+                If you received a magic link via email, click that link to sign in. After signing in with a magic link, you can create a password for easier access in the future.
               </span>
             </p>
           </div>
@@ -244,7 +247,7 @@ export const SignIn: React.FC = () => {
 
         {/* Footer */}
         <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
-          Secure passwordless authentication powered by Firebase
+          Secure authentication powered by Firebase
         </p>
       </div>
     </div>

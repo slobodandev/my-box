@@ -11,10 +11,16 @@ import {
   sendSignInLinkToEmail,
   signOut,
   onAuthStateChanged,
+  linkWithCredential,
+  updatePassword,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
   type User as FirebaseUser,
 } from 'firebase/auth';
 import { auth } from '@/config/firebase';
 import { CloudFunctionUrls } from '@/config/cloudFunctions';
+import { updateUserPasswordStatus as updateUserPasswordStatusMutation } from '../../dataconnect/src/__generated/dataconnect';
 
 /**
  * User interface
@@ -29,6 +35,9 @@ export interface User {
   firebaseUid?: string;
   borrowerContactId?: string;
   loanNumber?: string;
+  isTemporary?: boolean; // True for magic link users who haven't set password
+  hasPassword?: boolean; // True if user has set a password
+  googleAuthUid?: string; // Google OAuth UID if linked
 }
 
 /**
@@ -70,6 +79,11 @@ interface AuthContextValue extends AuthState {
   sendEmailLink: (email: string) => Promise<void>;
   completeEmailLinkSignIn: (email: string, emailLink: string) => Promise<void>;
   isEmailLinkValid: (emailLink?: string) => boolean;
+  // Password and Google Sign-In methods
+  setupPassword: (password: string) => Promise<void>;
+  signInWithPassword: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
+  linkGoogleAccount: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -98,7 +112,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         console.log('Firebase user signed in:', firebaseUser.uid);
         setState((prev) => ({ ...prev, firebaseUser }));
 
-        // Exchange Firebase ID token for session token
+        // Check if we already have a valid session token
+        const storedToken = localStorage.getItem(TOKEN_STORAGE_KEY);
+        if (storedToken) {
+          try {
+            const payload = jwtDecode<JWTPayload>(storedToken);
+            const now = Math.floor(Date.now() / 1000);
+
+            // If token is still valid and for the same user, skip exchange
+            if (payload.exp > now && payload.email === firebaseUser.email?.toLowerCase().trim()) {
+              console.log('Using existing valid session token');
+              setState((prev) => ({ ...prev, isLoading: false }));
+              return;
+            }
+          } catch (error) {
+            console.warn('Error validating stored token:', error);
+          }
+        }
+
+        // Determine sign-in method and exchange token accordingly
         await exchangeFirebaseTokenForSession(firebaseUser);
       } else {
         console.log('Firebase user signed out');
@@ -321,17 +353,36 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   /**
    * Exchange Firebase ID token for backend session token
-   * Called after Firebase Email Link authentication completes
+   * Detects sign-in method and calls appropriate endpoint
    */
   const exchangeFirebaseTokenForSession = async (firebaseUser: FirebaseUser) => {
     try {
       // Get Firebase ID token
       const idToken = await firebaseUser.getIdToken();
 
-      console.log('Exchanging Firebase token for session token...');
+      // Detect sign-in method by checking provider data
+      const hasPasswordProvider = firebaseUser.providerData.some(
+        (provider) => provider.providerId === 'password'
+      );
 
-      // Call verifyEmailLink Cloud Function
-      const response = await fetch(CloudFunctionUrls.verifyEmailLink(), {
+      // Determine which endpoint to call based on sign-in method
+      let endpoint: string;
+      let endpointName: string;
+
+      if (hasPasswordProvider && !isSignInWithEmailLink(auth, window.location.href)) {
+        // User signed in with password
+        endpoint = CloudFunctionUrls.createPasswordSession();
+        endpointName = 'createPasswordSession';
+        console.log('Exchanging Firebase token for password-based session...');
+      } else {
+        // User signed in with email link (magic link)
+        endpoint = CloudFunctionUrls.verifyEmailLink();
+        endpointName = 'verifyEmailLink';
+        console.log('Exchanging Firebase token for email link session...');
+      }
+
+      // Call the appropriate Cloud Function
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -341,7 +392,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Email link verification failed: ${response.statusText}`);
+        throw new Error(errorData.message || `${endpointName} failed: ${response.statusText}`);
       }
 
       const data = await response.json();
@@ -350,12 +401,74 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         throw new Error(data.message || 'Failed to get session token');
       }
 
-      // Login with the session token
-      login(data.sessionToken);
+      // Login with the session token and user data
+      loginWithUserData(data.sessionToken, data.user);
 
       console.log('Session token obtained and user logged in');
     } catch (error) {
       console.error('Error exchanging Firebase token:', error);
+      throw error;
+    }
+  };
+
+  /**
+   * Login with session token and additional user data
+   * Used when we have full user data from the backend
+   * @param sessionToken - JWT session token from backend
+   * @param userData - User data from backend
+   */
+  const loginWithUserData = (sessionToken: string, userData: any) => {
+    try {
+      // Decode token to extract user info
+      const payload = jwtDecode<JWTPayload>(sessionToken);
+
+      // Validate token type
+      if (payload.type !== 'session') {
+        throw new Error('Invalid token type');
+      }
+
+      // Check if token is expired
+      const now = Math.floor(Date.now() / 1000);
+      if (payload.exp < now) {
+        throw new Error('Token is expired');
+      }
+
+      // Create user object with data from backend
+      const user: User = {
+        id: payload.userId,
+        email: payload.email,
+        role: payload.role,
+        loanIds: payload.loanIds,
+        // Additional fields from backend
+        hasPassword: userData?.hasPassword,
+        googleAuthUid: userData?.googleAuthUid,
+        isTemporary: userData?.isTemporary,
+        firstName: userData?.firstName,
+        lastName: userData?.lastName,
+      };
+
+      // Store token and user in localStorage
+      localStorage.setItem(TOKEN_STORAGE_KEY, sessionToken);
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
+
+      // Update state
+      setState({
+        user,
+        sessionToken,
+        sessionId: payload.sessionId,
+        firebaseUser: null,
+        isAuthenticated: true,
+        isLoading: false,
+      });
+
+      console.log('User logged in with full data', {
+        userId: user.id,
+        sessionId: payload.sessionId,
+        isTemporary: user.isTemporary,
+        hasPassword: user.hasPassword,
+      });
+    } catch (error) {
+      console.error('Login error:', error);
       throw error;
     }
   };
@@ -425,6 +538,167 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return isSignInWithEmailLink(auth, linkToCheck);
   };
 
+  /**
+   * Setup password for temporary user (magic link user)
+   * Updates password for existing email provider (email link and email/password use same provider)
+   * @param password - Password to set
+   */
+  const setupPassword = async (password: string): Promise<void> => {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser || !currentUser.email) {
+        throw new Error('No authenticated user found');
+      }
+
+      console.log('Setting up password for user:', currentUser.email);
+
+      // Update password directly (email link and email/password use the same EmailAuthProvider)
+      await updatePassword(currentUser, password);
+
+      console.log('Password updated successfully');
+
+      // Update user record in database via Cloud Function
+      await updateUserPasswordStatus(true);
+
+      // Update local user state
+      if (state.user) {
+        updateUser({
+          hasPassword: true,
+          isTemporary: false,
+        });
+      }
+
+      console.log('Password setup complete');
+    } catch (error) {
+      console.error('Error setting up password:', error);
+      throw error;
+    }
+  };
+
+  /**
+   * Sign in with email and password
+   * @param email - User's email
+   * @param password - User's password
+   */
+  const signInWithPassword = async (email: string, password: string): Promise<void> => {
+    try {
+      console.log('Signing in with email/password:', email);
+
+      const result = await signInWithEmailAndPassword(auth, email, password);
+
+      console.log('Email/password sign-in successful:', result.user.uid);
+
+      // Firebase auth state listener will handle the rest
+    } catch (error) {
+      console.error('Error signing in with password:', error);
+      throw error;
+    }
+  };
+
+  /**
+   * Sign in with Google
+   */
+  const signInWithGoogle = async (): Promise<void> => {
+    try {
+      console.log('Initiating Google sign-in...');
+
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+
+      console.log('Google sign-in successful:', result.user.uid);
+
+      // Firebase auth state listener will handle the rest
+    } catch (error) {
+      console.error('Error signing in with Google:', error);
+      throw error;
+    }
+  };
+
+  /**
+   * Link Google account to existing user
+   */
+  const linkGoogleAccount = async (): Promise<void> => {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        throw new Error('No authenticated user found');
+      }
+
+      console.log('Linking Google account...');
+
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+
+      // Get credential from result
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      if (!credential) {
+        throw new Error('Failed to get Google credential');
+      }
+
+      // Link credential to existing account
+      await linkWithCredential(currentUser, credential);
+
+      console.log('Google account linked successfully');
+
+      // Update user record in database
+      await updateUserGoogleUid(result.user.uid);
+
+      // Update local user state
+      if (state.user) {
+        updateUser({
+          googleAuthUid: result.user.uid,
+        });
+      }
+    } catch (error) {
+      console.error('Error linking Google account:', error);
+      throw error;
+    }
+  };
+
+  /**
+   * Update user password status in database
+   * @param hasPassword - Whether user has set a password
+   */
+  const updateUserPasswordStatus = async (hasPassword: boolean): Promise<void> => {
+    if (!state.user?.id) {
+      throw new Error('Not authenticated');
+    }
+
+    try {
+      console.log('Updating user password status in database:', hasPassword);
+
+      await updateUserPasswordStatusMutation({
+        userId: state.user.id,
+        hasPassword,
+        isTemporary: !hasPassword, // If has password, no longer temporary
+      });
+
+      console.log('User password status updated in database');
+    } catch (error) {
+      console.error('Error updating password status:', error);
+      throw error;
+    }
+  };
+
+  /**
+   * Update user Google UID in database
+   * @param googleUid - Google OAuth UID
+   */
+  const updateUserGoogleUid = async (googleUid: string): Promise<void> => {
+    if (!state.sessionToken) {
+      throw new Error('Not authenticated');
+    }
+
+    try {
+      // TODO: Call Cloud Function to update user record
+      // For now, just log
+      console.log('Updating user Google UID:', googleUid);
+    } catch (error) {
+      console.error('Error updating Google UID:', error);
+      throw error;
+    }
+  };
+
   const contextValue: AuthContextValue = {
     ...state,
     login,
@@ -435,6 +709,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     sendEmailLink,
     completeEmailLinkSignIn,
     isEmailLinkValid,
+    setupPassword,
+    signInWithPassword,
+    signInWithGoogle,
+    linkGoogleAccount,
   };
 
   return (

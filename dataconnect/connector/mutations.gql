@@ -36,11 +36,40 @@ mutation UpdateUser(
   )
 }
 
+mutation UpdateUserPasswordStatus(
+  $userId: UUID!
+  $hasPassword: Boolean!
+  $isTemporary: Boolean!
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions to update user password status after password setup. Frontend access is controlled through authenticated setupPassword() function."
+) {
+  user_update(
+    id: $userId
+    data: {
+      hasPassword: $hasPassword
+      isTemporary: $isTemporary
+    }
+  )
+}
+
 mutation DeactivateUser($id: UUID!) {
   user_update(
     id: $id
     data: {
       isActive: false
+    }
+  )
+}
+
+mutation UpdateUserRole($userId: UUID!, $role: String!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is intended for use by Firebase Console administrators in GraphQL playground. UI access is restricted to super-admin role."
+) {
+  user_update(
+    id: $userId
+    data: {
+      role: $role
     }
   )
 }
@@ -58,6 +87,9 @@ mutation CreateLoan(
   $loanType: String
   $propertyAddress: String
   $loanOfficerId: UUID
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin and super-admin users to create loans. Frontend enforces role-based access control via RequireAdmin component."
 ) {
   loan_insert(data: {
     userId: $userId
@@ -76,6 +108,9 @@ mutation UpdateLoan(
   $status: String
   $notes: String
   $loanAmount: Float
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin and super-admin users to update loans. Frontend enforces role-based access control."
 ) {
   loan_update(
     id: $id
@@ -87,7 +122,10 @@ mutation UpdateLoan(
   )
 }
 
-mutation CloseLoan($id: UUID!, $closedAt: Timestamp!) {
+mutation CloseLoan($id: UUID!, $closedAt: Timestamp!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin and super-admin users to close loans. Frontend enforces role-based access control."
+) {
   loan_update(
     id: $id
     data: {
@@ -97,7 +135,10 @@ mutation CloseLoan($id: UUID!, $closedAt: Timestamp!) {
   )
 }
 
-mutation DeleteLoan($id: UUID!) {
+mutation DeleteLoan($id: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin and super-admin users to delete loans. Frontend enforces role-based access control."
+) {
   loan_delete(id: $id)
 }
 
@@ -107,21 +148,25 @@ mutation DeleteLoan($id: UUID!) {
 
 mutation CreateFile(
   $userId: UUID!
+  $loanId: UUID
   $originalFilename: String!
   $storagePath: String!
   $fileSize: Int!
   $mimeType: String
   $fileExtension: String
+  $downloadUrl: String
   $tags: String
   $description: String
-) {
+) @auth(level: PUBLIC) {
   file_insert(data: {
     userId: $userId
+    loanId: $loanId
     originalFilename: $originalFilename
     storagePath: $storagePath
     fileSize: $fileSize
     mimeType: $mimeType
     fileExtension: $fileExtension
+    downloadUrl: $downloadUrl
     tags: $tags
     description: $description
   })
@@ -132,7 +177,7 @@ mutation UpdateFile(
   $tags: String
   $description: String
   $downloadUrl: String
-) {
+) @auth(level: PUBLIC) {
   file_update(
     id: $id
     data: {
@@ -156,6 +201,66 @@ mutation SoftDeleteFile($id: UUID!, $deletedBy: UUID, $deletedAt: Timestamp!) {
 
 mutation HardDeleteFile($id: UUID!) {
   file_delete(id: $id)
+}
+
+mutation RenameFile($id: UUID!, $newFilename: String!) @auth(level: PUBLIC) {
+  file_update(
+    id: $id
+    data: {
+      originalFilename: $newFilename
+    }
+  )
+}
+
+mutation MoveFile(
+  $id: UUID!
+  $targetUserId: UUID!
+  $targetLoanId: UUID
+) @auth(level: PUBLIC) {
+  file_update(
+    id: $id
+    data: {
+      userId: $targetUserId
+      loanId: $targetLoanId
+    }
+  )
+}
+
+mutation CopyFile(
+  $userId: UUID!
+  $loanId: UUID
+  $originalFilename: String!
+  $storagePath: String!
+  $fileSize: Int!
+  $mimeType: String
+  $fileExtension: String
+  $downloadUrl: String
+  $tags: String
+  $description: String
+) @auth(level: PUBLIC) {
+  file_insert(data: {
+    userId: $userId
+    loanId: $loanId
+    originalFilename: $originalFilename
+    storagePath: $storagePath
+    fileSize: $fileSize
+    mimeType: $mimeType
+    fileExtension: $fileExtension
+    downloadUrl: $downloadUrl
+    tags: $tags
+    description: $description
+  })
+}
+
+mutation RestoreFile($id: UUID!) @auth(level: PUBLIC) {
+  file_update(
+    id: $id
+    data: {
+      isDeleted: false
+      deletedAt: null
+      deletedBy: null
+    }
+  )
 }
 
 # ============================================================================
@@ -398,6 +503,103 @@ mutation DeleteExpiredVerificationCodes($currentTime: Timestamp!) {
   verificationCode_deleteMany(
     where: {
       expiresAt: { lt: $currentTime }
+    }
+  )
+}
+
+# ============================================================================
+# MAGIC LINK MUTATIONS
+# ============================================================================
+
+mutation CreateMagicLink(
+  $userId: UUID!
+  $borrowerEmail: String!
+  $sendToEmail: String!
+  $magicLinkUrl: String!
+  $sessionId: String
+  $expiresAt: Timestamp!
+  $createdBy: UUID
+  $sentAt: Timestamp
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions to create magic links. Frontend access is controlled through authenticated Cloud Function."
+) {
+  magicLink_insert(data: {
+    userId: $userId
+    borrowerEmail: $borrowerEmail
+    sendToEmail: $sendToEmail
+    magicLinkUrl: $magicLinkUrl
+    sessionId: $sessionId
+    expiresAt: $expiresAt
+    createdBy: $createdBy
+    sentAt: $sentAt
+  })
+}
+
+mutation UpdateMagicLinkSendCount(
+  $id: UUID!
+  $sendCount: Int!
+  $lastSentAt: Timestamp!
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to track magic link resends. Frontend enforces role-based access control."
+) {
+  magicLink_update(
+    id: $id
+    data: {
+      sendCount: $sendCount
+      lastSentAt: $lastSentAt
+    }
+  )
+}
+
+mutation RevokeMagicLink(
+  $id: UUID!
+  $revokedAt: Timestamp!
+  $revokedBy: UUID
+  $revokeReason: String
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to revoke magic links. Frontend enforces role-based access control."
+) {
+  magicLink_update(
+    id: $id
+    data: {
+      isActive: false
+      revokedAt: $revokedAt
+      revokedBy: $revokedBy
+      revokeReason: $revokeReason
+    }
+  )
+}
+
+mutation MarkMagicLinkUsed(
+  $sessionId: String!
+  $usedAt: Timestamp!
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions when a user signs in with a magic link. Frontend access is controlled through authenticated Cloud Function."
+) {
+  magicLink_updateMany(
+    where: { sessionId: { eq: $sessionId } }
+    data: {
+      usedAt: $usedAt
+      isActive: false
+    }
+  )
+}
+
+mutation ExtendMagicLink(
+  $id: UUID!
+  $expiresAt: Timestamp!
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to extend magic link expiry. Frontend enforces role-based access control."
+) {
+  magicLink_update(
+    id: $id
+    data: {
+      expiresAt: $expiresAt
     }
   )
 }

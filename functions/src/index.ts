@@ -41,6 +41,18 @@ export {
   validateSession,
 } from './auth/validateSession';
 
+export {
+  createPasswordSession,
+} from './auth/createPasswordSession';
+
+// ============================================================================
+// USER FUNCTIONS
+// ============================================================================
+
+export {
+  createUserWithMagicLink,
+} from './users/createUserWithMagicLink';
+
 // ============================================================================
 // FILE FUNCTIONS
 // ============================================================================

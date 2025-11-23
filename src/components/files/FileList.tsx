@@ -1,51 +1,176 @@
 import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
-// import { useFiles } from '@/hooks' // TODO: Update to use new useListFiles hook
 import { getFileIcon, formatFileSize } from '@/utils'
-import { MOCK_USER_ID } from '@/constants/app'
-
-// Temporary mock hook until refactored
-const useFiles = (_params?: any) => ({
-  files: [] as Array<any>,
-  total: 0,
-  totalPages: 0,
-  loading: false,
-  error: null as Error | null,
-  fetchFiles: () => {}
-});
+import { getUserFiles } from '@/services/fileService'
+import { deleteFile } from '@/services/fileOperations'
+import { getLoan, type Loan } from '@/services/dataconnect/loanService'
+import { useAuth } from '@/contexts/AuthContext'
+import { ref, getDownloadURL, getBlob } from 'firebase/storage'
+import { storage } from '@/config/firebase'
 
 interface FileListProps {
   searchTerm: string
-  selectedLoan: string | null
+  userId?: string | null
+  loanId?: string | null
   showPersonalOnly: boolean
 }
 
-export default function FileList({ searchTerm, selectedLoan, showPersonalOnly }: FileListProps) {
+export default function FileList({ searchTerm, userId, loanId, showPersonalOnly }: FileListProps) {
+  const { user } = useAuth()
   const [currentPage, setCurrentPage] = useState(1)
+  const [files, setFiles] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+  const [loanCache, setLoanCache] = useState<Map<string, Loan>>(new Map())
   const pageSize = 5
 
-  // Fetch files from API with filters
-  const { files, total, totalPages, loading, error, fetchFiles } = useFiles({
-    userId: MOCK_USER_ID,
-    loanId: selectedLoan || undefined,
-    searchTerm: searchTerm || undefined,
-    personalOnly: showPersonalOnly,
-    page: currentPage,
-    pageSize,
-    autoFetch: true,
-  })
+  // Determine which user's files to fetch
+  const targetUserId = userId || user?.id
+
+  // Fetch files from Data Connect
+  const fetchFiles = async () => {
+    if (!targetUserId) return
+
+    setLoading(true)
+    setError(null)
+
+    try {
+      const allFiles = await getUserFiles(targetUserId, false)
+
+      // Apply filters
+      let filtered = allFiles
+
+      // Filter by search term
+      if (searchTerm) {
+        filtered = filtered.filter((file: any) =>
+          file.originalFilename.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      }
+
+      // Filter by loan
+      if (loanId) {
+        filtered = filtered.filter((file: any) => file.loanId === loanId)
+      }
+
+      // Filter personal files only (files without loanId)
+      if (showPersonalOnly) {
+        filtered = filtered.filter((file: any) => !file.loanId)
+      }
+
+      setFiles(filtered)
+
+      // Fetch loan information for files with loanId
+      const uniqueLoanIds = [...new Set(filtered.filter((f: any) => f.loanId).map((f: any) => f.loanId))]
+      const newLoanCache = new Map(loanCache)
+
+      await Promise.all(
+        uniqueLoanIds.map(async (lId: string) => {
+          if (!newLoanCache.has(lId)) {
+            try {
+              const loan = await getLoan(lId)
+              if (loan) {
+                newLoanCache.set(lId, loan)
+              }
+            } catch (err) {
+              console.error(`Failed to fetch loan ${lId}:`, err)
+            }
+          }
+        })
+      )
+
+      setLoanCache(newLoanCache)
+    } catch (err: any) {
+      console.error('Error fetching files:', err)
+      setError(err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm, selectedLoan, showPersonalOnly])
+  }, [searchTerm, userId, loanId, showPersonalOnly])
 
-  // Refetch when page changes
+  // Fetch files when user changes or filters change
   useEffect(() => {
     fetchFiles()
-  }, [currentPage, fetchFiles])
+  }, [targetUserId, searchTerm, loanId, showPersonalOnly])
 
   const startIndex = (currentPage - 1) * pageSize
+  const paginatedFiles = files.slice(startIndex, startIndex + pageSize)
+  const total = files.length
+  const totalPages = Math.ceil(total / pageSize)
+
+  const handleDownload = async (file: any) => {
+    try {
+      if (!file.storagePath) {
+        alert('Unable to download file. Storage path not found.')
+        return
+      }
+
+      // Get blob from Firebase Storage (CORS is now configured)
+      const storageRef = ref(storage, file.storagePath)
+      const blob = await getBlob(storageRef)
+
+      // Create blob URL and trigger download
+      const blobUrl = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = blobUrl
+      link.download = file.originalFilename
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      // Clean up blob URL
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100)
+    } catch (error) {
+      console.error('Error downloading file:', error)
+      alert('Failed to download file. Please check your permissions.')
+    }
+  }
+
+  const handlePreview = async (file: any) => {
+    try {
+      let downloadUrl = file.downloadUrl
+
+      // If no downloadUrl in database, generate it from storagePath
+      if (!downloadUrl && file.storagePath) {
+        const storageRef = ref(storage, file.storagePath)
+        downloadUrl = await getDownloadURL(storageRef)
+      }
+
+      if (downloadUrl) {
+        window.open(downloadUrl, '_blank')
+      } else {
+        console.error('No download URL available for file:', file.id)
+        alert('Unable to preview file. Please try again later.')
+      }
+    } catch (error) {
+      console.error('Error previewing file:', error)
+      alert('Failed to preview file. Please check your permissions.')
+    }
+  }
+
+  const handleDelete = async (file: any) => {
+    // Simple confirmation dialog
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${file.originalFilename}"? This action cannot be undone.`
+    )
+
+    if (!confirmed) return
+
+    try {
+      await deleteFile(file.id)
+      alert('File deleted successfully')
+      // Refresh the file list
+      fetchFiles()
+    } catch (error: any) {
+      console.error('Error deleting file:', error)
+      alert(error.message || 'Failed to delete file. Please try again.')
+    }
+  }
 
   return (
     <>
@@ -54,25 +179,25 @@ export default function FileList({ searchTerm, selectedLoan, showPersonalOnly }:
         <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/50">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-50 dark:bg-gray-900/50">
-                <th className="px-4 py-3 text-left text-gray-600 dark:text-gray-300 text-xs font-medium uppercase tracking-wider">
+              <tr className="border-b border-gray-200 dark:border-gray-700">
+                <th className="w-1/2 text-left font-semibold text-gray-500 dark:text-gray-400 py-3 px-4 uppercase tracking-wider text-xs">
                   File Name
                 </th>
-                <th className="px-4 py-3 text-left text-gray-600 dark:text-gray-300 text-xs font-medium uppercase tracking-wider">
+                <th className="text-left font-semibold text-gray-500 dark:text-gray-400 py-3 px-4 uppercase tracking-wider text-xs">
                   Size
                 </th>
-                <th className="px-4 py-3 text-left text-gray-600 dark:text-gray-300 text-xs font-medium uppercase tracking-wider">
-                  Date Uploaded
+                <th className="text-left font-semibold text-gray-500 dark:text-gray-400 py-3 px-4 uppercase tracking-wider text-xs">
+                  Date
                 </th>
-                <th className="px-4 py-3 text-left text-gray-600 dark:text-gray-300 text-xs font-medium uppercase tracking-wider">
+                <th className="text-left font-semibold text-gray-500 dark:text-gray-400 py-3 px-4 uppercase tracking-wider text-xs">
                   Associated Loans
                 </th>
-                <th className="px-4 py-3 text-right text-gray-600 dark:text-gray-300 text-xs font-medium uppercase tracking-wider">
+                <th className="text-left font-semibold text-gray-500 dark:text-gray-400 py-3 px-4 uppercase tracking-wider text-xs">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody>
               {loading ? (
                 <tr>
                   <td colSpan={5} className="h-[72px] px-4 py-2 text-center text-gray-500 dark:text-gray-400">
@@ -92,48 +217,65 @@ export default function FileList({ searchTerm, selectedLoan, showPersonalOnly }:
                   </td>
                 </tr>
               ) : (
-                files.map((file: any) => {
-                  const fileIcon = getFileIcon(file.filename)
+                paginatedFiles.map((file: any) => {
+                  const fileIcon = getFileIcon(file.originalFilename)
                   return (
-                    <tr key={file.id} className="hover:bg-gray-50 dark:hover:bg-white/5">
-                      <td className="h-[72px] px-4 py-2 text-gray-800 dark:text-gray-200 text-sm font-medium">
-                        <div className="flex items-center gap-3">
-                          <span className={`material-symbols-outlined ${fileIcon.color}`}>
-                            {fileIcon.icon}
+                    <tr key={file.id} className="hover:bg-gray-50 dark:hover:bg-white/5 border-b border-gray-200 dark:border-gray-700 last:border-0">
+                      <td className="py-4 px-4">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-8 h-8 flex-shrink-0 flex items-center justify-center ${fileIcon.bgColor} rounded-md`}>
+                            <span className={`material-symbols-outlined text-lg ${fileIcon.color}`}>
+                              {fileIcon.icon}
+                            </span>
+                          </div>
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {file.originalFilename}
                           </span>
-                          <span>{file.filename}</span>
                         </div>
                       </td>
-                      <td className="h-[72px] px-4 py-2 text-gray-500 dark:text-gray-400 text-sm font-normal">
-                        {formatFileSize(file.size)}
+                      <td className="py-4 px-4 text-gray-500 dark:text-gray-400 text-sm">
+                        {formatFileSize(file.fileSize)}
                       </td>
-                      <td className="h-[72px] px-4 py-2 text-gray-500 dark:text-gray-400 text-sm font-normal">
-                        {format(new Date(file.uploadedAt), 'yyyy-MM-dd')}
+                      <td className="py-4 px-4 text-gray-500 dark:text-gray-400 text-sm">
+                        {format(new Date(file.uploadedAt), 'MMM dd, yyyy')}
                       </td>
-                      <td className="h-[72px] px-4 py-2 text-sm font-normal">
-                        {file.loanIds.length > 0 ? (
-                          file.loanIds.map((loanId: string, idx: number) => (
-                            <span
-                              key={loanId}
-                              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                idx % 2 === 0
-                                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200'
-                                  : 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200'
-                              } mr-1`}
-                            >
-                              Loan #{loanId}
+                      <td className="py-4 px-4">
+                        {file.loanId ? (
+                          <div className="flex items-center space-x-1.5">
+                            <span className="bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-300 text-xs font-semibold px-2 py-1 rounded-full">
+                              {loanCache.get(file.loanId)?.loanNumber || `#${file.loanId.substring(0, 8)}...`}
                             </span>
-                          ))
+                          </div>
                         ) : (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
                             Personal File
                           </span>
                         )}
                       </td>
-                      <td className="h-[72px] px-4 py-2 text-right">
-                        <button className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-700 dark:hover:text-gray-200">
-                          <span className="material-symbols-outlined text-base">more_horiz</span>
-                        </button>
+                      <td className="py-4 px-4">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => handlePreview(file)}
+                            className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-700 dark:hover:text-gray-200"
+                            title="Preview file"
+                          >
+                            <span className="material-symbols-outlined text-base">visibility</span>
+                          </button>
+                          <button
+                            onClick={() => handleDownload(file)}
+                            className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/10 hover:text-gray-700 dark:hover:text-gray-200"
+                            title="Download file"
+                          >
+                            <span className="material-symbols-outlined text-base">download</span>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(file)}
+                            className="p-2 rounded-lg text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-700 dark:hover:text-red-300"
+                            title="Delete file"
+                          >
+                            <span className="material-symbols-outlined text-base">delete</span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   )

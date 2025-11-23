@@ -31,6 +31,18 @@ exports.updateUser = function updateUser(dcOrVars, vars) {
   return executeMutation(updateUserRef(dcOrVars, vars));
 };
 
+const updateUserPasswordStatusRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpdateUserPasswordStatus', inputVars);
+}
+updateUserPasswordStatusRef.operationName = 'UpdateUserPasswordStatus';
+exports.updateUserPasswordStatusRef = updateUserPasswordStatusRef;
+
+exports.updateUserPasswordStatus = function updateUserPasswordStatus(dcOrVars, vars) {
+  return executeMutation(updateUserPasswordStatusRef(dcOrVars, vars));
+};
+
 const deactivateUserRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
@@ -41,6 +53,18 @@ exports.deactivateUserRef = deactivateUserRef;
 
 exports.deactivateUser = function deactivateUser(dcOrVars, vars) {
   return executeMutation(deactivateUserRef(dcOrVars, vars));
+};
+
+const updateUserRoleRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpdateUserRole', inputVars);
+}
+updateUserRoleRef.operationName = 'UpdateUserRole';
+exports.updateUserRoleRef = updateUserRoleRef;
+
+exports.updateUserRole = function updateUserRole(dcOrVars, vars) {
+  return executeMutation(updateUserRoleRef(dcOrVars, vars));
 };
 
 const createLoanRef = (dcOrVars, vars) => {
@@ -137,6 +161,54 @@ exports.hardDeleteFileRef = hardDeleteFileRef;
 
 exports.hardDeleteFile = function hardDeleteFile(dcOrVars, vars) {
   return executeMutation(hardDeleteFileRef(dcOrVars, vars));
+};
+
+const renameFileRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'RenameFile', inputVars);
+}
+renameFileRef.operationName = 'RenameFile';
+exports.renameFileRef = renameFileRef;
+
+exports.renameFile = function renameFile(dcOrVars, vars) {
+  return executeMutation(renameFileRef(dcOrVars, vars));
+};
+
+const moveFileRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'MoveFile', inputVars);
+}
+moveFileRef.operationName = 'MoveFile';
+exports.moveFileRef = moveFileRef;
+
+exports.moveFile = function moveFile(dcOrVars, vars) {
+  return executeMutation(moveFileRef(dcOrVars, vars));
+};
+
+const copyFileRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CopyFile', inputVars);
+}
+copyFileRef.operationName = 'CopyFile';
+exports.copyFileRef = copyFileRef;
+
+exports.copyFile = function copyFile(dcOrVars, vars) {
+  return executeMutation(copyFileRef(dcOrVars, vars));
+};
+
+const restoreFileRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'RestoreFile', inputVars);
+}
+restoreFileRef.operationName = 'RestoreFile';
+exports.restoreFileRef = restoreFileRef;
+
+exports.restoreFile = function restoreFile(dcOrVars, vars) {
+  return executeMutation(restoreFileRef(dcOrVars, vars));
 };
 
 const associateFileWithLoanRef = (dcOrVars, vars) => {
@@ -329,6 +401,66 @@ exports.deleteExpiredVerificationCodesRef = deleteExpiredVerificationCodesRef;
 
 exports.deleteExpiredVerificationCodes = function deleteExpiredVerificationCodes(dcOrVars, vars) {
   return executeMutation(deleteExpiredVerificationCodesRef(dcOrVars, vars));
+};
+
+const createMagicLinkRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CreateMagicLink', inputVars);
+}
+createMagicLinkRef.operationName = 'CreateMagicLink';
+exports.createMagicLinkRef = createMagicLinkRef;
+
+exports.createMagicLink = function createMagicLink(dcOrVars, vars) {
+  return executeMutation(createMagicLinkRef(dcOrVars, vars));
+};
+
+const updateMagicLinkSendCountRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpdateMagicLinkSendCount', inputVars);
+}
+updateMagicLinkSendCountRef.operationName = 'UpdateMagicLinkSendCount';
+exports.updateMagicLinkSendCountRef = updateMagicLinkSendCountRef;
+
+exports.updateMagicLinkSendCount = function updateMagicLinkSendCount(dcOrVars, vars) {
+  return executeMutation(updateMagicLinkSendCountRef(dcOrVars, vars));
+};
+
+const revokeMagicLinkRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'RevokeMagicLink', inputVars);
+}
+revokeMagicLinkRef.operationName = 'RevokeMagicLink';
+exports.revokeMagicLinkRef = revokeMagicLinkRef;
+
+exports.revokeMagicLink = function revokeMagicLink(dcOrVars, vars) {
+  return executeMutation(revokeMagicLinkRef(dcOrVars, vars));
+};
+
+const markMagicLinkUsedRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'MarkMagicLinkUsed', inputVars);
+}
+markMagicLinkUsedRef.operationName = 'MarkMagicLinkUsed';
+exports.markMagicLinkUsedRef = markMagicLinkUsedRef;
+
+exports.markMagicLinkUsed = function markMagicLinkUsed(dcOrVars, vars) {
+  return executeMutation(markMagicLinkUsedRef(dcOrVars, vars));
+};
+
+const extendMagicLinkRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'ExtendMagicLink', inputVars);
+}
+extendMagicLinkRef.operationName = 'ExtendMagicLink';
+exports.extendMagicLinkRef = extendMagicLinkRef;
+
+exports.extendMagicLink = function extendMagicLink(dcOrVars, vars) {
+  return executeMutation(extendMagicLinkRef(dcOrVars, vars));
 };
 
 const getUserRef = (dcOrVars, vars) => {
@@ -581,4 +713,64 @@ exports.getLoanDetailsRef = getLoanDetailsRef;
 
 exports.getLoanDetails = function getLoanDetails(dcOrVars, vars) {
   return executeQuery(getLoanDetailsRef(dcOrVars, vars));
+};
+
+const getUserMagicLinksRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetUserMagicLinks', inputVars);
+}
+getUserMagicLinksRef.operationName = 'GetUserMagicLinks';
+exports.getUserMagicLinksRef = getUserMagicLinksRef;
+
+exports.getUserMagicLinks = function getUserMagicLinks(dcOrVars, vars) {
+  return executeQuery(getUserMagicLinksRef(dcOrVars, vars));
+};
+
+const getActiveMagicLinksRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetActiveMagicLinks', inputVars);
+}
+getActiveMagicLinksRef.operationName = 'GetActiveMagicLinks';
+exports.getActiveMagicLinksRef = getActiveMagicLinksRef;
+
+exports.getActiveMagicLinks = function getActiveMagicLinks(dcOrVars, vars) {
+  return executeQuery(getActiveMagicLinksRef(dcOrVars, vars));
+};
+
+const getMagicLinkRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetMagicLink', inputVars);
+}
+getMagicLinkRef.operationName = 'GetMagicLink';
+exports.getMagicLinkRef = getMagicLinkRef;
+
+exports.getMagicLink = function getMagicLink(dcOrVars, vars) {
+  return executeQuery(getMagicLinkRef(dcOrVars, vars));
+};
+
+const getMagicLinkBySessionIdRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetMagicLinkBySessionId', inputVars);
+}
+getMagicLinkBySessionIdRef.operationName = 'GetMagicLinkBySessionId';
+exports.getMagicLinkBySessionIdRef = getMagicLinkBySessionIdRef;
+
+exports.getMagicLinkBySessionId = function getMagicLinkBySessionId(dcOrVars, vars) {
+  return executeQuery(getMagicLinkBySessionIdRef(dcOrVars, vars));
+};
+
+const getMagicLinkStatsRef = (dc) => {
+  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetMagicLinkStats');
+}
+getMagicLinkStatsRef.operationName = 'GetMagicLinkStats';
+exports.getMagicLinkStatsRef = getMagicLinkStatsRef;
+
+exports.getMagicLinkStats = function getMagicLinkStats(dc) {
+  return executeQuery(getMagicLinkStatsRef(dc));
 };

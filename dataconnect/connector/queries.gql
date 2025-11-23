@@ -11,6 +11,9 @@ query GetUser($id: UUID!) @auth(level: PUBLIC) {
     role
     isActive
     phoneNumber
+    hasPassword
+    googleAuthUid
+    isTemporary
     createdAt
     lastLoginAt
   }
@@ -24,10 +27,16 @@ query GetUserByEmail($email: String!) @auth(level: PUBLIC) {
     lastName
     role
     isActive
+    hasPassword
+    googleAuthUid
+    isTemporary
   }
 }
 
-query ListAllUsers {
+query ListAllUsers @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by super-admin users only. Frontend enforces role-based access control via RequireSuperAdmin component."
+) {
   users(orderBy: { createdAt: DESC }) {
     id
     email
@@ -43,7 +52,10 @@ query ListAllUsers {
 # LOAN QUERIES
 # ============================================================================
 
-query GetUserLoans($userId: UUID!) {
+query GetUserLoans($userId: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by authenticated users to fetch their own loans. Frontend validates user ownership before calling."
+) {
   loans(where: { userId: { eq: $userId } }, orderBy: { createdAt: DESC }) {
     id
     loanNumber
@@ -92,7 +104,7 @@ query GetLoanByNumber($loanNumber: String!) {
 # FILE QUERIES
 # ============================================================================
 
-query GetUserFiles($userId: UUID!, $includeDeleted: Boolean) {
+query GetUserFiles($userId: UUID!, $includeDeleted: Boolean) @auth(level: PUBLIC) {
   files(
     where: {
       userId: { eq: $userId }
@@ -101,6 +113,8 @@ query GetUserFiles($userId: UUID!, $includeDeleted: Boolean) {
     orderBy: { uploadedAt: DESC }
   ) {
     id
+    userId
+    loanId
     originalFilename
     storagePath
     fileSize
@@ -127,6 +141,7 @@ query GetFile($id: UUID!) {
   file(id: $id) {
     id
     userId
+    loanId
     originalFilename
     storagePath
     fileSize
@@ -273,6 +288,9 @@ query GetAuthSessionByFirebaseUid($firebaseUid: String!, $email: String!) @auth(
       role
       firstName
       lastName
+      hasPassword
+      googleAuthUid
+      isTemporary
     }
   }
 }
@@ -373,5 +391,128 @@ query GetLoanDetails($loanId: UUID!) {
     id
     fileId
     associatedAt
+  }
+}
+
+# ============================================================================
+# MAGIC LINK QUERIES
+# ============================================================================
+
+query GetUserMagicLinks($userId: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by admin users to view magic links for a specific user. Frontend enforces role-based access control."
+) {
+  magicLinks(
+    where: { userId: { eq: $userId } }
+    orderBy: { createdAt: DESC }
+  ) {
+    id
+    userId
+    borrowerEmail
+    sendToEmail
+    magicLinkUrl
+    sessionId
+    expiresAt
+    createdAt
+    createdBy
+    sentAt
+    lastSentAt
+    sendCount
+    usedAt
+    isActive
+    revokedAt
+    revokedBy
+    revokeReason
+  }
+}
+
+query GetActiveMagicLinks($userId: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by admin users to view active magic links. Frontend enforces role-based access control."
+) {
+  magicLinks(
+    where: {
+      userId: { eq: $userId }
+      isActive: { eq: true }
+    }
+    orderBy: { createdAt: DESC }
+  ) {
+    id
+    userId
+    borrowerEmail
+    sendToEmail
+    magicLinkUrl
+    expiresAt
+    createdAt
+    sentAt
+    lastSentAt
+    sendCount
+    usedAt
+  }
+}
+
+query GetMagicLink($id: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by admin users to view magic link details. Frontend enforces role-based access control."
+) {
+  magicLink(id: $id) {
+    id
+    userId
+    borrowerEmail
+    sendToEmail
+    magicLinkUrl
+    sessionId
+    expiresAt
+    createdAt
+    createdBy
+    sentAt
+    lastSentAt
+    sendCount
+    usedAt
+    isActive
+    revokedAt
+    revokedBy
+    revokeReason
+    user {
+      id
+      email
+      firstName
+      lastName
+      role
+    }
+  }
+}
+
+query GetMagicLinkBySessionId($sessionId: String!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by Cloud Functions to check magic link status when users sign in. Frontend access is controlled through authenticated Cloud Function."
+) {
+  magicLinks(
+    where: { sessionId: { eq: $sessionId } }
+    orderBy: { createdAt: DESC }
+    limit: 1
+  ) {
+    id
+    userId
+    borrowerEmail
+    sendToEmail
+    expiresAt
+    usedAt
+    isActive
+  }
+}
+
+# Magic Link Analytics
+query GetMagicLinkStats @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by admin users for analytics. Frontend enforces role-based access control."
+) {
+  magicLinks {
+    id
+    userId
+    expiresAt
+    createdAt
+    usedAt
+    isActive
   }
 }

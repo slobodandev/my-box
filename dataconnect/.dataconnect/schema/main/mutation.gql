@@ -45,6 +45,15 @@ extend type Mutation {
     data: Loan_Data!
   ): Loan_KeyOutput! @fdc_generated(from: "Loan", purpose: INSERT_SINGLE)
   """
+  ✨ Insert a single `MagicLink` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  magicLink_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: MagicLink_Data!
+  ): MagicLink_KeyOutput! @fdc_generated(from: "MagicLink", purpose: INSERT_SINGLE)
+  """
   ✨ Insert a single `RateLimitTracking` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
   """
   rateLimitTracking_insert(
@@ -116,6 +125,15 @@ extend type Mutation {
     """
     data: [Loan_Data!]!
   ): [Loan_KeyOutput!]! @fdc_generated(from: "Loan", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `MagicLink` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  magicLink_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [MagicLink_Data!]!
+  ): [MagicLink_KeyOutput!]! @fdc_generated(from: "MagicLink", purpose: INSERT_MULTIPLE)
   """
   ✨ Insert `RateLimitTracking` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
   """
@@ -189,6 +207,15 @@ extend type Mutation {
     data: Loan_Data!
   ): Loan_KeyOutput! @fdc_generated(from: "Loan", purpose: UPSERT_SINGLE)
   """
+  ✨ Insert or update a single `MagicLink` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `MagicLink`.
+  """
+  magicLink_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: MagicLink_Data!
+  ): MagicLink_KeyOutput! @fdc_generated(from: "MagicLink", purpose: UPSERT_SINGLE)
+  """
   ✨ Insert or update a single `RateLimitTracking` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `RateLimitTracking`.
   """
   rateLimitTracking_upsert(
@@ -260,6 +287,15 @@ extend type Mutation {
     """
     data: [Loan_Data!]!
   ): [Loan_KeyOutput!]! @fdc_generated(from: "Loan", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `MagicLink` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `MagicLink`.
+  """
+  magicLink_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [MagicLink_Data!]!
+  ): [MagicLink_KeyOutput!]! @fdc_generated(from: "MagicLink", purpose: UPSERT_MULTIPLE)
   """
   ✨ Insert or update `RateLimitTracking` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `RateLimitTracking`.
   """
@@ -407,6 +443,30 @@ extend type Mutation {
     """
     data: Loan_Data!
   ): Loan_KeyOutput @fdc_generated(from: "Loan", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `MagicLink` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `MagicLink` or `null` if not found.
+  """
+  magicLink_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: MagicLink_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: MagicLink_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: MagicLink_Data!
+  ): MagicLink_KeyOutput @fdc_generated(from: "MagicLink", purpose: UPDATE_SINGLE)
   """
   ✨ Update a single `RateLimitTracking` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `RateLimitTracking` or `null` if not found.
   """
@@ -575,6 +635,25 @@ extend type Mutation {
     data: Loan_Data!
   ): Int! @fdc_generated(from: "Loan", purpose: UPDATE_MULTIPLE)
   """
+  ✨ Update `MagicLink` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  magicLink_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: MagicLink_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: MagicLink_Data!
+  ): Int! @fdc_generated(from: "MagicLink", purpose: UPDATE_MULTIPLE)
+  """
   ✨ Update `RateLimitTracking` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
   """
   rateLimitTracking_updateMany(
@@ -727,6 +806,25 @@ extend type Mutation {
     first: Loan_FirstRow
   ): Loan_KeyOutput @fdc_generated(from: "Loan", purpose: DELETE_SINGLE)
   """
+  ✨ Delete a single `MagicLink` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  magicLink_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: MagicLink_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: MagicLink_FirstRow
+  ): MagicLink_KeyOutput @fdc_generated(from: "MagicLink", purpose: DELETE_SINGLE)
+  """
   ✨ Delete a single `RateLimitTracking` based on `id`, `key` or `first` and return its key (or `null` if not found).
   """
   rateLimitTracking_delete(
@@ -853,6 +951,20 @@ extend type Mutation {
     """
     all: Boolean = false
   ): Int! @fdc_generated(from: "Loan", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `MagicLink` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  magicLink_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: MagicLink_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "MagicLink", purpose: DELETE_MULTIPLE)
   """
   ✨ Delete `RateLimitTracking` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
   """

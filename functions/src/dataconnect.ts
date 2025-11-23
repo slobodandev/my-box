@@ -44,7 +44,13 @@ export async function getUserByEmail(variables: { email: string }): Promise<{ da
   return result as any;
 }
 
-export async function createUser(variables: { email: string; role?: string | null }): Promise<{ data: any }> {
+export async function createUser(variables: {
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  role?: string | null;
+  phoneNumber?: string | null;
+}): Promise<{ data: any }> {
   const ref = mutationRef(dataConnect, 'CreateUser', variables);
   const result = await executeMutation(ref);
   return result as any;
@@ -106,6 +112,40 @@ export async function verifyAuthSession(variables: {
   verifiedAt: string;
 }): Promise<{ data: any }> {
   const ref = mutationRef(dataConnect, 'VerifyAuthSession', variables);
+  const result = await executeMutation(ref);
+  return result as any;
+}
+
+export async function updateUserPasswordStatus(variables: {
+  userId: string;
+  hasPassword: boolean;
+  isTemporary: boolean;
+}): Promise<{ data: any }> {
+  const ref = mutationRef(dataConnect, 'UpdateUserPasswordStatus', variables);
+  const result = await executeMutation(ref);
+  return result as any;
+}
+
+export async function createMagicLink(variables: {
+  userId: string;
+  borrowerEmail: string;
+  sendToEmail: string;
+  magicLinkUrl: string;
+  sessionId?: string | null;
+  expiresAt: string;
+  createdBy?: string | null;
+  sentAt?: string | null;
+}): Promise<{ data: any }> {
+  const ref = mutationRef(dataConnect, 'CreateMagicLink', variables);
+  const result = await executeMutation(ref);
+  return result as any;
+}
+
+export async function markMagicLinkUsed(variables: {
+  sessionId: string;
+  usedAt: string;
+}): Promise<{ data: any }> {
+  const ref = mutationRef(dataConnect, 'MarkMagicLinkUsed', variables);
   const result = await executeMutation(ref);
   return result as any;
 }

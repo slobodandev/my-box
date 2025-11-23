@@ -10,10 +10,12 @@ export enum CloudFunction {
   // Authentication
   GENERATE_AUTH_LINK = 'generateAuthLink',
   VERIFY_EMAIL_LINK = 'verifyEmailLink',
+  CREATE_PASSWORD_SESSION = 'createPasswordSession',
   VALIDATE_SESSION = 'validateSession',
   VERIFY_CODE = 'verifyCode',
   SEND_VERIFICATION_CODE = 'sendVerificationCode',
   VERIFY_MAGIC_LINK = 'verifyMagicLink',
+  CREATE_USER_WITH_MAGIC_LINK = 'createUserWithMagicLink',
 
   // File Operations
   PROCESS_UPLOAD = 'processUpload',
@@ -60,10 +62,12 @@ export const CloudFunctionUrls = {
   // Authentication
   generateAuthLink: () => getCloudFunctionUrl(CloudFunction.GENERATE_AUTH_LINK),
   verifyEmailLink: () => getCloudFunctionUrl(CloudFunction.VERIFY_EMAIL_LINK),
+  createPasswordSession: () => getCloudFunctionUrl(CloudFunction.CREATE_PASSWORD_SESSION),
   validateSession: () => getCloudFunctionUrl(CloudFunction.VALIDATE_SESSION),
   verifyCode: () => getCloudFunctionUrl(CloudFunction.VERIFY_CODE),
   sendVerificationCode: () => getCloudFunctionUrl(CloudFunction.SEND_VERIFICATION_CODE),
   verifyMagicLink: () => getCloudFunctionUrl(CloudFunction.VERIFY_MAGIC_LINK),
+  createUserWithMagicLink: getCloudFunctionUrl(CloudFunction.CREATE_USER_WITH_MAGIC_LINK),
 
   // File Operations
   processUpload: () => getCloudFunctionUrl(CloudFunction.PROCESS_UPLOAD),

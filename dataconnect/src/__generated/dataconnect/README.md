@@ -29,10 +29,17 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetActiveAuthSessionForUser*](#getactiveauthsessionforuser)
   - [*GetDashboard*](#getdashboard)
   - [*GetLoanDetails*](#getloandetails)
+  - [*GetUserMagicLinks*](#getusermagiclinks)
+  - [*GetActiveMagicLinks*](#getactivemagiclinks)
+  - [*GetMagicLink*](#getmagiclink)
+  - [*GetMagicLinkBySessionId*](#getmagiclinkbysessionid)
+  - [*GetMagicLinkStats*](#getmagiclinkstats)
 - [**Mutations**](#mutations)
   - [*CreateUser*](#createuser)
   - [*UpdateUser*](#updateuser)
+  - [*UpdateUserPasswordStatus*](#updateuserpasswordstatus)
   - [*DeactivateUser*](#deactivateuser)
+  - [*UpdateUserRole*](#updateuserrole)
   - [*CreateLoan*](#createloan)
   - [*UpdateLoan*](#updateloan)
   - [*CloseLoan*](#closeloan)
@@ -41,6 +48,10 @@ This README will guide you through the process of using the generated JavaScript
   - [*UpdateFile*](#updatefile)
   - [*SoftDeleteFile*](#softdeletefile)
   - [*HardDeleteFile*](#harddeletefile)
+  - [*RenameFile*](#renamefile)
+  - [*MoveFile*](#movefile)
+  - [*CopyFile*](#copyfile)
+  - [*RestoreFile*](#restorefile)
   - [*AssociateFileWithLoan*](#associatefilewithloan)
   - [*RemoveFileFromLoan*](#removefilefromloan)
   - [*CreateAuthSession*](#createauthsession)
@@ -57,6 +68,11 @@ This README will guide you through the process of using the generated JavaScript
   - [*UpdateRateLimit*](#updateratelimit)
   - [*DeleteExpiredSessions*](#deleteexpiredsessions)
   - [*DeleteExpiredVerificationCodes*](#deleteexpiredverificationcodes)
+  - [*CreateMagicLink*](#createmagiclink)
+  - [*UpdateMagicLinkSendCount*](#updatemagiclinksendcount)
+  - [*RevokeMagicLink*](#revokemagiclink)
+  - [*MarkMagicLinkUsed*](#markmagiclinkused)
+  - [*ExtendMagicLink*](#extendmagiclink)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `mybox-connector`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -154,6 +170,9 @@ export interface GetUserData {
     role: string;
     isActive: boolean;
     phoneNumber?: string | null;
+    hasPassword: boolean;
+    googleAuthUid?: string | null;
+    isTemporary: boolean;
     createdAt: TimestampString;
     lastLoginAt?: TimestampString | null;
   } & User_Key;
@@ -272,6 +291,9 @@ export interface GetUserByEmailData {
     lastName?: string | null;
     role: string;
     isActive: boolean;
+    hasPassword: boolean;
+    googleAuthUid?: string | null;
+    isTemporary: boolean;
   } & User_Key)[];
 }
 ```
@@ -843,6 +865,8 @@ The `data` property is an object of type `GetUserFilesData`, which is defined in
 export interface GetUserFilesData {
   files: ({
     id: UUIDString;
+    userId: UUIDString;
+    loanId?: UUIDString | null;
     originalFilename: string;
     storagePath: string;
     fileSize: number;
@@ -1081,6 +1105,7 @@ export interface GetFileData {
   file?: {
     id: UUIDString;
     userId: UUIDString;
+    loanId?: UUIDString | null;
     originalFilename: string;
     storagePath: string;
     fileSize: number;
@@ -2043,6 +2068,9 @@ export interface GetAuthSessionByFirebaseUidData {
       role: string;
       firstName?: string | null;
       lastName?: string | null;
+      hasPassword: boolean;
+      googleAuthUid?: string | null;
+      isTemporary: boolean;
     } & User_Key;
   } & AuthSession_Key)[];
 }
@@ -2618,6 +2646,603 @@ executeQuery(ref).then((response) => {
 });
 ```
 
+## GetUserMagicLinks
+You can execute the `GetUserMagicLinks` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getUserMagicLinks(vars: GetUserMagicLinksVariables): QueryPromise<GetUserMagicLinksData, GetUserMagicLinksVariables>;
+
+interface GetUserMagicLinksRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserMagicLinksVariables): QueryRef<GetUserMagicLinksData, GetUserMagicLinksVariables>;
+}
+export const getUserMagicLinksRef: GetUserMagicLinksRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getUserMagicLinks(dc: DataConnect, vars: GetUserMagicLinksVariables): QueryPromise<GetUserMagicLinksData, GetUserMagicLinksVariables>;
+
+interface GetUserMagicLinksRef {
+  ...
+  (dc: DataConnect, vars: GetUserMagicLinksVariables): QueryRef<GetUserMagicLinksData, GetUserMagicLinksVariables>;
+}
+export const getUserMagicLinksRef: GetUserMagicLinksRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getUserMagicLinksRef:
+```typescript
+const name = getUserMagicLinksRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetUserMagicLinks` query requires an argument of type `GetUserMagicLinksVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetUserMagicLinksVariables {
+  userId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetUserMagicLinks` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetUserMagicLinksData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetUserMagicLinksData {
+  magicLinks: ({
+    id: UUIDString;
+    userId: UUIDString;
+    borrowerEmail: string;
+    sendToEmail: string;
+    magicLinkUrl: string;
+    sessionId?: string | null;
+    expiresAt: TimestampString;
+    createdAt: TimestampString;
+    createdBy?: UUIDString | null;
+    sentAt?: TimestampString | null;
+    lastSentAt?: TimestampString | null;
+    sendCount: number;
+    usedAt?: TimestampString | null;
+    isActive: boolean;
+    revokedAt?: TimestampString | null;
+    revokedBy?: UUIDString | null;
+    revokeReason?: string | null;
+  } & MagicLink_Key)[];
+}
+```
+### Using `GetUserMagicLinks`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getUserMagicLinks, GetUserMagicLinksVariables } from '@mybox/dataconnect';
+
+// The `GetUserMagicLinks` query requires an argument of type `GetUserMagicLinksVariables`:
+const getUserMagicLinksVars: GetUserMagicLinksVariables = {
+  userId: ..., 
+};
+
+// Call the `getUserMagicLinks()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getUserMagicLinks(getUserMagicLinksVars);
+// Variables can be defined inline as well.
+const { data } = await getUserMagicLinks({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getUserMagicLinks(dataConnect, getUserMagicLinksVars);
+
+console.log(data.magicLinks);
+
+// Or, you can use the `Promise` API.
+getUserMagicLinks(getUserMagicLinksVars).then((response) => {
+  const data = response.data;
+  console.log(data.magicLinks);
+});
+```
+
+### Using `GetUserMagicLinks`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getUserMagicLinksRef, GetUserMagicLinksVariables } from '@mybox/dataconnect';
+
+// The `GetUserMagicLinks` query requires an argument of type `GetUserMagicLinksVariables`:
+const getUserMagicLinksVars: GetUserMagicLinksVariables = {
+  userId: ..., 
+};
+
+// Call the `getUserMagicLinksRef()` function to get a reference to the query.
+const ref = getUserMagicLinksRef(getUserMagicLinksVars);
+// Variables can be defined inline as well.
+const ref = getUserMagicLinksRef({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getUserMagicLinksRef(dataConnect, getUserMagicLinksVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.magicLinks);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.magicLinks);
+});
+```
+
+## GetActiveMagicLinks
+You can execute the `GetActiveMagicLinks` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getActiveMagicLinks(vars: GetActiveMagicLinksVariables): QueryPromise<GetActiveMagicLinksData, GetActiveMagicLinksVariables>;
+
+interface GetActiveMagicLinksRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetActiveMagicLinksVariables): QueryRef<GetActiveMagicLinksData, GetActiveMagicLinksVariables>;
+}
+export const getActiveMagicLinksRef: GetActiveMagicLinksRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getActiveMagicLinks(dc: DataConnect, vars: GetActiveMagicLinksVariables): QueryPromise<GetActiveMagicLinksData, GetActiveMagicLinksVariables>;
+
+interface GetActiveMagicLinksRef {
+  ...
+  (dc: DataConnect, vars: GetActiveMagicLinksVariables): QueryRef<GetActiveMagicLinksData, GetActiveMagicLinksVariables>;
+}
+export const getActiveMagicLinksRef: GetActiveMagicLinksRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getActiveMagicLinksRef:
+```typescript
+const name = getActiveMagicLinksRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetActiveMagicLinks` query requires an argument of type `GetActiveMagicLinksVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetActiveMagicLinksVariables {
+  userId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetActiveMagicLinks` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetActiveMagicLinksData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetActiveMagicLinksData {
+  magicLinks: ({
+    id: UUIDString;
+    userId: UUIDString;
+    borrowerEmail: string;
+    sendToEmail: string;
+    magicLinkUrl: string;
+    expiresAt: TimestampString;
+    createdAt: TimestampString;
+    sentAt?: TimestampString | null;
+    lastSentAt?: TimestampString | null;
+    sendCount: number;
+    usedAt?: TimestampString | null;
+  } & MagicLink_Key)[];
+}
+```
+### Using `GetActiveMagicLinks`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getActiveMagicLinks, GetActiveMagicLinksVariables } from '@mybox/dataconnect';
+
+// The `GetActiveMagicLinks` query requires an argument of type `GetActiveMagicLinksVariables`:
+const getActiveMagicLinksVars: GetActiveMagicLinksVariables = {
+  userId: ..., 
+};
+
+// Call the `getActiveMagicLinks()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getActiveMagicLinks(getActiveMagicLinksVars);
+// Variables can be defined inline as well.
+const { data } = await getActiveMagicLinks({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getActiveMagicLinks(dataConnect, getActiveMagicLinksVars);
+
+console.log(data.magicLinks);
+
+// Or, you can use the `Promise` API.
+getActiveMagicLinks(getActiveMagicLinksVars).then((response) => {
+  const data = response.data;
+  console.log(data.magicLinks);
+});
+```
+
+### Using `GetActiveMagicLinks`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getActiveMagicLinksRef, GetActiveMagicLinksVariables } from '@mybox/dataconnect';
+
+// The `GetActiveMagicLinks` query requires an argument of type `GetActiveMagicLinksVariables`:
+const getActiveMagicLinksVars: GetActiveMagicLinksVariables = {
+  userId: ..., 
+};
+
+// Call the `getActiveMagicLinksRef()` function to get a reference to the query.
+const ref = getActiveMagicLinksRef(getActiveMagicLinksVars);
+// Variables can be defined inline as well.
+const ref = getActiveMagicLinksRef({ userId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getActiveMagicLinksRef(dataConnect, getActiveMagicLinksVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.magicLinks);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.magicLinks);
+});
+```
+
+## GetMagicLink
+You can execute the `GetMagicLink` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getMagicLink(vars: GetMagicLinkVariables): QueryPromise<GetMagicLinkData, GetMagicLinkVariables>;
+
+interface GetMagicLinkRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMagicLinkVariables): QueryRef<GetMagicLinkData, GetMagicLinkVariables>;
+}
+export const getMagicLinkRef: GetMagicLinkRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getMagicLink(dc: DataConnect, vars: GetMagicLinkVariables): QueryPromise<GetMagicLinkData, GetMagicLinkVariables>;
+
+interface GetMagicLinkRef {
+  ...
+  (dc: DataConnect, vars: GetMagicLinkVariables): QueryRef<GetMagicLinkData, GetMagicLinkVariables>;
+}
+export const getMagicLinkRef: GetMagicLinkRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getMagicLinkRef:
+```typescript
+const name = getMagicLinkRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetMagicLink` query requires an argument of type `GetMagicLinkVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetMagicLinkVariables {
+  id: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetMagicLink` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetMagicLinkData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetMagicLinkData {
+  magicLink?: {
+    id: UUIDString;
+    userId: UUIDString;
+    borrowerEmail: string;
+    sendToEmail: string;
+    magicLinkUrl: string;
+    sessionId?: string | null;
+    expiresAt: TimestampString;
+    createdAt: TimestampString;
+    createdBy?: UUIDString | null;
+    sentAt?: TimestampString | null;
+    lastSentAt?: TimestampString | null;
+    sendCount: number;
+    usedAt?: TimestampString | null;
+    isActive: boolean;
+    revokedAt?: TimestampString | null;
+    revokedBy?: UUIDString | null;
+    revokeReason?: string | null;
+    user: {
+      id: UUIDString;
+      email: string;
+      firstName?: string | null;
+      lastName?: string | null;
+      role: string;
+    } & User_Key;
+  } & MagicLink_Key;
+}
+```
+### Using `GetMagicLink`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getMagicLink, GetMagicLinkVariables } from '@mybox/dataconnect';
+
+// The `GetMagicLink` query requires an argument of type `GetMagicLinkVariables`:
+const getMagicLinkVars: GetMagicLinkVariables = {
+  id: ..., 
+};
+
+// Call the `getMagicLink()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getMagicLink(getMagicLinkVars);
+// Variables can be defined inline as well.
+const { data } = await getMagicLink({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getMagicLink(dataConnect, getMagicLinkVars);
+
+console.log(data.magicLink);
+
+// Or, you can use the `Promise` API.
+getMagicLink(getMagicLinkVars).then((response) => {
+  const data = response.data;
+  console.log(data.magicLink);
+});
+```
+
+### Using `GetMagicLink`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getMagicLinkRef, GetMagicLinkVariables } from '@mybox/dataconnect';
+
+// The `GetMagicLink` query requires an argument of type `GetMagicLinkVariables`:
+const getMagicLinkVars: GetMagicLinkVariables = {
+  id: ..., 
+};
+
+// Call the `getMagicLinkRef()` function to get a reference to the query.
+const ref = getMagicLinkRef(getMagicLinkVars);
+// Variables can be defined inline as well.
+const ref = getMagicLinkRef({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getMagicLinkRef(dataConnect, getMagicLinkVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.magicLink);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.magicLink);
+});
+```
+
+## GetMagicLinkBySessionId
+You can execute the `GetMagicLinkBySessionId` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getMagicLinkBySessionId(vars: GetMagicLinkBySessionIdVariables): QueryPromise<GetMagicLinkBySessionIdData, GetMagicLinkBySessionIdVariables>;
+
+interface GetMagicLinkBySessionIdRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMagicLinkBySessionIdVariables): QueryRef<GetMagicLinkBySessionIdData, GetMagicLinkBySessionIdVariables>;
+}
+export const getMagicLinkBySessionIdRef: GetMagicLinkBySessionIdRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getMagicLinkBySessionId(dc: DataConnect, vars: GetMagicLinkBySessionIdVariables): QueryPromise<GetMagicLinkBySessionIdData, GetMagicLinkBySessionIdVariables>;
+
+interface GetMagicLinkBySessionIdRef {
+  ...
+  (dc: DataConnect, vars: GetMagicLinkBySessionIdVariables): QueryRef<GetMagicLinkBySessionIdData, GetMagicLinkBySessionIdVariables>;
+}
+export const getMagicLinkBySessionIdRef: GetMagicLinkBySessionIdRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getMagicLinkBySessionIdRef:
+```typescript
+const name = getMagicLinkBySessionIdRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetMagicLinkBySessionId` query requires an argument of type `GetMagicLinkBySessionIdVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetMagicLinkBySessionIdVariables {
+  sessionId: string;
+}
+```
+### Return Type
+Recall that executing the `GetMagicLinkBySessionId` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetMagicLinkBySessionIdData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetMagicLinkBySessionIdData {
+  magicLinks: ({
+    id: UUIDString;
+    userId: UUIDString;
+    borrowerEmail: string;
+    sendToEmail: string;
+    expiresAt: TimestampString;
+    usedAt?: TimestampString | null;
+    isActive: boolean;
+  } & MagicLink_Key)[];
+}
+```
+### Using `GetMagicLinkBySessionId`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getMagicLinkBySessionId, GetMagicLinkBySessionIdVariables } from '@mybox/dataconnect';
+
+// The `GetMagicLinkBySessionId` query requires an argument of type `GetMagicLinkBySessionIdVariables`:
+const getMagicLinkBySessionIdVars: GetMagicLinkBySessionIdVariables = {
+  sessionId: ..., 
+};
+
+// Call the `getMagicLinkBySessionId()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getMagicLinkBySessionId(getMagicLinkBySessionIdVars);
+// Variables can be defined inline as well.
+const { data } = await getMagicLinkBySessionId({ sessionId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getMagicLinkBySessionId(dataConnect, getMagicLinkBySessionIdVars);
+
+console.log(data.magicLinks);
+
+// Or, you can use the `Promise` API.
+getMagicLinkBySessionId(getMagicLinkBySessionIdVars).then((response) => {
+  const data = response.data;
+  console.log(data.magicLinks);
+});
+```
+
+### Using `GetMagicLinkBySessionId`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getMagicLinkBySessionIdRef, GetMagicLinkBySessionIdVariables } from '@mybox/dataconnect';
+
+// The `GetMagicLinkBySessionId` query requires an argument of type `GetMagicLinkBySessionIdVariables`:
+const getMagicLinkBySessionIdVars: GetMagicLinkBySessionIdVariables = {
+  sessionId: ..., 
+};
+
+// Call the `getMagicLinkBySessionIdRef()` function to get a reference to the query.
+const ref = getMagicLinkBySessionIdRef(getMagicLinkBySessionIdVars);
+// Variables can be defined inline as well.
+const ref = getMagicLinkBySessionIdRef({ sessionId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getMagicLinkBySessionIdRef(dataConnect, getMagicLinkBySessionIdVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.magicLinks);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.magicLinks);
+});
+```
+
+## GetMagicLinkStats
+You can execute the `GetMagicLinkStats` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getMagicLinkStats(): QueryPromise<GetMagicLinkStatsData, undefined>;
+
+interface GetMagicLinkStatsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<GetMagicLinkStatsData, undefined>;
+}
+export const getMagicLinkStatsRef: GetMagicLinkStatsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getMagicLinkStats(dc: DataConnect): QueryPromise<GetMagicLinkStatsData, undefined>;
+
+interface GetMagicLinkStatsRef {
+  ...
+  (dc: DataConnect): QueryRef<GetMagicLinkStatsData, undefined>;
+}
+export const getMagicLinkStatsRef: GetMagicLinkStatsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getMagicLinkStatsRef:
+```typescript
+const name = getMagicLinkStatsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetMagicLinkStats` query has no variables.
+### Return Type
+Recall that executing the `GetMagicLinkStats` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetMagicLinkStatsData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetMagicLinkStatsData {
+  magicLinks: ({
+    id: UUIDString;
+    userId: UUIDString;
+    expiresAt: TimestampString;
+    createdAt: TimestampString;
+    usedAt?: TimestampString | null;
+    isActive: boolean;
+  } & MagicLink_Key)[];
+}
+```
+### Using `GetMagicLinkStats`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getMagicLinkStats } from '@mybox/dataconnect';
+
+
+// Call the `getMagicLinkStats()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getMagicLinkStats();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getMagicLinkStats(dataConnect);
+
+console.log(data.magicLinks);
+
+// Or, you can use the `Promise` API.
+getMagicLinkStats().then((response) => {
+  const data = response.data;
+  console.log(data.magicLinks);
+});
+```
+
+### Using `GetMagicLinkStats`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getMagicLinkStatsRef } from '@mybox/dataconnect';
+
+
+// Call the `getMagicLinkStatsRef()` function to get a reference to the query.
+const ref = getMagicLinkStatsRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getMagicLinkStatsRef(dataConnect);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.magicLinks);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.magicLinks);
+});
+```
+
 # Mutations
 
 There are two ways to execute a Data Connect Mutation using the generated Web SDK:
@@ -2875,6 +3500,121 @@ executeMutation(ref).then((response) => {
 });
 ```
 
+## UpdateUserPasswordStatus
+You can execute the `UpdateUserPasswordStatus` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+updateUserPasswordStatus(vars: UpdateUserPasswordStatusVariables): MutationPromise<UpdateUserPasswordStatusData, UpdateUserPasswordStatusVariables>;
+
+interface UpdateUserPasswordStatusRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateUserPasswordStatusVariables): MutationRef<UpdateUserPasswordStatusData, UpdateUserPasswordStatusVariables>;
+}
+export const updateUserPasswordStatusRef: UpdateUserPasswordStatusRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+updateUserPasswordStatus(dc: DataConnect, vars: UpdateUserPasswordStatusVariables): MutationPromise<UpdateUserPasswordStatusData, UpdateUserPasswordStatusVariables>;
+
+interface UpdateUserPasswordStatusRef {
+  ...
+  (dc: DataConnect, vars: UpdateUserPasswordStatusVariables): MutationRef<UpdateUserPasswordStatusData, UpdateUserPasswordStatusVariables>;
+}
+export const updateUserPasswordStatusRef: UpdateUserPasswordStatusRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the updateUserPasswordStatusRef:
+```typescript
+const name = updateUserPasswordStatusRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `UpdateUserPasswordStatus` mutation requires an argument of type `UpdateUserPasswordStatusVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface UpdateUserPasswordStatusVariables {
+  userId: UUIDString;
+  hasPassword: boolean;
+  isTemporary: boolean;
+}
+```
+### Return Type
+Recall that executing the `UpdateUserPasswordStatus` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `UpdateUserPasswordStatusData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface UpdateUserPasswordStatusData {
+  user_update?: User_Key | null;
+}
+```
+### Using `UpdateUserPasswordStatus`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, updateUserPasswordStatus, UpdateUserPasswordStatusVariables } from '@mybox/dataconnect';
+
+// The `UpdateUserPasswordStatus` mutation requires an argument of type `UpdateUserPasswordStatusVariables`:
+const updateUserPasswordStatusVars: UpdateUserPasswordStatusVariables = {
+  userId: ..., 
+  hasPassword: ..., 
+  isTemporary: ..., 
+};
+
+// Call the `updateUserPasswordStatus()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await updateUserPasswordStatus(updateUserPasswordStatusVars);
+// Variables can be defined inline as well.
+const { data } = await updateUserPasswordStatus({ userId: ..., hasPassword: ..., isTemporary: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await updateUserPasswordStatus(dataConnect, updateUserPasswordStatusVars);
+
+console.log(data.user_update);
+
+// Or, you can use the `Promise` API.
+updateUserPasswordStatus(updateUserPasswordStatusVars).then((response) => {
+  const data = response.data;
+  console.log(data.user_update);
+});
+```
+
+### Using `UpdateUserPasswordStatus`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, updateUserPasswordStatusRef, UpdateUserPasswordStatusVariables } from '@mybox/dataconnect';
+
+// The `UpdateUserPasswordStatus` mutation requires an argument of type `UpdateUserPasswordStatusVariables`:
+const updateUserPasswordStatusVars: UpdateUserPasswordStatusVariables = {
+  userId: ..., 
+  hasPassword: ..., 
+  isTemporary: ..., 
+};
+
+// Call the `updateUserPasswordStatusRef()` function to get a reference to the mutation.
+const ref = updateUserPasswordStatusRef(updateUserPasswordStatusVars);
+// Variables can be defined inline as well.
+const ref = updateUserPasswordStatusRef({ userId: ..., hasPassword: ..., isTemporary: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = updateUserPasswordStatusRef(dataConnect, updateUserPasswordStatusVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.user_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.user_update);
+});
+```
+
 ## DeactivateUser
 You can execute the `DeactivateUser` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
 ```typescript
@@ -2970,6 +3710,118 @@ const ref = deactivateUserRef({ id: ..., });
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
 const ref = deactivateUserRef(dataConnect, deactivateUserVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.user_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.user_update);
+});
+```
+
+## UpdateUserRole
+You can execute the `UpdateUserRole` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+updateUserRole(vars: UpdateUserRoleVariables): MutationPromise<UpdateUserRoleData, UpdateUserRoleVariables>;
+
+interface UpdateUserRoleRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateUserRoleVariables): MutationRef<UpdateUserRoleData, UpdateUserRoleVariables>;
+}
+export const updateUserRoleRef: UpdateUserRoleRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+updateUserRole(dc: DataConnect, vars: UpdateUserRoleVariables): MutationPromise<UpdateUserRoleData, UpdateUserRoleVariables>;
+
+interface UpdateUserRoleRef {
+  ...
+  (dc: DataConnect, vars: UpdateUserRoleVariables): MutationRef<UpdateUserRoleData, UpdateUserRoleVariables>;
+}
+export const updateUserRoleRef: UpdateUserRoleRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the updateUserRoleRef:
+```typescript
+const name = updateUserRoleRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `UpdateUserRole` mutation requires an argument of type `UpdateUserRoleVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface UpdateUserRoleVariables {
+  userId: UUIDString;
+  role: string;
+}
+```
+### Return Type
+Recall that executing the `UpdateUserRole` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `UpdateUserRoleData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface UpdateUserRoleData {
+  user_update?: User_Key | null;
+}
+```
+### Using `UpdateUserRole`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, updateUserRole, UpdateUserRoleVariables } from '@mybox/dataconnect';
+
+// The `UpdateUserRole` mutation requires an argument of type `UpdateUserRoleVariables`:
+const updateUserRoleVars: UpdateUserRoleVariables = {
+  userId: ..., 
+  role: ..., 
+};
+
+// Call the `updateUserRole()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await updateUserRole(updateUserRoleVars);
+// Variables can be defined inline as well.
+const { data } = await updateUserRole({ userId: ..., role: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await updateUserRole(dataConnect, updateUserRoleVars);
+
+console.log(data.user_update);
+
+// Or, you can use the `Promise` API.
+updateUserRole(updateUserRoleVars).then((response) => {
+  const data = response.data;
+  console.log(data.user_update);
+});
+```
+
+### Using `UpdateUserRole`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, updateUserRoleRef, UpdateUserRoleVariables } from '@mybox/dataconnect';
+
+// The `UpdateUserRole` mutation requires an argument of type `UpdateUserRoleVariables`:
+const updateUserRoleVars: UpdateUserRoleVariables = {
+  userId: ..., 
+  role: ..., 
+};
+
+// Call the `updateUserRoleRef()` function to get a reference to the mutation.
+const ref = updateUserRoleRef(updateUserRoleVars);
+// Variables can be defined inline as well.
+const ref = updateUserRoleRef({ userId: ..., role: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = updateUserRoleRef(dataConnect, updateUserRoleVars);
 
 // Call `executeMutation()` on the reference to execute the mutation.
 // You can use the `await` keyword to wait for the promise to resolve.
@@ -3488,11 +4340,13 @@ The `CreateFile` mutation requires an argument of type `CreateFileVariables`, wh
 ```typescript
 export interface CreateFileVariables {
   userId: UUIDString;
+  loanId?: UUIDString | null;
   originalFilename: string;
   storagePath: string;
   fileSize: number;
   mimeType?: string | null;
   fileExtension?: string | null;
+  downloadUrl?: string | null;
   tags?: string | null;
   description?: string | null;
 }
@@ -3515,11 +4369,13 @@ import { connectorConfig, createFile, CreateFileVariables } from '@mybox/datacon
 // The `CreateFile` mutation requires an argument of type `CreateFileVariables`:
 const createFileVars: CreateFileVariables = {
   userId: ..., 
+  loanId: ..., // optional
   originalFilename: ..., 
   storagePath: ..., 
   fileSize: ..., 
   mimeType: ..., // optional
   fileExtension: ..., // optional
+  downloadUrl: ..., // optional
   tags: ..., // optional
   description: ..., // optional
 };
@@ -3528,7 +4384,7 @@ const createFileVars: CreateFileVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await createFile(createFileVars);
 // Variables can be defined inline as well.
-const { data } = await createFile({ userId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., tags: ..., description: ..., });
+const { data } = await createFile({ userId: ..., loanId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., downloadUrl: ..., tags: ..., description: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -3552,11 +4408,13 @@ import { connectorConfig, createFileRef, CreateFileVariables } from '@mybox/data
 // The `CreateFile` mutation requires an argument of type `CreateFileVariables`:
 const createFileVars: CreateFileVariables = {
   userId: ..., 
+  loanId: ..., // optional
   originalFilename: ..., 
   storagePath: ..., 
   fileSize: ..., 
   mimeType: ..., // optional
   fileExtension: ..., // optional
+  downloadUrl: ..., // optional
   tags: ..., // optional
   description: ..., // optional
 };
@@ -3564,7 +4422,7 @@ const createFileVars: CreateFileVariables = {
 // Call the `createFileRef()` function to get a reference to the mutation.
 const ref = createFileRef(createFileVars);
 // Variables can be defined inline as well.
-const ref = createFileRef({ userId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., tags: ..., description: ..., });
+const ref = createFileRef({ userId: ..., loanId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., downloadUrl: ..., tags: ..., description: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -3922,6 +4780,478 @@ console.log(data.file_delete);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.file_delete);
+});
+```
+
+## RenameFile
+You can execute the `RenameFile` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+renameFile(vars: RenameFileVariables): MutationPromise<RenameFileData, RenameFileVariables>;
+
+interface RenameFileRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RenameFileVariables): MutationRef<RenameFileData, RenameFileVariables>;
+}
+export const renameFileRef: RenameFileRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+renameFile(dc: DataConnect, vars: RenameFileVariables): MutationPromise<RenameFileData, RenameFileVariables>;
+
+interface RenameFileRef {
+  ...
+  (dc: DataConnect, vars: RenameFileVariables): MutationRef<RenameFileData, RenameFileVariables>;
+}
+export const renameFileRef: RenameFileRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the renameFileRef:
+```typescript
+const name = renameFileRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `RenameFile` mutation requires an argument of type `RenameFileVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface RenameFileVariables {
+  id: UUIDString;
+  newFilename: string;
+}
+```
+### Return Type
+Recall that executing the `RenameFile` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `RenameFileData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface RenameFileData {
+  file_update?: File_Key | null;
+}
+```
+### Using `RenameFile`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, renameFile, RenameFileVariables } from '@mybox/dataconnect';
+
+// The `RenameFile` mutation requires an argument of type `RenameFileVariables`:
+const renameFileVars: RenameFileVariables = {
+  id: ..., 
+  newFilename: ..., 
+};
+
+// Call the `renameFile()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await renameFile(renameFileVars);
+// Variables can be defined inline as well.
+const { data } = await renameFile({ id: ..., newFilename: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await renameFile(dataConnect, renameFileVars);
+
+console.log(data.file_update);
+
+// Or, you can use the `Promise` API.
+renameFile(renameFileVars).then((response) => {
+  const data = response.data;
+  console.log(data.file_update);
+});
+```
+
+### Using `RenameFile`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, renameFileRef, RenameFileVariables } from '@mybox/dataconnect';
+
+// The `RenameFile` mutation requires an argument of type `RenameFileVariables`:
+const renameFileVars: RenameFileVariables = {
+  id: ..., 
+  newFilename: ..., 
+};
+
+// Call the `renameFileRef()` function to get a reference to the mutation.
+const ref = renameFileRef(renameFileVars);
+// Variables can be defined inline as well.
+const ref = renameFileRef({ id: ..., newFilename: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = renameFileRef(dataConnect, renameFileVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.file_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.file_update);
+});
+```
+
+## MoveFile
+You can execute the `MoveFile` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+moveFile(vars: MoveFileVariables): MutationPromise<MoveFileData, MoveFileVariables>;
+
+interface MoveFileRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: MoveFileVariables): MutationRef<MoveFileData, MoveFileVariables>;
+}
+export const moveFileRef: MoveFileRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+moveFile(dc: DataConnect, vars: MoveFileVariables): MutationPromise<MoveFileData, MoveFileVariables>;
+
+interface MoveFileRef {
+  ...
+  (dc: DataConnect, vars: MoveFileVariables): MutationRef<MoveFileData, MoveFileVariables>;
+}
+export const moveFileRef: MoveFileRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the moveFileRef:
+```typescript
+const name = moveFileRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `MoveFile` mutation requires an argument of type `MoveFileVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface MoveFileVariables {
+  id: UUIDString;
+  targetUserId: UUIDString;
+  targetLoanId?: UUIDString | null;
+}
+```
+### Return Type
+Recall that executing the `MoveFile` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `MoveFileData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface MoveFileData {
+  file_update?: File_Key | null;
+}
+```
+### Using `MoveFile`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, moveFile, MoveFileVariables } from '@mybox/dataconnect';
+
+// The `MoveFile` mutation requires an argument of type `MoveFileVariables`:
+const moveFileVars: MoveFileVariables = {
+  id: ..., 
+  targetUserId: ..., 
+  targetLoanId: ..., // optional
+};
+
+// Call the `moveFile()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await moveFile(moveFileVars);
+// Variables can be defined inline as well.
+const { data } = await moveFile({ id: ..., targetUserId: ..., targetLoanId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await moveFile(dataConnect, moveFileVars);
+
+console.log(data.file_update);
+
+// Or, you can use the `Promise` API.
+moveFile(moveFileVars).then((response) => {
+  const data = response.data;
+  console.log(data.file_update);
+});
+```
+
+### Using `MoveFile`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, moveFileRef, MoveFileVariables } from '@mybox/dataconnect';
+
+// The `MoveFile` mutation requires an argument of type `MoveFileVariables`:
+const moveFileVars: MoveFileVariables = {
+  id: ..., 
+  targetUserId: ..., 
+  targetLoanId: ..., // optional
+};
+
+// Call the `moveFileRef()` function to get a reference to the mutation.
+const ref = moveFileRef(moveFileVars);
+// Variables can be defined inline as well.
+const ref = moveFileRef({ id: ..., targetUserId: ..., targetLoanId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = moveFileRef(dataConnect, moveFileVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.file_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.file_update);
+});
+```
+
+## CopyFile
+You can execute the `CopyFile` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+copyFile(vars: CopyFileVariables): MutationPromise<CopyFileData, CopyFileVariables>;
+
+interface CopyFileRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CopyFileVariables): MutationRef<CopyFileData, CopyFileVariables>;
+}
+export const copyFileRef: CopyFileRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+copyFile(dc: DataConnect, vars: CopyFileVariables): MutationPromise<CopyFileData, CopyFileVariables>;
+
+interface CopyFileRef {
+  ...
+  (dc: DataConnect, vars: CopyFileVariables): MutationRef<CopyFileData, CopyFileVariables>;
+}
+export const copyFileRef: CopyFileRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the copyFileRef:
+```typescript
+const name = copyFileRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CopyFile` mutation requires an argument of type `CopyFileVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CopyFileVariables {
+  userId: UUIDString;
+  loanId?: UUIDString | null;
+  originalFilename: string;
+  storagePath: string;
+  fileSize: number;
+  mimeType?: string | null;
+  fileExtension?: string | null;
+  downloadUrl?: string | null;
+  tags?: string | null;
+  description?: string | null;
+}
+```
+### Return Type
+Recall that executing the `CopyFile` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CopyFileData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CopyFileData {
+  file_insert: File_Key;
+}
+```
+### Using `CopyFile`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, copyFile, CopyFileVariables } from '@mybox/dataconnect';
+
+// The `CopyFile` mutation requires an argument of type `CopyFileVariables`:
+const copyFileVars: CopyFileVariables = {
+  userId: ..., 
+  loanId: ..., // optional
+  originalFilename: ..., 
+  storagePath: ..., 
+  fileSize: ..., 
+  mimeType: ..., // optional
+  fileExtension: ..., // optional
+  downloadUrl: ..., // optional
+  tags: ..., // optional
+  description: ..., // optional
+};
+
+// Call the `copyFile()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await copyFile(copyFileVars);
+// Variables can be defined inline as well.
+const { data } = await copyFile({ userId: ..., loanId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., downloadUrl: ..., tags: ..., description: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await copyFile(dataConnect, copyFileVars);
+
+console.log(data.file_insert);
+
+// Or, you can use the `Promise` API.
+copyFile(copyFileVars).then((response) => {
+  const data = response.data;
+  console.log(data.file_insert);
+});
+```
+
+### Using `CopyFile`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, copyFileRef, CopyFileVariables } from '@mybox/dataconnect';
+
+// The `CopyFile` mutation requires an argument of type `CopyFileVariables`:
+const copyFileVars: CopyFileVariables = {
+  userId: ..., 
+  loanId: ..., // optional
+  originalFilename: ..., 
+  storagePath: ..., 
+  fileSize: ..., 
+  mimeType: ..., // optional
+  fileExtension: ..., // optional
+  downloadUrl: ..., // optional
+  tags: ..., // optional
+  description: ..., // optional
+};
+
+// Call the `copyFileRef()` function to get a reference to the mutation.
+const ref = copyFileRef(copyFileVars);
+// Variables can be defined inline as well.
+const ref = copyFileRef({ userId: ..., loanId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., downloadUrl: ..., tags: ..., description: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = copyFileRef(dataConnect, copyFileVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.file_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.file_insert);
+});
+```
+
+## RestoreFile
+You can execute the `RestoreFile` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+restoreFile(vars: RestoreFileVariables): MutationPromise<RestoreFileData, RestoreFileVariables>;
+
+interface RestoreFileRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RestoreFileVariables): MutationRef<RestoreFileData, RestoreFileVariables>;
+}
+export const restoreFileRef: RestoreFileRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+restoreFile(dc: DataConnect, vars: RestoreFileVariables): MutationPromise<RestoreFileData, RestoreFileVariables>;
+
+interface RestoreFileRef {
+  ...
+  (dc: DataConnect, vars: RestoreFileVariables): MutationRef<RestoreFileData, RestoreFileVariables>;
+}
+export const restoreFileRef: RestoreFileRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the restoreFileRef:
+```typescript
+const name = restoreFileRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `RestoreFile` mutation requires an argument of type `RestoreFileVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface RestoreFileVariables {
+  id: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `RestoreFile` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `RestoreFileData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface RestoreFileData {
+  file_update?: File_Key | null;
+}
+```
+### Using `RestoreFile`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, restoreFile, RestoreFileVariables } from '@mybox/dataconnect';
+
+// The `RestoreFile` mutation requires an argument of type `RestoreFileVariables`:
+const restoreFileVars: RestoreFileVariables = {
+  id: ..., 
+};
+
+// Call the `restoreFile()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await restoreFile(restoreFileVars);
+// Variables can be defined inline as well.
+const { data } = await restoreFile({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await restoreFile(dataConnect, restoreFileVars);
+
+console.log(data.file_update);
+
+// Or, you can use the `Promise` API.
+restoreFile(restoreFileVars).then((response) => {
+  const data = response.data;
+  console.log(data.file_update);
+});
+```
+
+### Using `RestoreFile`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, restoreFileRef, RestoreFileVariables } from '@mybox/dataconnect';
+
+// The `RestoreFile` mutation requires an argument of type `RestoreFileVariables`:
+const restoreFileVars: RestoreFileVariables = {
+  id: ..., 
+};
+
+// Call the `restoreFileRef()` function to get a reference to the mutation.
+const ref = restoreFileRef(restoreFileVars);
+// Variables can be defined inline as well.
+const ref = restoreFileRef({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = restoreFileRef(dataConnect, restoreFileVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.file_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.file_update);
 });
 ```
 
@@ -5804,6 +7134,593 @@ console.log(data.verificationCode_deleteMany);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.verificationCode_deleteMany);
+});
+```
+
+## CreateMagicLink
+You can execute the `CreateMagicLink` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+createMagicLink(vars: CreateMagicLinkVariables): MutationPromise<CreateMagicLinkData, CreateMagicLinkVariables>;
+
+interface CreateMagicLinkRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateMagicLinkVariables): MutationRef<CreateMagicLinkData, CreateMagicLinkVariables>;
+}
+export const createMagicLinkRef: CreateMagicLinkRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+createMagicLink(dc: DataConnect, vars: CreateMagicLinkVariables): MutationPromise<CreateMagicLinkData, CreateMagicLinkVariables>;
+
+interface CreateMagicLinkRef {
+  ...
+  (dc: DataConnect, vars: CreateMagicLinkVariables): MutationRef<CreateMagicLinkData, CreateMagicLinkVariables>;
+}
+export const createMagicLinkRef: CreateMagicLinkRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the createMagicLinkRef:
+```typescript
+const name = createMagicLinkRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CreateMagicLink` mutation requires an argument of type `CreateMagicLinkVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CreateMagicLinkVariables {
+  userId: UUIDString;
+  borrowerEmail: string;
+  sendToEmail: string;
+  magicLinkUrl: string;
+  sessionId?: string | null;
+  expiresAt: TimestampString;
+  createdBy?: UUIDString | null;
+  sentAt?: TimestampString | null;
+}
+```
+### Return Type
+Recall that executing the `CreateMagicLink` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CreateMagicLinkData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CreateMagicLinkData {
+  magicLink_insert: MagicLink_Key;
+}
+```
+### Using `CreateMagicLink`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, createMagicLink, CreateMagicLinkVariables } from '@mybox/dataconnect';
+
+// The `CreateMagicLink` mutation requires an argument of type `CreateMagicLinkVariables`:
+const createMagicLinkVars: CreateMagicLinkVariables = {
+  userId: ..., 
+  borrowerEmail: ..., 
+  sendToEmail: ..., 
+  magicLinkUrl: ..., 
+  sessionId: ..., // optional
+  expiresAt: ..., 
+  createdBy: ..., // optional
+  sentAt: ..., // optional
+};
+
+// Call the `createMagicLink()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await createMagicLink(createMagicLinkVars);
+// Variables can be defined inline as well.
+const { data } = await createMagicLink({ userId: ..., borrowerEmail: ..., sendToEmail: ..., magicLinkUrl: ..., sessionId: ..., expiresAt: ..., createdBy: ..., sentAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await createMagicLink(dataConnect, createMagicLinkVars);
+
+console.log(data.magicLink_insert);
+
+// Or, you can use the `Promise` API.
+createMagicLink(createMagicLinkVars).then((response) => {
+  const data = response.data;
+  console.log(data.magicLink_insert);
+});
+```
+
+### Using `CreateMagicLink`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, createMagicLinkRef, CreateMagicLinkVariables } from '@mybox/dataconnect';
+
+// The `CreateMagicLink` mutation requires an argument of type `CreateMagicLinkVariables`:
+const createMagicLinkVars: CreateMagicLinkVariables = {
+  userId: ..., 
+  borrowerEmail: ..., 
+  sendToEmail: ..., 
+  magicLinkUrl: ..., 
+  sessionId: ..., // optional
+  expiresAt: ..., 
+  createdBy: ..., // optional
+  sentAt: ..., // optional
+};
+
+// Call the `createMagicLinkRef()` function to get a reference to the mutation.
+const ref = createMagicLinkRef(createMagicLinkVars);
+// Variables can be defined inline as well.
+const ref = createMagicLinkRef({ userId: ..., borrowerEmail: ..., sendToEmail: ..., magicLinkUrl: ..., sessionId: ..., expiresAt: ..., createdBy: ..., sentAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = createMagicLinkRef(dataConnect, createMagicLinkVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.magicLink_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.magicLink_insert);
+});
+```
+
+## UpdateMagicLinkSendCount
+You can execute the `UpdateMagicLinkSendCount` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+updateMagicLinkSendCount(vars: UpdateMagicLinkSendCountVariables): MutationPromise<UpdateMagicLinkSendCountData, UpdateMagicLinkSendCountVariables>;
+
+interface UpdateMagicLinkSendCountRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateMagicLinkSendCountVariables): MutationRef<UpdateMagicLinkSendCountData, UpdateMagicLinkSendCountVariables>;
+}
+export const updateMagicLinkSendCountRef: UpdateMagicLinkSendCountRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+updateMagicLinkSendCount(dc: DataConnect, vars: UpdateMagicLinkSendCountVariables): MutationPromise<UpdateMagicLinkSendCountData, UpdateMagicLinkSendCountVariables>;
+
+interface UpdateMagicLinkSendCountRef {
+  ...
+  (dc: DataConnect, vars: UpdateMagicLinkSendCountVariables): MutationRef<UpdateMagicLinkSendCountData, UpdateMagicLinkSendCountVariables>;
+}
+export const updateMagicLinkSendCountRef: UpdateMagicLinkSendCountRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the updateMagicLinkSendCountRef:
+```typescript
+const name = updateMagicLinkSendCountRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `UpdateMagicLinkSendCount` mutation requires an argument of type `UpdateMagicLinkSendCountVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface UpdateMagicLinkSendCountVariables {
+  id: UUIDString;
+  sendCount: number;
+  lastSentAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `UpdateMagicLinkSendCount` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `UpdateMagicLinkSendCountData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface UpdateMagicLinkSendCountData {
+  magicLink_update?: MagicLink_Key | null;
+}
+```
+### Using `UpdateMagicLinkSendCount`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, updateMagicLinkSendCount, UpdateMagicLinkSendCountVariables } from '@mybox/dataconnect';
+
+// The `UpdateMagicLinkSendCount` mutation requires an argument of type `UpdateMagicLinkSendCountVariables`:
+const updateMagicLinkSendCountVars: UpdateMagicLinkSendCountVariables = {
+  id: ..., 
+  sendCount: ..., 
+  lastSentAt: ..., 
+};
+
+// Call the `updateMagicLinkSendCount()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await updateMagicLinkSendCount(updateMagicLinkSendCountVars);
+// Variables can be defined inline as well.
+const { data } = await updateMagicLinkSendCount({ id: ..., sendCount: ..., lastSentAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await updateMagicLinkSendCount(dataConnect, updateMagicLinkSendCountVars);
+
+console.log(data.magicLink_update);
+
+// Or, you can use the `Promise` API.
+updateMagicLinkSendCount(updateMagicLinkSendCountVars).then((response) => {
+  const data = response.data;
+  console.log(data.magicLink_update);
+});
+```
+
+### Using `UpdateMagicLinkSendCount`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, updateMagicLinkSendCountRef, UpdateMagicLinkSendCountVariables } from '@mybox/dataconnect';
+
+// The `UpdateMagicLinkSendCount` mutation requires an argument of type `UpdateMagicLinkSendCountVariables`:
+const updateMagicLinkSendCountVars: UpdateMagicLinkSendCountVariables = {
+  id: ..., 
+  sendCount: ..., 
+  lastSentAt: ..., 
+};
+
+// Call the `updateMagicLinkSendCountRef()` function to get a reference to the mutation.
+const ref = updateMagicLinkSendCountRef(updateMagicLinkSendCountVars);
+// Variables can be defined inline as well.
+const ref = updateMagicLinkSendCountRef({ id: ..., sendCount: ..., lastSentAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = updateMagicLinkSendCountRef(dataConnect, updateMagicLinkSendCountVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.magicLink_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.magicLink_update);
+});
+```
+
+## RevokeMagicLink
+You can execute the `RevokeMagicLink` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+revokeMagicLink(vars: RevokeMagicLinkVariables): MutationPromise<RevokeMagicLinkData, RevokeMagicLinkVariables>;
+
+interface RevokeMagicLinkRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RevokeMagicLinkVariables): MutationRef<RevokeMagicLinkData, RevokeMagicLinkVariables>;
+}
+export const revokeMagicLinkRef: RevokeMagicLinkRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+revokeMagicLink(dc: DataConnect, vars: RevokeMagicLinkVariables): MutationPromise<RevokeMagicLinkData, RevokeMagicLinkVariables>;
+
+interface RevokeMagicLinkRef {
+  ...
+  (dc: DataConnect, vars: RevokeMagicLinkVariables): MutationRef<RevokeMagicLinkData, RevokeMagicLinkVariables>;
+}
+export const revokeMagicLinkRef: RevokeMagicLinkRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the revokeMagicLinkRef:
+```typescript
+const name = revokeMagicLinkRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `RevokeMagicLink` mutation requires an argument of type `RevokeMagicLinkVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface RevokeMagicLinkVariables {
+  id: UUIDString;
+  revokedAt: TimestampString;
+  revokedBy?: UUIDString | null;
+  revokeReason?: string | null;
+}
+```
+### Return Type
+Recall that executing the `RevokeMagicLink` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `RevokeMagicLinkData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface RevokeMagicLinkData {
+  magicLink_update?: MagicLink_Key | null;
+}
+```
+### Using `RevokeMagicLink`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, revokeMagicLink, RevokeMagicLinkVariables } from '@mybox/dataconnect';
+
+// The `RevokeMagicLink` mutation requires an argument of type `RevokeMagicLinkVariables`:
+const revokeMagicLinkVars: RevokeMagicLinkVariables = {
+  id: ..., 
+  revokedAt: ..., 
+  revokedBy: ..., // optional
+  revokeReason: ..., // optional
+};
+
+// Call the `revokeMagicLink()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await revokeMagicLink(revokeMagicLinkVars);
+// Variables can be defined inline as well.
+const { data } = await revokeMagicLink({ id: ..., revokedAt: ..., revokedBy: ..., revokeReason: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await revokeMagicLink(dataConnect, revokeMagicLinkVars);
+
+console.log(data.magicLink_update);
+
+// Or, you can use the `Promise` API.
+revokeMagicLink(revokeMagicLinkVars).then((response) => {
+  const data = response.data;
+  console.log(data.magicLink_update);
+});
+```
+
+### Using `RevokeMagicLink`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, revokeMagicLinkRef, RevokeMagicLinkVariables } from '@mybox/dataconnect';
+
+// The `RevokeMagicLink` mutation requires an argument of type `RevokeMagicLinkVariables`:
+const revokeMagicLinkVars: RevokeMagicLinkVariables = {
+  id: ..., 
+  revokedAt: ..., 
+  revokedBy: ..., // optional
+  revokeReason: ..., // optional
+};
+
+// Call the `revokeMagicLinkRef()` function to get a reference to the mutation.
+const ref = revokeMagicLinkRef(revokeMagicLinkVars);
+// Variables can be defined inline as well.
+const ref = revokeMagicLinkRef({ id: ..., revokedAt: ..., revokedBy: ..., revokeReason: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = revokeMagicLinkRef(dataConnect, revokeMagicLinkVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.magicLink_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.magicLink_update);
+});
+```
+
+## MarkMagicLinkUsed
+You can execute the `MarkMagicLinkUsed` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+markMagicLinkUsed(vars: MarkMagicLinkUsedVariables): MutationPromise<MarkMagicLinkUsedData, MarkMagicLinkUsedVariables>;
+
+interface MarkMagicLinkUsedRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: MarkMagicLinkUsedVariables): MutationRef<MarkMagicLinkUsedData, MarkMagicLinkUsedVariables>;
+}
+export const markMagicLinkUsedRef: MarkMagicLinkUsedRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+markMagicLinkUsed(dc: DataConnect, vars: MarkMagicLinkUsedVariables): MutationPromise<MarkMagicLinkUsedData, MarkMagicLinkUsedVariables>;
+
+interface MarkMagicLinkUsedRef {
+  ...
+  (dc: DataConnect, vars: MarkMagicLinkUsedVariables): MutationRef<MarkMagicLinkUsedData, MarkMagicLinkUsedVariables>;
+}
+export const markMagicLinkUsedRef: MarkMagicLinkUsedRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the markMagicLinkUsedRef:
+```typescript
+const name = markMagicLinkUsedRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `MarkMagicLinkUsed` mutation requires an argument of type `MarkMagicLinkUsedVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface MarkMagicLinkUsedVariables {
+  sessionId: string;
+  usedAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `MarkMagicLinkUsed` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `MarkMagicLinkUsedData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface MarkMagicLinkUsedData {
+  magicLink_updateMany: number;
+}
+```
+### Using `MarkMagicLinkUsed`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, markMagicLinkUsed, MarkMagicLinkUsedVariables } from '@mybox/dataconnect';
+
+// The `MarkMagicLinkUsed` mutation requires an argument of type `MarkMagicLinkUsedVariables`:
+const markMagicLinkUsedVars: MarkMagicLinkUsedVariables = {
+  sessionId: ..., 
+  usedAt: ..., 
+};
+
+// Call the `markMagicLinkUsed()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await markMagicLinkUsed(markMagicLinkUsedVars);
+// Variables can be defined inline as well.
+const { data } = await markMagicLinkUsed({ sessionId: ..., usedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await markMagicLinkUsed(dataConnect, markMagicLinkUsedVars);
+
+console.log(data.magicLink_updateMany);
+
+// Or, you can use the `Promise` API.
+markMagicLinkUsed(markMagicLinkUsedVars).then((response) => {
+  const data = response.data;
+  console.log(data.magicLink_updateMany);
+});
+```
+
+### Using `MarkMagicLinkUsed`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, markMagicLinkUsedRef, MarkMagicLinkUsedVariables } from '@mybox/dataconnect';
+
+// The `MarkMagicLinkUsed` mutation requires an argument of type `MarkMagicLinkUsedVariables`:
+const markMagicLinkUsedVars: MarkMagicLinkUsedVariables = {
+  sessionId: ..., 
+  usedAt: ..., 
+};
+
+// Call the `markMagicLinkUsedRef()` function to get a reference to the mutation.
+const ref = markMagicLinkUsedRef(markMagicLinkUsedVars);
+// Variables can be defined inline as well.
+const ref = markMagicLinkUsedRef({ sessionId: ..., usedAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = markMagicLinkUsedRef(dataConnect, markMagicLinkUsedVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.magicLink_updateMany);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.magicLink_updateMany);
+});
+```
+
+## ExtendMagicLink
+You can execute the `ExtendMagicLink` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+extendMagicLink(vars: ExtendMagicLinkVariables): MutationPromise<ExtendMagicLinkData, ExtendMagicLinkVariables>;
+
+interface ExtendMagicLinkRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ExtendMagicLinkVariables): MutationRef<ExtendMagicLinkData, ExtendMagicLinkVariables>;
+}
+export const extendMagicLinkRef: ExtendMagicLinkRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+extendMagicLink(dc: DataConnect, vars: ExtendMagicLinkVariables): MutationPromise<ExtendMagicLinkData, ExtendMagicLinkVariables>;
+
+interface ExtendMagicLinkRef {
+  ...
+  (dc: DataConnect, vars: ExtendMagicLinkVariables): MutationRef<ExtendMagicLinkData, ExtendMagicLinkVariables>;
+}
+export const extendMagicLinkRef: ExtendMagicLinkRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the extendMagicLinkRef:
+```typescript
+const name = extendMagicLinkRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ExtendMagicLink` mutation requires an argument of type `ExtendMagicLinkVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface ExtendMagicLinkVariables {
+  id: UUIDString;
+  expiresAt: TimestampString;
+}
+```
+### Return Type
+Recall that executing the `ExtendMagicLink` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ExtendMagicLinkData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ExtendMagicLinkData {
+  magicLink_update?: MagicLink_Key | null;
+}
+```
+### Using `ExtendMagicLink`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, extendMagicLink, ExtendMagicLinkVariables } from '@mybox/dataconnect';
+
+// The `ExtendMagicLink` mutation requires an argument of type `ExtendMagicLinkVariables`:
+const extendMagicLinkVars: ExtendMagicLinkVariables = {
+  id: ..., 
+  expiresAt: ..., 
+};
+
+// Call the `extendMagicLink()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await extendMagicLink(extendMagicLinkVars);
+// Variables can be defined inline as well.
+const { data } = await extendMagicLink({ id: ..., expiresAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await extendMagicLink(dataConnect, extendMagicLinkVars);
+
+console.log(data.magicLink_update);
+
+// Or, you can use the `Promise` API.
+extendMagicLink(extendMagicLinkVars).then((response) => {
+  const data = response.data;
+  console.log(data.magicLink_update);
+});
+```
+
+### Using `ExtendMagicLink`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, extendMagicLinkRef, ExtendMagicLinkVariables } from '@mybox/dataconnect';
+
+// The `ExtendMagicLink` mutation requires an argument of type `ExtendMagicLinkVariables`:
+const extendMagicLinkVars: ExtendMagicLinkVariables = {
+  id: ..., 
+  expiresAt: ..., 
+};
+
+// Call the `extendMagicLinkRef()` function to get a reference to the mutation.
+const ref = extendMagicLinkRef(extendMagicLinkVars);
+// Variables can be defined inline as well.
+const ref = extendMagicLinkRef({ id: ..., expiresAt: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = extendMagicLinkRef(dataConnect, extendMagicLinkVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.magicLink_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.magicLink_update);
 });
 ```
 

@@ -39,6 +39,23 @@ export interface CloseLoanVariables {
   closedAt: TimestampString;
 }
 
+export interface CopyFileData {
+  file_insert: File_Key;
+}
+
+export interface CopyFileVariables {
+  userId: UUIDString;
+  loanId?: UUIDString | null;
+  originalFilename: string;
+  storagePath: string;
+  fileSize: number;
+  mimeType?: string | null;
+  fileExtension?: string | null;
+  downloadUrl?: string | null;
+  tags?: string | null;
+  description?: string | null;
+}
+
 export interface CreateAuthSessionData {
   authSession_insert: AuthSession_Key;
 }
@@ -78,11 +95,13 @@ export interface CreateFileData {
 
 export interface CreateFileVariables {
   userId: UUIDString;
+  loanId?: UUIDString | null;
   originalFilename: string;
   storagePath: string;
   fileSize: number;
   mimeType?: string | null;
   fileExtension?: string | null;
+  downloadUrl?: string | null;
   tags?: string | null;
   description?: string | null;
 }
@@ -100,6 +119,21 @@ export interface CreateLoanVariables {
   loanType?: string | null;
   propertyAddress?: string | null;
   loanOfficerId?: UUIDString | null;
+}
+
+export interface CreateMagicLinkData {
+  magicLink_insert: MagicLink_Key;
+}
+
+export interface CreateMagicLinkVariables {
+  userId: UUIDString;
+  borrowerEmail: string;
+  sendToEmail: string;
+  magicLinkUrl: string;
+  sessionId?: string | null;
+  expiresAt: TimestampString;
+  createdBy?: UUIDString | null;
+  sentAt?: TimestampString | null;
 }
 
 export interface CreateUserData {
@@ -156,6 +190,15 @@ export interface DeleteLoanVariables {
   id: UUIDString;
 }
 
+export interface ExtendMagicLinkData {
+  magicLink_update?: MagicLink_Key | null;
+}
+
+export interface ExtendMagicLinkVariables {
+  id: UUIDString;
+  expiresAt: TimestampString;
+}
+
 export interface FileLoanAssociation_Key {
   id: UUIDString;
   __typename?: 'FileLoanAssociation_Key';
@@ -181,6 +224,26 @@ export interface GetActiveAuthSessionForUserData {
 }
 
 export interface GetActiveAuthSessionForUserVariables {
+  userId: UUIDString;
+}
+
+export interface GetActiveMagicLinksData {
+  magicLinks: ({
+    id: UUIDString;
+    userId: UUIDString;
+    borrowerEmail: string;
+    sendToEmail: string;
+    magicLinkUrl: string;
+    expiresAt: TimestampString;
+    createdAt: TimestampString;
+    sentAt?: TimestampString | null;
+    lastSentAt?: TimestampString | null;
+    sendCount: number;
+    usedAt?: TimestampString | null;
+  } & MagicLink_Key)[];
+}
+
+export interface GetActiveMagicLinksVariables {
   userId: UUIDString;
 }
 
@@ -241,6 +304,9 @@ export interface GetAuthSessionByFirebaseUidData {
       role: string;
       firstName?: string | null;
       lastName?: string | null;
+      hasPassword: boolean;
+      googleAuthUid?: string | null;
+      isTemporary: boolean;
     } & User_Key;
   } & AuthSession_Key)[];
 }
@@ -316,6 +382,7 @@ export interface GetFileData {
   file?: {
     id: UUIDString;
     userId: UUIDString;
+    loanId?: UUIDString | null;
     originalFilename: string;
     storagePath: string;
     fileSize: number;
@@ -436,6 +503,66 @@ export interface GetLoanVariables {
   id: UUIDString;
 }
 
+export interface GetMagicLinkBySessionIdData {
+  magicLinks: ({
+    id: UUIDString;
+    userId: UUIDString;
+    borrowerEmail: string;
+    sendToEmail: string;
+    expiresAt: TimestampString;
+    usedAt?: TimestampString | null;
+    isActive: boolean;
+  } & MagicLink_Key)[];
+}
+
+export interface GetMagicLinkBySessionIdVariables {
+  sessionId: string;
+}
+
+export interface GetMagicLinkData {
+  magicLink?: {
+    id: UUIDString;
+    userId: UUIDString;
+    borrowerEmail: string;
+    sendToEmail: string;
+    magicLinkUrl: string;
+    sessionId?: string | null;
+    expiresAt: TimestampString;
+    createdAt: TimestampString;
+    createdBy?: UUIDString | null;
+    sentAt?: TimestampString | null;
+    lastSentAt?: TimestampString | null;
+    sendCount: number;
+    usedAt?: TimestampString | null;
+    isActive: boolean;
+    revokedAt?: TimestampString | null;
+    revokedBy?: UUIDString | null;
+    revokeReason?: string | null;
+    user: {
+      id: UUIDString;
+      email: string;
+      firstName?: string | null;
+      lastName?: string | null;
+      role: string;
+    } & User_Key;
+  } & MagicLink_Key;
+}
+
+export interface GetMagicLinkStatsData {
+  magicLinks: ({
+    id: UUIDString;
+    userId: UUIDString;
+    expiresAt: TimestampString;
+    createdAt: TimestampString;
+    usedAt?: TimestampString | null;
+    isActive: boolean;
+  } & MagicLink_Key)[];
+}
+
+export interface GetMagicLinkVariables {
+  id: UUIDString;
+}
+
 export interface GetUserAuthSessionsData {
   authSessions: ({
     sessionId: string;
@@ -458,6 +585,9 @@ export interface GetUserByEmailData {
     lastName?: string | null;
     role: string;
     isActive: boolean;
+    hasPassword: boolean;
+    googleAuthUid?: string | null;
+    isTemporary: boolean;
   } & User_Key)[];
 }
 
@@ -474,6 +604,9 @@ export interface GetUserData {
     role: string;
     isActive: boolean;
     phoneNumber?: string | null;
+    hasPassword: boolean;
+    googleAuthUid?: string | null;
+    isTemporary: boolean;
     createdAt: TimestampString;
     lastLoginAt?: TimestampString | null;
   } & User_Key;
@@ -482,6 +615,8 @@ export interface GetUserData {
 export interface GetUserFilesData {
   files: ({
     id: UUIDString;
+    userId: UUIDString;
+    loanId?: UUIDString | null;
     originalFilename: string;
     storagePath: string;
     fileSize: number;
@@ -516,6 +651,32 @@ export interface GetUserLoansData {
 }
 
 export interface GetUserLoansVariables {
+  userId: UUIDString;
+}
+
+export interface GetUserMagicLinksData {
+  magicLinks: ({
+    id: UUIDString;
+    userId: UUIDString;
+    borrowerEmail: string;
+    sendToEmail: string;
+    magicLinkUrl: string;
+    sessionId?: string | null;
+    expiresAt: TimestampString;
+    createdAt: TimestampString;
+    createdBy?: UUIDString | null;
+    sentAt?: TimestampString | null;
+    lastSentAt?: TimestampString | null;
+    sendCount: number;
+    usedAt?: TimestampString | null;
+    isActive: boolean;
+    revokedAt?: TimestampString | null;
+    revokedBy?: UUIDString | null;
+    revokeReason?: string | null;
+  } & MagicLink_Key)[];
+}
+
+export interface GetUserMagicLinksVariables {
   userId: UUIDString;
 }
 
@@ -581,6 +742,20 @@ export interface LogAuthEventVariables {
   requestPayload?: string | null;
 }
 
+export interface MagicLink_Key {
+  id: UUIDString;
+  __typename?: 'MagicLink_Key';
+}
+
+export interface MarkMagicLinkUsedData {
+  magicLink_updateMany: number;
+}
+
+export interface MarkMagicLinkUsedVariables {
+  sessionId: string;
+  usedAt: TimestampString;
+}
+
 export interface MarkVerificationCodeUsedData {
   verificationCode_update?: VerificationCode_Key | null;
 }
@@ -588,6 +763,16 @@ export interface MarkVerificationCodeUsedData {
 export interface MarkVerificationCodeUsedVariables {
   id: UUIDString;
   usedAt: TimestampString;
+}
+
+export interface MoveFileData {
+  file_update?: File_Key | null;
+}
+
+export interface MoveFileVariables {
+  id: UUIDString;
+  targetUserId: UUIDString;
+  targetLoanId?: UUIDString | null;
 }
 
 export interface RateLimitTracking_Key {
@@ -603,6 +788,23 @@ export interface RemoveFileFromLoanVariables {
   id: UUIDString;
 }
 
+export interface RenameFileData {
+  file_update?: File_Key | null;
+}
+
+export interface RenameFileVariables {
+  id: UUIDString;
+  newFilename: string;
+}
+
+export interface RestoreFileData {
+  file_update?: File_Key | null;
+}
+
+export interface RestoreFileVariables {
+  id: UUIDString;
+}
+
 export interface RevokeAuthSessionData {
   authSession_update?: AuthSession_Key | null;
 }
@@ -612,6 +814,17 @@ export interface RevokeAuthSessionVariables {
   revokedBy?: UUIDString | null;
   revokeReason?: string | null;
   revokedAt: TimestampString;
+}
+
+export interface RevokeMagicLinkData {
+  magicLink_update?: MagicLink_Key | null;
+}
+
+export interface RevokeMagicLinkVariables {
+  id: UUIDString;
+  revokedAt: TimestampString;
+  revokedBy?: UUIDString | null;
+  revokeReason?: string | null;
 }
 
 export interface SoftDeleteFileData {
@@ -669,6 +882,16 @@ export interface UpdateLoanVariables {
   loanAmount?: number | null;
 }
 
+export interface UpdateMagicLinkSendCountData {
+  magicLink_update?: MagicLink_Key | null;
+}
+
+export interface UpdateMagicLinkSendCountVariables {
+  id: UUIDString;
+  sendCount: number;
+  lastSentAt: TimestampString;
+}
+
 export interface UpdateRateLimitData {
   rateLimitTracking_update?: RateLimitTracking_Key | null;
 }
@@ -690,6 +913,25 @@ export interface UpdateSessionAccessVariables {
 
 export interface UpdateUserData {
   user_update?: User_Key | null;
+}
+
+export interface UpdateUserPasswordStatusData {
+  user_update?: User_Key | null;
+}
+
+export interface UpdateUserPasswordStatusVariables {
+  userId: UUIDString;
+  hasPassword: boolean;
+  isTemporary: boolean;
+}
+
+export interface UpdateUserRoleData {
+  user_update?: User_Key | null;
+}
+
+export interface UpdateUserRoleVariables {
+  userId: UUIDString;
+  role: string;
 }
 
 export interface UpdateUserVariables {
@@ -753,6 +995,18 @@ export const updateUserRef: UpdateUserRef;
 export function updateUser(vars: UpdateUserVariables): MutationPromise<UpdateUserData, UpdateUserVariables>;
 export function updateUser(dc: DataConnect, vars: UpdateUserVariables): MutationPromise<UpdateUserData, UpdateUserVariables>;
 
+interface UpdateUserPasswordStatusRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateUserPasswordStatusVariables): MutationRef<UpdateUserPasswordStatusData, UpdateUserPasswordStatusVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpdateUserPasswordStatusVariables): MutationRef<UpdateUserPasswordStatusData, UpdateUserPasswordStatusVariables>;
+  operationName: string;
+}
+export const updateUserPasswordStatusRef: UpdateUserPasswordStatusRef;
+
+export function updateUserPasswordStatus(vars: UpdateUserPasswordStatusVariables): MutationPromise<UpdateUserPasswordStatusData, UpdateUserPasswordStatusVariables>;
+export function updateUserPasswordStatus(dc: DataConnect, vars: UpdateUserPasswordStatusVariables): MutationPromise<UpdateUserPasswordStatusData, UpdateUserPasswordStatusVariables>;
+
 interface DeactivateUserRef {
   /* Allow users to create refs without passing in DataConnect */
   (vars: DeactivateUserVariables): MutationRef<DeactivateUserData, DeactivateUserVariables>;
@@ -764,6 +1018,18 @@ export const deactivateUserRef: DeactivateUserRef;
 
 export function deactivateUser(vars: DeactivateUserVariables): MutationPromise<DeactivateUserData, DeactivateUserVariables>;
 export function deactivateUser(dc: DataConnect, vars: DeactivateUserVariables): MutationPromise<DeactivateUserData, DeactivateUserVariables>;
+
+interface UpdateUserRoleRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateUserRoleVariables): MutationRef<UpdateUserRoleData, UpdateUserRoleVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpdateUserRoleVariables): MutationRef<UpdateUserRoleData, UpdateUserRoleVariables>;
+  operationName: string;
+}
+export const updateUserRoleRef: UpdateUserRoleRef;
+
+export function updateUserRole(vars: UpdateUserRoleVariables): MutationPromise<UpdateUserRoleData, UpdateUserRoleVariables>;
+export function updateUserRole(dc: DataConnect, vars: UpdateUserRoleVariables): MutationPromise<UpdateUserRoleData, UpdateUserRoleVariables>;
 
 interface CreateLoanRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -860,6 +1126,54 @@ export const hardDeleteFileRef: HardDeleteFileRef;
 
 export function hardDeleteFile(vars: HardDeleteFileVariables): MutationPromise<HardDeleteFileData, HardDeleteFileVariables>;
 export function hardDeleteFile(dc: DataConnect, vars: HardDeleteFileVariables): MutationPromise<HardDeleteFileData, HardDeleteFileVariables>;
+
+interface RenameFileRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RenameFileVariables): MutationRef<RenameFileData, RenameFileVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: RenameFileVariables): MutationRef<RenameFileData, RenameFileVariables>;
+  operationName: string;
+}
+export const renameFileRef: RenameFileRef;
+
+export function renameFile(vars: RenameFileVariables): MutationPromise<RenameFileData, RenameFileVariables>;
+export function renameFile(dc: DataConnect, vars: RenameFileVariables): MutationPromise<RenameFileData, RenameFileVariables>;
+
+interface MoveFileRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: MoveFileVariables): MutationRef<MoveFileData, MoveFileVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: MoveFileVariables): MutationRef<MoveFileData, MoveFileVariables>;
+  operationName: string;
+}
+export const moveFileRef: MoveFileRef;
+
+export function moveFile(vars: MoveFileVariables): MutationPromise<MoveFileData, MoveFileVariables>;
+export function moveFile(dc: DataConnect, vars: MoveFileVariables): MutationPromise<MoveFileData, MoveFileVariables>;
+
+interface CopyFileRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CopyFileVariables): MutationRef<CopyFileData, CopyFileVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CopyFileVariables): MutationRef<CopyFileData, CopyFileVariables>;
+  operationName: string;
+}
+export const copyFileRef: CopyFileRef;
+
+export function copyFile(vars: CopyFileVariables): MutationPromise<CopyFileData, CopyFileVariables>;
+export function copyFile(dc: DataConnect, vars: CopyFileVariables): MutationPromise<CopyFileData, CopyFileVariables>;
+
+interface RestoreFileRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RestoreFileVariables): MutationRef<RestoreFileData, RestoreFileVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: RestoreFileVariables): MutationRef<RestoreFileData, RestoreFileVariables>;
+  operationName: string;
+}
+export const restoreFileRef: RestoreFileRef;
+
+export function restoreFile(vars: RestoreFileVariables): MutationPromise<RestoreFileData, RestoreFileVariables>;
+export function restoreFile(dc: DataConnect, vars: RestoreFileVariables): MutationPromise<RestoreFileData, RestoreFileVariables>;
 
 interface AssociateFileWithLoanRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -1052,6 +1366,66 @@ export const deleteExpiredVerificationCodesRef: DeleteExpiredVerificationCodesRe
 
 export function deleteExpiredVerificationCodes(vars: DeleteExpiredVerificationCodesVariables): MutationPromise<DeleteExpiredVerificationCodesData, DeleteExpiredVerificationCodesVariables>;
 export function deleteExpiredVerificationCodes(dc: DataConnect, vars: DeleteExpiredVerificationCodesVariables): MutationPromise<DeleteExpiredVerificationCodesData, DeleteExpiredVerificationCodesVariables>;
+
+interface CreateMagicLinkRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateMagicLinkVariables): MutationRef<CreateMagicLinkData, CreateMagicLinkVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateMagicLinkVariables): MutationRef<CreateMagicLinkData, CreateMagicLinkVariables>;
+  operationName: string;
+}
+export const createMagicLinkRef: CreateMagicLinkRef;
+
+export function createMagicLink(vars: CreateMagicLinkVariables): MutationPromise<CreateMagicLinkData, CreateMagicLinkVariables>;
+export function createMagicLink(dc: DataConnect, vars: CreateMagicLinkVariables): MutationPromise<CreateMagicLinkData, CreateMagicLinkVariables>;
+
+interface UpdateMagicLinkSendCountRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateMagicLinkSendCountVariables): MutationRef<UpdateMagicLinkSendCountData, UpdateMagicLinkSendCountVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpdateMagicLinkSendCountVariables): MutationRef<UpdateMagicLinkSendCountData, UpdateMagicLinkSendCountVariables>;
+  operationName: string;
+}
+export const updateMagicLinkSendCountRef: UpdateMagicLinkSendCountRef;
+
+export function updateMagicLinkSendCount(vars: UpdateMagicLinkSendCountVariables): MutationPromise<UpdateMagicLinkSendCountData, UpdateMagicLinkSendCountVariables>;
+export function updateMagicLinkSendCount(dc: DataConnect, vars: UpdateMagicLinkSendCountVariables): MutationPromise<UpdateMagicLinkSendCountData, UpdateMagicLinkSendCountVariables>;
+
+interface RevokeMagicLinkRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: RevokeMagicLinkVariables): MutationRef<RevokeMagicLinkData, RevokeMagicLinkVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: RevokeMagicLinkVariables): MutationRef<RevokeMagicLinkData, RevokeMagicLinkVariables>;
+  operationName: string;
+}
+export const revokeMagicLinkRef: RevokeMagicLinkRef;
+
+export function revokeMagicLink(vars: RevokeMagicLinkVariables): MutationPromise<RevokeMagicLinkData, RevokeMagicLinkVariables>;
+export function revokeMagicLink(dc: DataConnect, vars: RevokeMagicLinkVariables): MutationPromise<RevokeMagicLinkData, RevokeMagicLinkVariables>;
+
+interface MarkMagicLinkUsedRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: MarkMagicLinkUsedVariables): MutationRef<MarkMagicLinkUsedData, MarkMagicLinkUsedVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: MarkMagicLinkUsedVariables): MutationRef<MarkMagicLinkUsedData, MarkMagicLinkUsedVariables>;
+  operationName: string;
+}
+export const markMagicLinkUsedRef: MarkMagicLinkUsedRef;
+
+export function markMagicLinkUsed(vars: MarkMagicLinkUsedVariables): MutationPromise<MarkMagicLinkUsedData, MarkMagicLinkUsedVariables>;
+export function markMagicLinkUsed(dc: DataConnect, vars: MarkMagicLinkUsedVariables): MutationPromise<MarkMagicLinkUsedData, MarkMagicLinkUsedVariables>;
+
+interface ExtendMagicLinkRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ExtendMagicLinkVariables): MutationRef<ExtendMagicLinkData, ExtendMagicLinkVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ExtendMagicLinkVariables): MutationRef<ExtendMagicLinkData, ExtendMagicLinkVariables>;
+  operationName: string;
+}
+export const extendMagicLinkRef: ExtendMagicLinkRef;
+
+export function extendMagicLink(vars: ExtendMagicLinkVariables): MutationPromise<ExtendMagicLinkData, ExtendMagicLinkVariables>;
+export function extendMagicLink(dc: DataConnect, vars: ExtendMagicLinkVariables): MutationPromise<ExtendMagicLinkData, ExtendMagicLinkVariables>;
 
 interface GetUserRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -1304,4 +1678,64 @@ export const getLoanDetailsRef: GetLoanDetailsRef;
 
 export function getLoanDetails(vars: GetLoanDetailsVariables): QueryPromise<GetLoanDetailsData, GetLoanDetailsVariables>;
 export function getLoanDetails(dc: DataConnect, vars: GetLoanDetailsVariables): QueryPromise<GetLoanDetailsData, GetLoanDetailsVariables>;
+
+interface GetUserMagicLinksRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetUserMagicLinksVariables): QueryRef<GetUserMagicLinksData, GetUserMagicLinksVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetUserMagicLinksVariables): QueryRef<GetUserMagicLinksData, GetUserMagicLinksVariables>;
+  operationName: string;
+}
+export const getUserMagicLinksRef: GetUserMagicLinksRef;
+
+export function getUserMagicLinks(vars: GetUserMagicLinksVariables): QueryPromise<GetUserMagicLinksData, GetUserMagicLinksVariables>;
+export function getUserMagicLinks(dc: DataConnect, vars: GetUserMagicLinksVariables): QueryPromise<GetUserMagicLinksData, GetUserMagicLinksVariables>;
+
+interface GetActiveMagicLinksRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetActiveMagicLinksVariables): QueryRef<GetActiveMagicLinksData, GetActiveMagicLinksVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetActiveMagicLinksVariables): QueryRef<GetActiveMagicLinksData, GetActiveMagicLinksVariables>;
+  operationName: string;
+}
+export const getActiveMagicLinksRef: GetActiveMagicLinksRef;
+
+export function getActiveMagicLinks(vars: GetActiveMagicLinksVariables): QueryPromise<GetActiveMagicLinksData, GetActiveMagicLinksVariables>;
+export function getActiveMagicLinks(dc: DataConnect, vars: GetActiveMagicLinksVariables): QueryPromise<GetActiveMagicLinksData, GetActiveMagicLinksVariables>;
+
+interface GetMagicLinkRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMagicLinkVariables): QueryRef<GetMagicLinkData, GetMagicLinkVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetMagicLinkVariables): QueryRef<GetMagicLinkData, GetMagicLinkVariables>;
+  operationName: string;
+}
+export const getMagicLinkRef: GetMagicLinkRef;
+
+export function getMagicLink(vars: GetMagicLinkVariables): QueryPromise<GetMagicLinkData, GetMagicLinkVariables>;
+export function getMagicLink(dc: DataConnect, vars: GetMagicLinkVariables): QueryPromise<GetMagicLinkData, GetMagicLinkVariables>;
+
+interface GetMagicLinkBySessionIdRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetMagicLinkBySessionIdVariables): QueryRef<GetMagicLinkBySessionIdData, GetMagicLinkBySessionIdVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetMagicLinkBySessionIdVariables): QueryRef<GetMagicLinkBySessionIdData, GetMagicLinkBySessionIdVariables>;
+  operationName: string;
+}
+export const getMagicLinkBySessionIdRef: GetMagicLinkBySessionIdRef;
+
+export function getMagicLinkBySessionId(vars: GetMagicLinkBySessionIdVariables): QueryPromise<GetMagicLinkBySessionIdData, GetMagicLinkBySessionIdVariables>;
+export function getMagicLinkBySessionId(dc: DataConnect, vars: GetMagicLinkBySessionIdVariables): QueryPromise<GetMagicLinkBySessionIdData, GetMagicLinkBySessionIdVariables>;
+
+interface GetMagicLinkStatsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<GetMagicLinkStatsData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<GetMagicLinkStatsData, undefined>;
+  operationName: string;
+}
+export const getMagicLinkStatsRef: GetMagicLinkStatsRef;
+
+export function getMagicLinkStats(): QueryPromise<GetMagicLinkStatsData, undefined>;
+export function getMagicLinkStats(dc: DataConnect): QueryPromise<GetMagicLinkStatsData, undefined>;
 

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { fileService } from '@/services'
-import type { File } from '@/types'
+import type { UploadResult } from '@/services/fileService'
 
 interface UploadProgress {
   percent: number
@@ -12,20 +12,19 @@ export const useFileUpload = () => {
     percent: 0,
     status: 'idle',
   })
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+  const [uploadedFile, setUploadedFile] = useState<UploadResult | null>(null)
   const [error, setError] = useState<Error | null>(null)
 
   const uploadFile = useCallback(
-    async (file: globalThis.File, userId: string, loanIds?: string[], tags?: string[]) => {
+    async (file: globalThis.File, userId: string) => {
       setProgress({ percent: 0, status: 'uploading' })
       setError(null)
       setUploadedFile(null)
 
       try {
-        // Simulate progress (in real implementation, you'd track actual upload progress)
-        setProgress({ percent: 50, status: 'uploading' })
-
-        const result = await fileService.uploadFile(file, userId, loanIds, tags)
+        const result = await fileService.uploadFile(file, userId, (percent) => {
+          setProgress({ percent, status: 'uploading' })
+        })
 
         setProgress({ percent: 100, status: 'success' })
         setUploadedFile(result)

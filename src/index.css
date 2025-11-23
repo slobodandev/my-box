@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Reset box-sizing for file manager component */
+.file-explorer,
+.file-explorer *,
+.file-explorer *::before,
+.file-explorer *::after {
+  box-sizing: content-box !important;
+}

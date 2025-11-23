@@ -38,21 +38,21 @@ export const getFileType = (filename: string): FileType => {
 }
 
 /**
- * Get Material Symbols icon and color for file type
+ * Get Material Symbols icon, color, and background for file type
  */
 export const getFileIcon = (filename: string): FileIcon => {
   const ext = getFileExtension(filename)
   const iconMap: Record<string, FileIcon> = {
-    pdf: { icon: 'picture_as_pdf', color: 'text-red-500' },
-    doc: { icon: 'description', color: 'text-blue-500' },
-    docx: { icon: 'description', color: 'text-blue-500' },
-    jpg: { icon: 'image', color: 'text-green-500' },
-    jpeg: { icon: 'image', color: 'text-green-500' },
-    png: { icon: 'image', color: 'text-green-500' },
-    xls: { icon: 'table_chart', color: 'text-green-600' },
-    xlsx: { icon: 'table_chart', color: 'text-green-600' },
+    pdf: { icon: 'picture_as_pdf', color: 'text-red-500 dark:text-red-400', bgColor: 'bg-red-100 dark:bg-red-900/40' },
+    doc: { icon: 'description', color: 'text-blue-500 dark:text-blue-400', bgColor: 'bg-blue-100 dark:bg-blue-900/40' },
+    docx: { icon: 'description', color: 'text-blue-500 dark:text-blue-400', bgColor: 'bg-blue-100 dark:bg-blue-900/40' },
+    jpg: { icon: 'image', color: 'text-green-500 dark:text-green-400', bgColor: 'bg-green-100 dark:bg-green-900/40' },
+    jpeg: { icon: 'image', color: 'text-green-500 dark:text-green-400', bgColor: 'bg-green-100 dark:bg-green-900/40' },
+    png: { icon: 'image', color: 'text-green-500 dark:text-green-400', bgColor: 'bg-green-100 dark:bg-green-900/40' },
+    xls: { icon: 'description', color: 'text-green-500 dark:text-green-400', bgColor: 'bg-green-100 dark:bg-green-900/40' },
+    xlsx: { icon: 'description', color: 'text-green-500 dark:text-green-400', bgColor: 'bg-green-100 dark:bg-green-900/40' },
   }
-  return iconMap[ext] || { icon: 'insert_drive_file', color: 'text-gray-500' }
+  return iconMap[ext] || { icon: 'insert_drive_file', color: 'text-gray-500 dark:text-gray-400', bgColor: 'bg-gray-100 dark:bg-gray-700' }
 }
 
 /**

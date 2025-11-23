@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://my-box-53040.web.app", "https://my-box-53040.firebaseapp.com"],
+    "method": ["GET", "HEAD", "PUT", "POST", "DELETE"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": ["Content-Type", "Content-Disposition"]
+  }
+]

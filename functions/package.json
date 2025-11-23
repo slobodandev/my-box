@@ -26,7 +26,8 @@
     "genkit": "^1.22.0",
     "graphql": "^16.12.0",
     "graphql-request": "^7.3.3",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "resend": "^6.5.2"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.12.0",

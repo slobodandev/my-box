@@ -1,232 +1,265 @@
 /**
  * File Service
- * Handles all file-related operations via Firebase Cloud Functions
- * Replaces n8n webhook-based implementation
+ * Handles file operations with Data Connect and Firebase Storage
  */
 
-import { ref, uploadBytesResumable } from 'firebase/storage';
-import { storage } from '@/config/firebase';
-import type {
-  File,
-  FileListParams,
-  FileListResponse,
-} from '@/types';
-import {
-  processUpload,
-  getUserFiles,
-  softDeleteFile,
-  type ListFilesRequest,
-  type ProcessUploadRequest,
-} from './dataconnect/filesService';
+import { getDataConnect, connectDataConnectEmulator, mutationRef, executeMutation, queryRef, executeQuery } from '@firebase/data-connect';
+import { app, storage } from '@/config/firebase';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
+import { getFile as getFileQuery } from '../../dataconnect/src/__generated/dataconnect';
 
-/**
- * File Service - Cloud Functions implementation
- */
-class FileService {
-  /**
-   * Get list of files with filters and pagination
-   */
-  async getFiles(params: FileListParams): Promise<FileListResponse> {
-    try {
-      // Get session token from auth context
-      const sessionToken = localStorage.getItem('mybox_session_token');
-      if (!sessionToken) {
-        throw new Error('Not authenticated');
-      }
+// Data Connect configuration
+const connectorConfig = {
+  connector: 'mybox-connector',
+  service: 'mybox-dataconnect',
+  location: 'us-central1',
+};
 
-      const request: ListFilesRequest = {
-        loanId: params.loanId,
-        searchTerm: params.searchTerm,
-        personalOnly: params.personalOnly,
-        page: params.page,
-        pageSize: params.pageSize,
-      };
+const dataConnect = getDataConnect(app, connectorConfig);
 
-      const response = await getUserFiles(request, sessionToken);
-
-      // Transform response to match FileListResponse interface
-      return {
-        files: response.files.map((file) => ({
-          id: file.id,
-          filename: file.originalFilename,
-          originalFilename: file.originalFilename,
-          size: file.fileSize,
-          mimeType: file.mimeType || 'application/octet-stream',
-          blobUrl: file.storagePath,
-          uploadedAt: new Date(file.uploadedAt),
-          uploadedBy: params.userId,
-          loanIds: file.loanIds,
-          tags: file.tags ? file.tags.split(',') : [],
-        })),
-        total: response.total,
-        page: response.page,
-        pageSize: response.pageSize,
-        totalPages: response.totalPages,
-      };
-    } catch (error) {
-      console.error('Error fetching files:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Upload a file with optional loan associations
-   * Uses Firebase Storage for upload, then calls processUpload Cloud Function
-   */
-  async uploadFile(
-    file: globalThis.File,
-    userId: string,
-    loanIds?: string[],
-    tags?: string[]
-  ): Promise<File> {
-    try {
-      // Get session token
-      const sessionToken = localStorage.getItem('mybox_session_token');
-      if (!sessionToken) {
-        throw new Error('Not authenticated');
-      }
-
-      // Generate unique file ID
-      const fileId = crypto.randomUUID();
-      const fileExtension = file.name.split('.').pop()?.toLowerCase() || '';
-
-      // Determine storage path based on loan association
-      const storagePath = loanIds && loanIds.length > 0
-        ? `users/${userId}/loans/${loanIds[0]}/${fileId}.${fileExtension}`
-        : `users/${userId}/personal/${fileId}.${fileExtension}`;
-
-      // Upload to Firebase Storage
-      const storageRef = ref(storage, storagePath);
-      const uploadTask = uploadBytesResumable(storageRef, file, {
-        customMetadata: {
-          userId,
-          fileId,
-          originalFilename: file.name,
-        },
-      });
-
-      // Wait for upload to complete
-      await new Promise<void>((resolve, reject) => {
-        uploadTask.on(
-          'state_changed',
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            console.log(`Upload progress: ${progress}%`);
-          },
-          (error) => {
-            console.error('Upload error:', error);
-            reject(error);
-          },
-          () => {
-            resolve();
-          }
-        );
-      });
-
-      // Call processUpload Cloud Function
-      const processRequest: ProcessUploadRequest = {
-        userId,
-        storagePath,
-        originalFilename: file.name,
-        tags,
-      };
-
-      const result = await processUpload(processRequest, sessionToken);
-
-      // Return file metadata
-      return {
-        id: result.fileId,
-        filename: file.name,
-        originalFilename: file.name,
-        size: file.size,
-        mimeType: file.type,
-        blobUrl: storagePath,
-        uploadedAt: new Date(),
-        uploadedBy: userId,
-        loanIds: loanIds || [],
-        tags: tags || [],
-      };
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Download a file by ID
-   * Gets the file from Firebase Storage and returns it as a blob
-   */
-  async downloadFile(fileId: string, userId: string): Promise<Blob> {
-    try {
-      // First get the file metadata to get the storage path
-      const files = await this.getFiles({
-        userId,
-        page: 1,
-        pageSize: 100, // Get enough files to find the one we want
-      });
-
-      const file = files.files.find((f) => f.id === fileId);
-      if (!file || !file.blobUrl) {
-        throw new Error('File not found or storage path not available');
-      }
-
-      // Get download URL from Firebase Storage
-      const { getDownloadURL } = await import('firebase/storage');
-      const storageRef = ref(storage, file.blobUrl);
-      const downloadUrl = await getDownloadURL(storageRef);
-
-      // Fetch the file as a blob
-      const response = await fetch(downloadUrl);
-      if (!response.ok) {
-        throw new Error('Failed to download file');
-      }
-
-      return await response.blob();
-    } catch (error) {
-      console.error('Error downloading file:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Delete a file by ID (soft delete)
-   */
-  async deleteFile(fileId: string, _userId: string): Promise<void> {
-    try {
-      const sessionToken = localStorage.getItem('mybox_session_token');
-      if (!sessionToken) {
-        throw new Error('Not authenticated');
-      }
-
-      await softDeleteFile(fileId, sessionToken);
-    } catch (error) {
-      console.error('Error deleting file:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get file by ID
-   */
-  async getFileById(fileId: string, userId: string): Promise<File> {
-    try {
-      const response = await this.getFiles({
-        userId,
-        page: 1,
-        pageSize: 100,
-      });
-
-      const file = response.files.find((f) => f.id === fileId);
-      if (!file) {
-        throw new Error('File not found');
-      }
-
-      return file;
-    } catch (error) {
-      console.error('Error fetching file:', error);
-      throw error;
-    }
+// Connect to emulator if enabled
+const useEmulators = import.meta.env.VITE_USE_FIREBASE_EMULATORS === 'true';
+if (useEmulators) {
+  try {
+    connectDataConnectEmulator(dataConnect, '127.0.0.1', 9399);
+    console.log('✅ FileService connected to Data Connect emulator');
+  } catch (error) {
+    console.warn('⚠️ FileService Data Connect emulator connection failed:', error);
   }
 }
 
-export const fileService = new FileService();
+export interface FileMetadata {
+  id?: string;
+  userId: string;
+  loanId?: string; // Optional loan association
+  originalFilename: string;
+  storagePath: string;
+  fileSize: number;
+  mimeType: string;
+  fileExtension: string;
+  downloadUrl?: string;
+  tags?: string;
+  description?: string;
+}
+
+export interface UploadResult {
+  fileId: string;
+  downloadUrl: string;
+  storagePath: string;
+}
+
+/**
+ * Create file metadata in Data Connect
+ */
+export async function createFileMetadata(metadata: FileMetadata): Promise<{ fileId: string }> {
+  try {
+    const variables = {
+      userId: metadata.userId,
+      loanId: metadata.loanId || null, // Optional loan association
+      originalFilename: metadata.originalFilename,
+      storagePath: metadata.storagePath,
+      fileSize: metadata.fileSize,
+      mimeType: metadata.mimeType || 'application/octet-stream',
+      fileExtension: metadata.fileExtension,
+      downloadUrl: metadata.downloadUrl || null,
+      tags: metadata.tags || null,
+      description: metadata.description || null,
+    };
+
+    const ref = mutationRef(dataConnect, 'CreateFile', variables);
+    const result = await executeMutation(ref);
+
+    console.log('File metadata created:', result);
+
+    // Extract file ID from result
+    // The mutation returns the inserted file data
+    const fileId = (result.data as any)?.file_insert?.id || '';
+
+    return { fileId };
+  } catch (error) {
+    console.error('Error creating file metadata:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update file download URL
+ */
+export async function updateFileDownloadUrl(fileId: string, downloadUrl: string): Promise<void> {
+  try {
+    const variables = {
+      id: fileId,
+      downloadUrl,
+      tags: null,
+      description: null,
+    };
+
+    const ref = mutationRef(dataConnect, 'UpdateFile', variables);
+    await executeMutation(ref);
+
+    console.log('File download URL updated:', fileId);
+  } catch (error) {
+    console.error('Error updating file download URL:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get user files
+ */
+export async function getUserFiles(userId: string, includeDeleted: boolean = false): Promise<any[]> {
+  try {
+    const variables = {
+      userId,
+      includeDeleted,
+    };
+
+    const ref = queryRef(dataConnect, 'GetUserFiles', variables);
+    const result = await executeQuery(ref);
+
+    return (result.data as any)?.files || [];
+  } catch (error) {
+    console.error('Error getting user files:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get file metadata by ID
+ */
+export async function getFileMetadata(fileId: string): Promise<FileMetadata | null> {
+  try {
+    const result = await getFileQuery({ id: fileId });
+
+    if (!result.data.file) {
+      return null;
+    }
+
+    const file = result.data.file;
+
+    // Map the query result to FileMetadata interface
+    return {
+      id: file.id,
+      userId: file.userId,
+      loanId: file.loanId || undefined,
+      originalFilename: file.originalFilename,
+      storagePath: file.storagePath,
+      fileSize: file.fileSize,
+      mimeType: file.mimeType || 'application/octet-stream',
+      fileExtension: file.fileExtension || '',
+      downloadUrl: file.downloadUrl || undefined,
+      tags: file.tags || undefined,
+      description: file.description || undefined,
+    };
+  } catch (error) {
+    console.error('Error getting file metadata:', error);
+    return null;
+  }
+}
+
+/**
+ * Upload file to Firebase Storage and save metadata
+ */
+export async function uploadFile(
+  file: File,
+  userId: string,
+  onProgress?: (progress: number) => void,
+  loanId?: string // Optional loan association
+): Promise<UploadResult> {
+  try {
+    // Create storage path
+    const timestamp = Date.now();
+    const sanitizedFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const storagePath = `users/${userId}/files/${timestamp}_${sanitizedFilename}`;
+    const storageRef = ref(storage, storagePath);
+
+    // Get file extension
+    const fileExtension = file.name.split('.').pop() || '';
+
+    // Upload file
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    return new Promise((resolve, reject) => {
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          if (onProgress) {
+            onProgress(progress);
+          }
+        },
+        (error) => {
+          console.error('Upload error:', error);
+          reject(error);
+        },
+        async () => {
+          try {
+            // Get download URL
+            console.log(uploadTask.snapshot.ref);
+            const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+            console.log('Download URL:', downloadUrl);
+            // Create file metadata in Data Connect
+            const { fileId } = await createFileMetadata({
+              userId,
+              loanId, // Pass loan ID if provided
+              originalFilename: file.name,
+              storagePath,
+              fileSize: file.size,
+              mimeType: file.type,
+              fileExtension,
+              downloadUrl,
+            });
+
+            resolve({
+              fileId,
+              downloadUrl,
+              storagePath,
+            });
+          } catch (error) {
+            reject(error);
+          }
+        }
+      );
+    });
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete file from storage and mark as deleted in database
+ */
+export async function deleteFile(fileId: string, storagePath: string): Promise<void> {
+  try {
+    // Delete from storage
+    const storageRef = ref(storage, storagePath);
+    await deleteObject(storageRef);
+
+    // Mark as deleted in database
+    const variables = {
+      id: fileId,
+      deletedBy: null, // TODO: Pass current user ID
+      deletedAt: new Date().toISOString(),
+    };
+
+    const mutationReference = mutationRef(dataConnect, 'SoftDeleteFile', variables);
+    await executeMutation(mutationReference);
+
+    console.log('File deleted:', fileId);
+  } catch (error) {
+    console.error('Error deleting file:', error);
+    throw error;
+  }
+}
+
+export const fileService = {
+  uploadFile,
+  getUserFiles,
+  getFileMetadata,
+  createFileMetadata,
+  updateFileDownloadUrl,
+  deleteFile,
+};
+
+export default fileService;

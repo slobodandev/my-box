@@ -9,7 +9,8 @@
 import { onRequest } from 'firebase-functions/v2/https';
 import { getAuth } from 'firebase-admin/auth';
 import { logger } from 'firebase-functions/v2';
-import { getUserByEmail, createUser, createAuthSessionWithFirebase } from '../dataconnect';
+import { getUserByEmail, createUser, createAuthSessionWithFirebase, createMagicLink } from '../dataconnect';
+import { sendMagicLinkEmail } from '../services/emailService';
 import * as crypto from 'crypto';
 
 /**
@@ -246,8 +247,43 @@ export const generateAuthLink = onRequest(
 
       logger.info('Created auth session:', sessionId);
 
-      // Note: Firebase Auth automatically sends the email
-      // The email link will contain the sign-in link
+      // Send custom email via Resend (if configured)
+      try {
+        const emailSent = await sendMagicLinkEmail({
+          to: email.toLowerCase().trim(),
+          borrowerName: email.split('@')[0], // You can pass actual name from request if available
+          magicLink: emailLink,
+          expiresInHours: expirationHours,
+          loanNumber: loanNumber,
+        });
+
+        if (emailSent) {
+          logger.info('Email sent via Resend');
+        } else {
+          logger.info('Resend not configured, falling back to Firebase Auth email');
+        }
+      } catch (emailError) {
+        logger.warn('Resend email failed, Firebase Auth will handle sending:', emailError);
+        // Fall back to Firebase Auth email (which was already sent by generateSignInWithEmailLink)
+      }
+
+      // Persist magic link to database for tracking and management
+      try {
+        await createMagicLink({
+          userId,
+          borrowerEmail: email.toLowerCase().trim(),
+          sendToEmail: email.toLowerCase().trim(),
+          magicLinkUrl: emailLink,
+          sessionId,
+          expiresAt: expiresAt.toISOString(),
+          createdBy: null, // Generated via API, not by a user
+          sentAt: new Date().toISOString(), // Mark as sent
+        });
+        logger.info('Persisted magic link to database for tracking');
+      } catch (dbError) {
+        // Log the error but don't fail the request - the link still works
+        logger.error('Failed to persist magic link to database:', dbError);
+      }
 
       const responseData: GenerateAuthLinkResponse = {
         success: true,
@@ -255,14 +291,10 @@ export const generateAuthLink = onRequest(
         emailSent: true,
         expiresAt: expiresAt.toISOString(),
         message: `Authentication email sent to ${email}`,
+        emailLink, // Always include link for testing (until email is properly configured)
       };
 
-      // Include email link in response for emulator testing
-      const isEmulator = process.env.FUNCTIONS_EMULATOR === 'true';
-      if (isEmulator) {
-        responseData.emailLink = emailLink;
-        logger.info('Including emailLink in response for emulator testing');
-      }
+      logger.info('Including emailLink in response for testing');
 
       response.status(200).json(responseData);
     } catch (error: any) {
