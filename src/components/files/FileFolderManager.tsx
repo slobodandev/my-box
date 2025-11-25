@@ -11,7 +11,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getAllUsers } from '@/services/dataconnect/userService';
 import { getUserFiles } from '@/services/fileService';
 import { getUserLoans } from '@/services/dataconnect/loanService';
-import { deleteFile, downloadFile } from '@/services/fileOperations';
+import { deleteFile } from '@/services/fileOperations';
+import { getFileDownloadURL } from '@/utils/storage';
 
 interface FileFolderManagerProps {
   onRefresh?: () => void;
@@ -76,6 +77,7 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
           path: `${personalFilesPath}/${file.originalFilename}`,
           updatedAt: file.uploadedAt?.toString() || new Date().toISOString(),
           size: file.fileSize,
+          storagePath: file.storagePath, // Include storagePath for download
         } as FileManagerFile);
       });
 
@@ -142,6 +144,7 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
             path: `${personalFilesPath}/${file.originalFilename}`,
             updatedAt: file.uploadedAt?.toString() || new Date().toISOString(),
             size: file.fileSize,
+            storagePath: file.storagePath, // Include storagePath for download
           } as FileManagerFile);
         });
 
@@ -180,6 +183,7 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
               path: `${loanPath}/${file.originalFilename}`,
               updatedAt: file.uploadedAt?.toString() || new Date().toISOString(),
               size: file.fileSize,
+              storagePath: file.storagePath, // Include storagePath for download
             } as FileManagerFile);
           });
         });
@@ -228,14 +232,39 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
     }
   };
 
-  const handleDownload = async (file: FileManagerFile) => {
+  const handleDownload = async (fileOrFiles: FileManagerFile | FileManagerFile[]) => {
+    // Handle case where library passes an array of files
+    const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles;
+
+    if (!file) {
+      alert('No file selected for download.');
+      return;
+    }
+
     if (file.isDirectory) {
       alert('Cannot download folders. Please download files individually.');
       return;
     }
 
     try {
-      await downloadFile(file.id);
+      // @ts-ignore - storagePath is added to FileManagerFile
+      const storagePath = file.storagePath as string;
+
+      if (!storagePath) {
+        throw new Error('File storage path not found');
+      }
+
+      const downloadUrl = await getFileDownloadURL(storagePath);
+
+      // Trigger download
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      console.log('File downloaded:', file.name);
     } catch (error: any) {
       console.error('Error downloading file:', error);
       alert(error.message || 'Failed to download file. Please try again.');

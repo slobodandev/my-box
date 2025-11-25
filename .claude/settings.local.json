@@ -136,7 +136,13 @@
       "mcp__chrome-devtools__take_snapshot",
       "mcp__chrome-devtools__list_pages",
       "Bash(cmd.exe /c \"dir /s /b C:\\Users\\bobah\\WebstormProjects\\my-box\\docs\\assets\\*sidebar*\")",
-      "Bash(cmd.exe /c \"dir /b C:\\Users\\bobah\\WebstormProjects\\my-box\\docs\\assets\")"
+      "Bash(cmd.exe /c \"dir /b C:\\Users\\bobah\\WebstormProjects\\my-box\\docs\\assets\")",
+      "mcp__chrome-devtools__list_console_messages",
+      "mcp__chrome-devtools__click",
+      "mcp__chrome-devtools__wait_for",
+      "mcp__chrome-devtools__handle_dialog",
+      "mcp__chrome-devtools__get_console_message",
+      "mcp__chrome-devtools__evaluate_script"
     ],
     "deny": [],
     "ask": []
