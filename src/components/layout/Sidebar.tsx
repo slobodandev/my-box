@@ -1,8 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { getAllUsers, User } from '@/services/dataconnect/userService'
 import { getUserLoans, Loan } from '@/services/dataconnect/loanService'
+import { getUserFiles } from '@/services/fileService'
+import {
+  downloadFilesAsZip,
+  type DownloadFileInfo,
+  type FolderDownloadProgress,
+} from '@/utils/folderDownload'
+import { modal } from '@/utils/modal'
 
 export default function Sidebar() {
   const location = useLocation()
@@ -13,6 +20,12 @@ export default function Sidebar() {
   const [expandedBorrowers, setExpandedBorrowers] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(false)
   const [globalSearchTerm, setGlobalSearchTerm] = useState('')
+
+  // Download state
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [downloadProgress, setDownloadProgress] = useState<FolderDownloadProgress | null>(null)
+  const [downloadingItem, setDownloadingItem] = useState<string>('')
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const isAdmin = user?.role === 'admin' || user?.role === 'super-admin'
 
@@ -122,6 +135,114 @@ export default function Sidebar() {
     setExpandedBorrowers(newExpanded)
   }, [globalSearchTerm, borrowers, borrowerLoans, isAdmin])
 
+  // Download files for a user (personal files or loan files)
+  const handleDownloadFiles = async (
+    userId: string,
+    loanId: string | null,
+    folderName: string
+  ) => {
+    if (isDownloading) {
+      modal.warning('A download is already in progress.')
+      return
+    }
+
+    try {
+      // Fetch files for the user
+      const allFiles = await getUserFiles(userId, false)
+
+      // Filter files based on whether it's personal or loan files
+      let filesToDownload: DownloadFileInfo[]
+      if (loanId) {
+        // Loan files
+        filesToDownload = allFiles
+          .filter((f: any) => f.loanId === loanId && f.storagePath)
+          .map((f: any) => ({
+            name: f.originalFilename,
+            path: f.originalFilename,
+            storagePath: f.storagePath,
+            size: f.fileSize || 0,
+          }))
+      } else {
+        // Personal files (no loanId)
+        filesToDownload = allFiles
+          .filter((f: any) => !f.loanId && f.storagePath)
+          .map((f: any) => ({
+            name: f.originalFilename,
+            path: f.originalFilename,
+            storagePath: f.storagePath,
+            size: f.fileSize || 0,
+          }))
+      }
+
+      if (filesToDownload.length === 0) {
+        modal.info('No files to download in this folder.')
+        return
+      }
+
+      // Calculate total size
+      const totalSize = filesToDownload.reduce((sum, f) => sum + f.size, 0)
+      const sizeMB = (totalSize / (1024 * 1024)).toFixed(2)
+
+      // Confirm download
+      const confirmed = await modal.downloadConfirm({
+        folderName,
+        fileCount: filesToDownload.length,
+        totalSizeMB: sizeMB,
+      })
+
+      if (!confirmed) return
+
+      setIsDownloading(true)
+      setDownloadingItem(folderName)
+      abortControllerRef.current = new AbortController()
+
+      console.log(`Starting sidebar download: ${folderName} (${filesToDownload.length} files)`)
+
+      await downloadFilesAsZip(filesToDownload, folderName, {
+        onProgress: (progress) => {
+          setDownloadProgress(progress)
+        },
+        onFileStart: (fileName) => {
+          console.log(`Downloading: ${fileName}`)
+        },
+        onFileComplete: (fileName) => {
+          console.log(`Completed: ${fileName}`)
+        },
+        onError: (error, fileName) => {
+          console.error(`Error downloading ${fileName || 'file'}:`, error)
+        },
+        onComplete: () => {
+          console.log(`Download complete: ${folderName}`)
+          modal.success(`"${folderName}" downloaded successfully!`)
+        },
+        abortController: abortControllerRef.current,
+      })
+    } catch (error: any) {
+      if (abortControllerRef.current?.signal.aborted) {
+        console.log('Download was cancelled.')
+      } else {
+        console.error('Error downloading:', error)
+        modal.error(error.message || 'Failed to download. Please try again.')
+      }
+    } finally {
+      setIsDownloading(false)
+      setDownloadProgress(null)
+      setDownloadingItem('')
+      abortControllerRef.current = null
+    }
+  }
+
+  // Cancel download
+  const cancelDownload = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+      setIsDownloading(false)
+      setDownloadProgress(null)
+      setDownloadingItem('')
+      modal.info('Download cancelled.')
+    }
+  }
+
   // Highlight matching text
   const highlightText = (text: string, search: string) => {
     if (!search) return text
@@ -173,17 +294,33 @@ export default function Sidebar() {
             </Link>
 
             {/* Personal Files - Shows current user's personal files */}
-            <Link
-              to="/?view=personal"
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg ${
-                location.search.includes('view=personal') && !location.search.includes('borrower=')
-                  ? 'bg-primary/10 dark:bg-primary/20 text-primary'
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10'
-              }`}
-            >
-              <span className="material-symbols-outlined text-base">person</span>
-              <p className="text-sm font-medium leading-normal">Personal Files</p>
-            </Link>
+            <div className="flex items-center gap-1">
+              <Link
+                to="/?view=personal"
+                className={`flex-1 flex items-center gap-3 px-3 py-2 rounded-lg ${
+                  location.search.includes('view=personal') && !location.search.includes('borrower=')
+                    ? 'bg-primary/10 dark:bg-primary/20 text-primary'
+                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10'
+                }`}
+              >
+                <span className="material-symbols-outlined text-base">person</span>
+                <p className="text-sm font-medium leading-normal">Personal Files</p>
+              </Link>
+              {user && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleDownloadFiles(user.id, null, 'My Personal Files')
+                  }}
+                  disabled={isDownloading}
+                  className="p-1.5 rounded-md text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Download Personal Files as ZIP"
+                >
+                  <span className="material-symbols-outlined text-base">download</span>
+                </button>
+              )}
+            </div>
           </nav>
         </div>
 
@@ -243,10 +380,10 @@ export default function Sidebar() {
                       {isExpanded && (
                         <ul className="mt-3 space-y-2 pl-2">
                           {/* Personal Files */}
-                          <li>
+                          <li className="flex items-center gap-1">
                             <Link
                               to={`/?borrower=${borrower.id}&view=personal`}
-                              className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                              className={`flex-1 flex items-center space-x-3 px-3 py-2 rounded-md text-sm transition-colors ${
                                 location.search.includes(`borrower=${borrower.id}`) && location.search.includes('view=personal')
                                   ? 'text-primary bg-primary/5'
                                   : 'text-gray-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-slate-600'
@@ -255,6 +392,18 @@ export default function Sidebar() {
                               <span className="material-symbols-outlined text-base">folder_open</span>
                               <span>Personal Files (No Loan)</span>
                             </Link>
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault()
+                                e.stopPropagation()
+                                handleDownloadFiles(borrower.id, null, `${borrowerName} - Personal Files`)
+                              }}
+                              disabled={isDownloading}
+                              className="p-1 rounded-md text-gray-400 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Download Personal Files as ZIP"
+                            >
+                              <span className="material-symbols-outlined text-sm">download</span>
+                            </button>
                           </li>
 
                           {/* Loans */}
@@ -268,10 +417,10 @@ export default function Sidebar() {
                                   : 'bg-slate-100 dark:bg-slate-500/20 text-slate-600 dark:text-slate-300'
 
                                 return (
-                                  <li key={loan.id} className={isLoanActive ? 'bg-primary/10 dark:bg-primary/20 rounded-md shadow-sm' : ''}>
+                                  <li key={loan.id} className={`flex items-center gap-1 ${isLoanActive ? 'bg-primary/10 dark:bg-primary/20 rounded-md shadow-sm' : ''}`}>
                                     <Link
                                       to={`/?borrower=${borrower.id}&loan=${loan.id}`}
-                                      className={`flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                      className={`flex-1 flex items-center justify-between px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                                         isLoanActive
                                           ? 'text-primary hover:bg-primary/20 dark:hover:bg-primary/30'
                                           : 'text-gray-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-slate-600'
@@ -289,6 +438,18 @@ export default function Sidebar() {
                                         {loanStatus.charAt(0).toUpperCase() + loanStatus.slice(1)}
                                       </span>
                                     </Link>
+                                    <button
+                                      onClick={(e) => {
+                                        e.preventDefault()
+                                        e.stopPropagation()
+                                        handleDownloadFiles(borrower.id, loan.id, `${borrowerName} - Loan ${loan.loanNumber}`)
+                                      }}
+                                      disabled={isDownloading}
+                                      className="p-1 rounded-md text-gray-400 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                      title={`Download Loan ${loan.loanNumber} files as ZIP`}
+                                    >
+                                      <span className="material-symbols-outlined text-sm">download</span>
+                                    </button>
                                   </li>
                                 )
                               })}
@@ -321,18 +482,33 @@ export default function Sidebar() {
                 <p className="text-xs text-gray-400 dark:text-gray-500 px-3 py-2">No loans yet</p>
               ) : (
                 myLoans.map((loan) => (
-                  <Link
-                    key={loan.id}
-                    to={`/?loan=${loan.id}`}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium leading-normal ${
-                      location.search.includes(`loan=${loan.id}`)
-                        ? 'bg-primary/10 dark:bg-primary/20 text-primary'
-                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10'
-                    }`}
-                  >
-                    <span className="material-symbols-outlined text-base">account_balance</span>
-                    <span className="truncate">{loan.loanNumber}</span>
-                  </Link>
+                  <div key={loan.id} className="flex items-center gap-1">
+                    <Link
+                      to={`/?loan=${loan.id}`}
+                      className={`flex-1 flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium leading-normal ${
+                        location.search.includes(`loan=${loan.id}`)
+                          ? 'bg-primary/10 dark:bg-primary/20 text-primary'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10'
+                      }`}
+                    >
+                      <span className="material-symbols-outlined text-base">account_balance</span>
+                      <span className="truncate">{loan.loanNumber}</span>
+                    </Link>
+                    {user && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleDownloadFiles(user.id, loan.id, `Loan ${loan.loanNumber}`)
+                        }}
+                        disabled={isDownloading}
+                        className="p-1.5 rounded-md text-gray-400 hover:text-primary hover:bg-gray-100 dark:hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title={`Download Loan ${loan.loanNumber} files as ZIP`}
+                      >
+                        <span className="material-symbols-outlined text-base">download</span>
+                      </button>
+                    )}
+                  </div>
                 ))
               )}
             </nav>
@@ -352,6 +528,65 @@ export default function Sidebar() {
           </Link>
         )}
       </div>
+
+      {/* Download Progress Overlay */}
+      {isDownloading && downloadProgress && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="material-symbols-outlined text-primary text-3xl animate-pulse">
+                folder_zip
+              </span>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Downloading Files
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 truncate max-w-[250px]">
+                  {downloadingItem}
+                </p>
+              </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="mb-4">
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-1">
+                <span>Progress</span>
+                <span>{downloadProgress.percentage}%</span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                <div
+                  className="bg-primary h-3 rounded-full transition-all duration-300"
+                  style={{ width: `${downloadProgress.percentage}%` }}
+                />
+              </div>
+            </div>
+
+            {/* File progress */}
+            <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              <p>
+                Files: {downloadProgress.completedFiles} / {downloadProgress.totalFiles}
+              </p>
+              <p className="truncate" title={downloadProgress.currentFile}>
+                Current: {downloadProgress.currentFile}
+              </p>
+              <p>
+                Size: {(downloadProgress.loadedBytes / (1024 * 1024)).toFixed(2)} MB
+                {downloadProgress.totalBytes > 0 &&
+                  ` / ${(downloadProgress.totalBytes / (1024 * 1024)).toFixed(2)} MB`
+                }
+              </p>
+            </div>
+
+            {/* Cancel button */}
+            <button
+              onClick={cancelDownload}
+              className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+            >
+              Cancel Download
+            </button>
+          </div>
+        </div>
+      )}
     </aside>
   )
 }

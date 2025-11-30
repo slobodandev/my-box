@@ -4,7 +4,7 @@
  * Organizes files by borrower and loan in a hierarchical structure
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { FileManager, type FileManagerFile } from '@cubone/react-file-manager';
 import '@cubone/react-file-manager/dist/style.css';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,16 +13,128 @@ import { getUserFiles } from '@/services/fileService';
 import { getUserLoans } from '@/services/dataconnect/loanService';
 import { deleteFile } from '@/services/fileOperations';
 import { getFileDownloadURL } from '@/utils/storage';
+import {
+  collectFilesFromFolder,
+  downloadFolderAsZip,
+  getFolderStats,
+  type FolderDownloadProgress,
+} from '@/utils/folderDownload';
+import { modal } from '@/utils/modal';
 
 interface FileFolderManagerProps {
   onRefresh?: () => void;
 }
+
+/**
+ * Extract folder path from file tags
+ * Tags format: "folder:/path/to/folder" or "tag1,folder:/path/to/folder,tag2"
+ */
+const extractFolderPathFromTags = (tags: string | null | undefined): string | null => {
+  if (!tags) return null;
+
+  const tagParts = tags.split(',');
+  for (const part of tagParts) {
+    const trimmed = part.trim();
+    if (trimmed.startsWith('folder:')) {
+      return trimmed.substring(7); // Remove "folder:" prefix
+    }
+  }
+  return null;
+};
+
+/**
+ * Build folder structure from file paths
+ * Creates all necessary folder nodes and places files in correct locations
+ */
+const buildFolderStructureFromFiles = (
+  files: any[],
+  basePath: string,
+  existingFolders: Set<string>
+): FileManagerFile[] => {
+  const result: FileManagerFile[] = [];
+  const foldersToCreate = new Map<string, { path: string; name: string; parentPath: string }>();
+
+  files.forEach(file => {
+    const folderPath = extractFolderPathFromTags(file.tags);
+
+    if (folderPath) {
+      // File has a folder path - we need to create folders and place file correctly
+      const fullFolderPath = `${basePath}/${folderPath}`;
+
+      // Build all folders in the path
+      const parts = folderPath.split('/').filter(p => p);
+      let currentPath = basePath;
+
+      parts.forEach((part, index) => {
+        const parentPath = currentPath;
+        currentPath = `${currentPath}/${part}`;
+
+        if (!existingFolders.has(currentPath) && !foldersToCreate.has(currentPath)) {
+          foldersToCreate.set(currentPath, {
+            path: currentPath,
+            name: part,
+            parentPath: parentPath,
+          });
+        }
+      });
+
+      // Add file to its folder
+      result.push({
+        id: file.id || `file-${file.originalFilename}`,
+        name: file.originalFilename,
+        isDirectory: false,
+        type: 'file',
+        path: `${fullFolderPath}/${file.originalFilename}`,
+        updatedAt: file.uploadedAt?.toString() || new Date().toISOString(),
+        size: file.fileSize,
+        storagePath: file.storagePath,
+      } as FileManagerFile);
+    } else {
+      // File has no folder path - add directly to base path
+      result.push({
+        id: file.id || `file-${file.originalFilename}`,
+        name: file.originalFilename,
+        isDirectory: false,
+        type: 'file',
+        path: `${basePath}/${file.originalFilename}`,
+        updatedAt: file.uploadedAt?.toString() || new Date().toISOString(),
+        size: file.fileSize,
+        storagePath: file.storagePath,
+      } as FileManagerFile);
+    }
+  });
+
+  // Add created folders to result (sorted by path depth to ensure parents come first)
+  const sortedFolders = Array.from(foldersToCreate.values()).sort(
+    (a, b) => a.path.split('/').length - b.path.split('/').length
+  );
+
+  sortedFolders.forEach(folder => {
+    result.unshift({
+      id: `folder-${folder.path.replace(/\//g, '-')}`,
+      name: folder.name,
+      isDirectory: true,
+      type: 'folder',
+      path: folder.path,
+      updatedAt: new Date().toISOString(),
+      size: 0,
+    } as FileManagerFile);
+    existingFolders.add(folder.path);
+  });
+
+  return result;
+};
 
 export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
   const { user } = useAuth();
   const [fileStructure, setFileStructure] = useState<FileManagerFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Folder download state
+  const [folderDownloadProgress, setFolderDownloadProgress] = useState<FolderDownloadProgress | null>(null);
+  const [isDownloadingFolder, setIsDownloadingFolder] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // Load file structure
   useEffect(() => {
@@ -52,7 +164,10 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
       // Initialize path metadata for upload context
       const pathMetadata: { [path: string]: { userId?: string; loanId?: string } } = {};
 
-      // Personal Files folder - flat structure with all current user's files
+      // Track existing folders to avoid duplicates
+      const existingFolders = new Set<string>();
+
+      // Personal Files folder - with support for nested folders from ZIP uploads
       const personalFilesPath = '/Personal Files';
       structure.push({
         id: 'personal-files-root',
@@ -63,23 +178,14 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
         updatedAt: new Date().toISOString(),
         size: 0,
       } as FileManagerFile);
+      existingFolders.add(personalFilesPath);
 
       // Fetch current user's files
       const myFiles = await getUserFiles(user.id, false);
 
-      // Add all current user's files (both personal and loan files) to Personal Files folder
-      myFiles.forEach(file => {
-        structure.push({
-          id: file.id || `personal-file-${file.originalFilename}`,
-          name: file.originalFilename,
-          isDirectory: false,
-          type: 'file',
-          path: `${personalFilesPath}/${file.originalFilename}`,
-          updatedAt: file.uploadedAt?.toString() || new Date().toISOString(),
-          size: file.fileSize,
-          storagePath: file.storagePath, // Include storagePath for download
-        } as FileManagerFile);
-      });
+      // Build folder structure from files (handles ZIP folder paths)
+      const personalFileStructure = buildFolderStructureFromFiles(myFiles, personalFilesPath, existingFolders);
+      structure.push(...personalFileStructure);
 
       // Add path metadata for personal files
       pathMetadata['/'] = { userId: user.id };
@@ -95,6 +201,7 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
         updatedAt: new Date().toISOString(),
         size: 0,
       } as FileManagerFile);
+      existingFolders.add('/Borrowers');
 
       // Create structure for each borrower
       for (const borrower of borrowers) {
@@ -114,6 +221,7 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
           updatedAt: borrower.createdAt?.toString() || new Date().toISOString(),
           size: 0,
         } as FileManagerFile);
+        existingFolders.add(borrowerPath);
 
         // Fetch borrower's loans and files
         const [loans, files] = await Promise.all([
@@ -122,31 +230,22 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
         ]);
 
         // Personal Files folder
-        const personalFilesPath = `${borrowerPath}/Personal Files`;
+        const borrowerPersonalFilesPath = `${borrowerPath}/Personal Files`;
         structure.push({
           id: `personal-${borrower.id}`,
           name: 'Personal Files',
           isDirectory: true,
           type: 'folder',
-          path: personalFilesPath,
+          path: borrowerPersonalFilesPath,
           updatedAt: borrower.createdAt?.toString() || new Date().toISOString(),
           size: 0,
         } as FileManagerFile);
+        existingFolders.add(borrowerPersonalFilesPath);
 
-        // Add personal files (files without loanId)
+        // Add personal files (files without loanId) - with folder structure support
         const personalFiles = files.filter(f => !f.loanId);
-        personalFiles.forEach(file => {
-          structure.push({
-            id: file.id || `personal-file-${file.originalFilename}`,
-            name: file.originalFilename,
-            isDirectory: false,
-            type: 'file',
-            path: `${personalFilesPath}/${file.originalFilename}`,
-            updatedAt: file.uploadedAt?.toString() || new Date().toISOString(),
-            size: file.fileSize,
-            storagePath: file.storagePath, // Include storagePath for download
-          } as FileManagerFile);
-        });
+        const borrowerPersonalFileStructure = buildFolderStructureFromFiles(personalFiles, borrowerPersonalFilesPath, existingFolders);
+        structure.push(...borrowerPersonalFileStructure);
 
         // Add path metadata for this borrower
         pathMetadata[borrowerPath] = { userId: borrower.id };
@@ -165,6 +264,7 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
             updatedAt: loan.createdAt?.toString() || new Date().toISOString(),
             size: 0,
           } as FileManagerFile);
+          existingFolders.add(loanPath);
 
           // Add path metadata for this loan
           pathMetadata[loanPath] = {
@@ -172,20 +272,10 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
             loanId: loan.id
           };
 
-          // Add loan files
+          // Add loan files - with folder structure support
           const loanFiles = files.filter(f => f.loanId === loan.id);
-          loanFiles.forEach(file => {
-            structure.push({
-              id: file.id || `loan-file-${file.originalFilename}`,
-              name: file.originalFilename,
-              isDirectory: false,
-              type: 'file',
-              path: `${loanPath}/${file.originalFilename}`,
-              updatedAt: file.uploadedAt?.toString() || new Date().toISOString(),
-              size: file.fileSize,
-              storagePath: file.storagePath, // Include storagePath for download
-            } as FileManagerFile);
-          });
+          const loanFileStructure = buildFolderStructureFromFiles(loanFiles, loanPath, existingFolders);
+          structure.push(...loanFileStructure);
         });
       }
 
@@ -207,28 +297,110 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
     const file = fileStructure.find(f => f.id === fileId);
 
     if (!file) {
-      alert('File not found');
+      modal.error('File not found');
       return;
     }
 
     if (file.isDirectory) {
-      alert('Cannot delete folders. Please delete files individually.');
+      modal.warning('Cannot delete folders. Please delete files individually.');
       return;
     }
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${file.name}"? This action cannot be undone.`
-    );
+    const confirmed = await modal.deleteConfirm(file.name);
 
     if (!confirmed) return;
 
     try {
       await deleteFile(fileId);
-      alert('File deleted successfully');
+      modal.success('File deleted successfully');
       loadFileStructure(); // Refresh the structure
     } catch (error: any) {
       console.error('Error deleting file:', error);
-      alert(error.message || 'Failed to delete file. Please try again.');
+      modal.error(error.message || 'Failed to delete file. Please try again.');
+    }
+  };
+
+  // Handle folder download as ZIP
+  const handleFolderDownload = async (folder: FileManagerFile) => {
+    if (isDownloadingFolder) {
+      modal.warning('A folder download is already in progress.');
+      return;
+    }
+
+    const folderPath = folder.path;
+    if (!folderPath) {
+      modal.error('Folder path not found.');
+      return;
+    }
+
+    // Get folder stats first
+    const stats = getFolderStats(fileStructure, folderPath);
+
+    if (stats.fileCount === 0) {
+      modal.info('This folder is empty or contains no downloadable files.');
+      return;
+    }
+
+    // Confirm download for large folders
+    const sizeMB = (stats.totalSize / (1024 * 1024)).toFixed(2);
+    const confirmed = await modal.downloadConfirm({
+      folderName: folder.name,
+      fileCount: stats.fileCount,
+      totalSizeMB: sizeMB,
+    });
+
+    if (!confirmed) return;
+
+    try {
+      setIsDownloadingFolder(true);
+      abortControllerRef.current = new AbortController();
+
+      // Collect all files from the folder
+      const filesToDownload = collectFilesFromFolder(fileStructure, folderPath);
+
+      console.log(`Starting folder download: ${folder.name} (${filesToDownload.length} files)`);
+
+      await downloadFolderAsZip(filesToDownload, folder.name, {
+        onProgress: (progress) => {
+          setFolderDownloadProgress(progress);
+          console.log(`Download progress: ${progress.percentage}% (${progress.completedFiles}/${progress.totalFiles} files)`);
+        },
+        onFileStart: (fileName) => {
+          console.log(`Downloading: ${fileName}`);
+        },
+        onFileComplete: (fileName) => {
+          console.log(`Completed: ${fileName}`);
+        },
+        onError: (error, fileName) => {
+          console.error(`Error downloading ${fileName || 'file'}:`, error);
+        },
+        onComplete: () => {
+          console.log(`Folder download complete: ${folder.name}`);
+          modal.success(`Folder "${folder.name}" downloaded successfully!`);
+        },
+        abortController: abortControllerRef.current,
+      });
+    } catch (error: any) {
+      if (abortControllerRef.current?.signal.aborted) {
+        console.log('Folder download was cancelled.');
+      } else {
+        console.error('Error downloading folder:', error);
+        modal.error(error.message || 'Failed to download folder. Please try again.');
+      }
+    } finally {
+      setIsDownloadingFolder(false);
+      setFolderDownloadProgress(null);
+      abortControllerRef.current = null;
+    }
+  };
+
+  // Cancel folder download
+  const cancelFolderDownload = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setIsDownloadingFolder(false);
+      setFolderDownloadProgress(null);
+      modal.info('Folder download cancelled.');
     }
   };
 
@@ -237,12 +409,13 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
     const file = Array.isArray(fileOrFiles) ? fileOrFiles[0] : fileOrFiles;
 
     if (!file) {
-      alert('No file selected for download.');
+      modal.warning('No file selected for download.');
       return;
     }
 
+    // Handle folder download
     if (file.isDirectory) {
-      alert('Cannot download folders. Please download files individually.');
+      await handleFolderDownload(file);
       return;
     }
 
@@ -267,7 +440,7 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
       console.log('File downloaded:', file.name);
     } catch (error: any) {
       console.error('Error downloading file:', error);
-      alert(error.message || 'Failed to download file. Please try again.');
+      modal.error(error.message || 'Failed to download file. Please try again.');
     }
   };
 
@@ -303,12 +476,71 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
   }
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full relative">
       <FileManager
         files={fileStructure}
         onDelete={handleDelete}
         onDownload={handleDownload}
       />
+
+      {/* Folder Download Progress Overlay */}
+      {isDownloadingFolder && folderDownloadProgress && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="material-symbols-outlined text-primary text-3xl animate-pulse">
+                folder_zip
+              </span>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Downloading Folder
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Creating ZIP file...
+                </p>
+              </div>
+            </div>
+
+            {/* Progress bar */}
+            <div className="mb-4">
+              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-300 mb-1">
+                <span>Progress</span>
+                <span>{folderDownloadProgress.percentage}%</span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                <div
+                  className="bg-primary h-3 rounded-full transition-all duration-300"
+                  style={{ width: `${folderDownloadProgress.percentage}%` }}
+                />
+              </div>
+            </div>
+
+            {/* File progress */}
+            <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              <p>
+                Files: {folderDownloadProgress.completedFiles} / {folderDownloadProgress.totalFiles}
+              </p>
+              <p className="truncate" title={folderDownloadProgress.currentFile}>
+                Current: {folderDownloadProgress.currentFile}
+              </p>
+              <p>
+                Size: {(folderDownloadProgress.loadedBytes / (1024 * 1024)).toFixed(2)} MB
+                {folderDownloadProgress.totalBytes > 0 &&
+                  ` / ${(folderDownloadProgress.totalBytes / (1024 * 1024)).toFixed(2)} MB`
+                }
+              </p>
+            </div>
+
+            {/* Cancel button */}
+            <button
+              onClick={cancelFolderDownload}
+              className="w-full px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium transition-colors"
+            >
+              Cancel Download
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,8 +1,8 @@
 [
   {
-    "origin": ["https://my-box-53040.web.app", "https://my-box-53040.firebaseapp.com"],
+    "origin": ["https://my-box-53040.web.app", "https://my-box-53040.firebaseapp.com", "http://localhost:5173", "http://localhost:3000"],
     "method": ["GET", "HEAD", "PUT", "POST", "DELETE"],
     "maxAgeSeconds": 3600,
-    "responseHeader": ["Content-Type", "Content-Disposition"]
+    "responseHeader": ["Content-Type", "Content-Disposition", "Content-Length"]
   }
 ]

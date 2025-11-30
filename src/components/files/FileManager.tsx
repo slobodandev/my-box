@@ -16,6 +16,7 @@ import {
 } from '../../utils/storage';
 import { getMetadata } from 'firebase/storage';
 import type { StorageReference } from 'firebase/storage';
+import { modal } from '@/utils/modal';
 
 interface FileManagerProps {
   userId: string;
@@ -195,16 +196,16 @@ export const FileManager: React.FC<FileManagerProps> = ({
     try {
       const file = files.find((f) => f.id === fileId);
       if (!file) {
-        throw new Error('File not found');
+        modal.error('File not found');
+        return;
       }
 
       // @ts-ignore - we added storagePath in loadFiles
       const storagePath = file.storagePath as string;
 
       // Confirm deletion
-      if (!window.confirm(`Are you sure you want to delete "${file.name}"?`)) {
-        return;
-      }
+      const confirmed = await modal.deleteConfirm(file.name);
+      if (!confirmed) return;
 
       await deleteFile(storagePath);
 
@@ -213,10 +214,10 @@ export const FileManager: React.FC<FileManagerProps> = ({
       // Reload files
       await loadFiles();
 
-      // TODO: Show success notification
+      modal.success('File deleted successfully');
     } catch (error) {
       console.error('Error deleting file:', error);
-      // TODO: Show error notification
+      modal.error('Failed to delete file. Please try again.');
     }
   };
 

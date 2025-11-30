@@ -40,6 +40,7 @@ export interface FileMetadata {
   downloadUrl?: string;
   tags?: string;
   description?: string;
+  folderPath?: string; // Optional folder path from ZIP extraction
 }
 
 export interface UploadResult {
@@ -53,6 +54,16 @@ export interface UploadResult {
  */
 export async function createFileMetadata(metadata: FileMetadata): Promise<{ fileId: string }> {
   try {
+    // If there's a folder path, include it in the tags or description for now
+    // until we have a dedicated folderPath column in the database
+    let tags = metadata.tags || null;
+    let description = metadata.description || null;
+
+    // Store folder path in tags for now (format: "folder:/path/to/folder")
+    if (metadata.folderPath) {
+      tags = tags ? `${tags},folder:${metadata.folderPath}` : `folder:${metadata.folderPath}`;
+    }
+
     const variables = {
       userId: metadata.userId,
       loanId: metadata.loanId || null, // Optional loan association
@@ -62,8 +73,8 @@ export async function createFileMetadata(metadata: FileMetadata): Promise<{ file
       mimeType: metadata.mimeType || 'application/octet-stream',
       fileExtension: metadata.fileExtension,
       downloadUrl: metadata.downloadUrl || null,
-      tags: metadata.tags || null,
-      description: metadata.description || null,
+      tags,
+      description,
     };
 
     const ref = mutationRef(dataConnect, 'CreateFile', variables);
@@ -228,6 +239,84 @@ export async function uploadFile(
 }
 
 /**
+ * Upload file to Firebase Storage with folder path preservation
+ * The folder path is stored in the metadata for later retrieval
+ */
+export async function uploadFileWithFolder(
+  file: File,
+  userId: string,
+  folderPath: string,
+  onProgress?: (progress: number) => void,
+  loanId?: string
+): Promise<UploadResult> {
+  try {
+    // Create storage path that includes the folder structure
+    const timestamp = Date.now();
+    const sanitizedFilename = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const sanitizedFolderPath = folderPath.replace(/[^a-zA-Z0-9/.-]/g, '_');
+
+    // Storage path: users/{userId}/files/{folderPath}/{timestamp}_{filename}
+    const storagePath = folderPath
+      ? `users/${userId}/files/${sanitizedFolderPath}/${timestamp}_${sanitizedFilename}`
+      : `users/${userId}/files/${timestamp}_${sanitizedFilename}`;
+
+    const storageRef = ref(storage, storagePath);
+
+    // Get file extension
+    const fileExtension = file.name.split('.').pop() || '';
+
+    // Upload file
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    return new Promise((resolve, reject) => {
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          if (onProgress) {
+            onProgress(progress);
+          }
+        },
+        (error) => {
+          console.error('Upload error:', error);
+          reject(error);
+        },
+        async () => {
+          try {
+            // Get download URL
+            const downloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+
+            // Create file metadata in Data Connect with folder path
+            const { fileId } = await createFileMetadata({
+              userId,
+              loanId,
+              originalFilename: file.name,
+              storagePath,
+              fileSize: file.size,
+              mimeType: file.type,
+              fileExtension,
+              downloadUrl,
+              folderPath, // Include the folder path
+            });
+
+            resolve({
+              fileId,
+              downloadUrl,
+              storagePath,
+            });
+          } catch (error) {
+            reject(error);
+          }
+        }
+      );
+    });
+  } catch (error) {
+    console.error('Error uploading file with folder:', error);
+    throw error;
+  }
+}
+
+/**
  * Delete file from storage and mark as deleted in database
  */
 export async function deleteFile(fileId: string, storagePath: string): Promise<void> {
@@ -255,6 +344,7 @@ export async function deleteFile(fileId: string, storagePath: string): Promise<v
 
 export const fileService = {
   uploadFile,
+  uploadFileWithFolder,
   getUserFiles,
   getFileMetadata,
   createFileMetadata,

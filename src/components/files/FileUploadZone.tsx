@@ -4,9 +4,10 @@
  */
 
 import React, { useState, useRef, useCallback } from 'react';
-import JSZip from 'jszip';
 import { useAuth } from '@/contexts/AuthContext';
-import { uploadFile as uploadFileToStorage } from '@/services/fileService';
+import { uploadFile as uploadFileToStorage, uploadFileWithFolder } from '@/services/fileService';
+import { analyzeZipFile, formatBytes, generateFolderTreeString, zipEntryToFile, type ZipFileEntry } from '@/utils/zipExtractor';
+import { modal, type ZipUploadOption } from '@/utils/modal';
 
 interface FileUploadZoneProps {
   userId?: string; // User ID to associate files with (for admin uploading to borrower)
@@ -108,7 +109,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
   const extractAndUploadZip = async (zipFile: File): Promise<void> => {
     const fileId = `${Date.now()}-${zipFile.name}`;
 
-    // Show extracting message
+    // Show analyzing message
     setUploadingFiles(prev => {
       const next = new Map(prev);
       next.set(fileId, { file: zipFile, progress: 0 });
@@ -116,42 +117,55 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
     });
 
     try {
-      console.log('Extracting ZIP file:', zipFile.name);
+      console.log('Analyzing ZIP file:', zipFile.name);
 
-      const zip = new JSZip();
-      const zipContent = await zip.loadAsync(zipFile);
+      // Analyze the ZIP file to detect folder structure
+      const analysis = await analyzeZipFile(zipFile);
 
-      // Get all files from ZIP (excluding directories)
-      const files: File[] = [];
-      const filePromises: Promise<void>[] = [];
+      // Update progress to show analysis complete
+      setUploadingFiles(prev => {
+        const next = new Map(prev);
+        next.set(fileId, { file: zipFile, progress: 25 });
+        return next;
+      });
 
-      zipContent.forEach((relativePath, zipEntry) => {
-        // Skip directories and hidden files
-        if (zipEntry.dir || relativePath.startsWith('__MACOSX') || relativePath.startsWith('.')) {
+      let uploadOption: ZipUploadOption = 'flat';
+
+      // If there's a folder structure, ask the user what to do
+      if (analysis.hasfolderStructure && analysis.totalFolders > 0) {
+        // Hide the progress indicator while showing modal
+        setUploadingFiles(prev => {
+          const next = new Map(prev);
+          next.delete(fileId);
+          return next;
+        });
+
+        // Generate folder tree for display
+        const folderTree = generateFolderTreeString(analysis.folderTree);
+
+        // Show the modal and wait for user choice
+        uploadOption = await modal.zipUploadConfirm({
+          zipName: zipFile.name,
+          fileCount: analysis.totalFiles,
+          folderCount: analysis.totalFolders,
+          totalSize: formatBytes(analysis.totalSize),
+          folderTree,
+        });
+
+        if (uploadOption === 'cancel') {
+          console.log('ZIP upload cancelled by user');
           return;
         }
 
-        const promise = zipEntry.async('blob').then((blob) => {
-          // Get the filename from the path
-          const filename = relativePath.split('/').pop() || relativePath;
-
-          // Determine the correct MIME type from the file extension
-          const mimeType = getMimeTypeFromExtension(filename);
-
-          // Create a File object from the blob with the correct MIME type
-          const extractedFile = new File([blob], filename, {
-            type: mimeType,
-          });
-
-          files.push(extractedFile);
+        // Show progress again
+        setUploadingFiles(prev => {
+          const next = new Map(prev);
+          next.set(fileId, { file: zipFile, progress: 30 });
+          return next;
         });
+      }
 
-        filePromises.push(promise);
-      });
-
-      await Promise.all(filePromises);
-
-      console.log(`Extracted ${files.length} files from ZIP`);
+      console.log(`Uploading ${analysis.totalFiles} files from ZIP (mode: ${uploadOption})`);
 
       // Update progress
       setUploadingFiles(prev => {
@@ -169,9 +183,18 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
         });
 
         // Upload each extracted file
-        files.forEach(file => {
-          uploadFile(file);
-        });
+        if (uploadOption === 'preserve') {
+          // Upload with folder structure preserved
+          analysis.flatFiles.forEach((entry: ZipFileEntry) => {
+            uploadFileWithFolderPath(entry);
+          });
+        } else {
+          // Upload flat - just the files without folder structure
+          analysis.flatFiles.forEach((entry: ZipFileEntry) => {
+            const file = zipEntryToFile(entry);
+            uploadFile(file);
+          });
+        }
       }, 500);
 
     } catch (error: any) {
@@ -179,6 +202,89 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
       setUploadingFiles(prev => {
         const next = new Map(prev);
         next.set(fileId, { file: zipFile, progress: 0, error: `Failed to extract ZIP: ${error.message}` });
+        return next;
+      });
+    }
+  };
+
+  /**
+   * Upload a file with its folder path preserved
+   */
+  const uploadFileWithFolderPath = async (entry: ZipFileEntry): Promise<void> => {
+    if (!targetUserId) {
+      throw new Error('User not authenticated');
+    }
+
+    const file = zipEntryToFile(entry);
+    const fileId = `${Date.now()}-${file.name}`;
+    const error = validateFile(file);
+
+    if (error) {
+      setUploadingFiles(prev => {
+        const next = new Map(prev);
+        next.set(fileId, { file, progress: 0, error });
+        return next;
+      });
+      return;
+    }
+
+    // Initialize upload state
+    setUploadingFiles(prev => {
+      const next = new Map(prev);
+      next.set(fileId, { file, progress: 0 });
+      return next;
+    });
+
+    try {
+      // Upload file with folder path
+      const result = await uploadFileWithFolder(
+        file,
+        targetUserId,
+        entry.folderPath, // Pass the folder path from the ZIP
+        (progress) => {
+          setUploadingFiles(prev => {
+            const next = new Map(prev);
+            const existing = next.get(fileId);
+            if (existing) {
+              next.set(fileId, { ...existing, progress });
+            }
+            return next;
+          });
+        },
+        loanId || undefined
+      );
+
+      console.log('File uploaded successfully with folder path:', result);
+
+      // Update state with download URL
+      setUploadingFiles(prev => {
+        const next = new Map(prev);
+        const existing = next.get(fileId);
+        if (existing) {
+          next.set(fileId, { ...existing, progress: 100, downloadUrl: result.downloadUrl });
+        }
+        return next;
+      });
+
+      // Remove from uploading list after 2 seconds
+      setTimeout(() => {
+        setUploadingFiles(prev => {
+          const next = new Map(prev);
+          next.delete(fileId);
+          return next;
+        });
+        if (onUploadComplete) {
+          onUploadComplete();
+        }
+      }, 2000);
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      setUploadingFiles(prev => {
+        const next = new Map(prev);
+        const existing = next.get(fileId);
+        if (existing) {
+          next.set(fileId, { ...existing, error: error.message });
+        }
         return next;
       });
     }

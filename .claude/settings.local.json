@@ -142,7 +142,20 @@
       "mcp__chrome-devtools__wait_for",
       "mcp__chrome-devtools__handle_dialog",
       "mcp__chrome-devtools__get_console_message",
-      "mcp__chrome-devtools__evaluate_script"
+      "mcp__chrome-devtools__evaluate_script",
+      "Bash(cmd.exe /c \"cd /d C:\\Users\\bobah\\WebstormProjects\\my-box && npm install @transcend-io/conflux streamsaver @types/streamsaver\")",
+      "Bash(cmd.exe /c \"npm install @transcend-io/conflux streamsaver\")",
+      "Bash(cmd.exe /c \"cd /d C:\\Users\\bobah\\WebstormProjects\\my-box && npm run build 2>&1\")",
+      "Bash(cmd.exe /c \"cd /d C:\\Users\\bobah\\WebstormProjects\\my-box && npx vite build\")",
+      "Bash(cmd.exe /c \"cd /d C:\\Users\\bobah\\WebstormProjects\\my-box && npx tsc --noEmit 2>&1 || echo TypeScript check completed\")",
+      "Bash(cmd.exe /c \"cd /d C:\\Users\\bobah\\WebstormProjects\\my-box && npm run dev\")",
+      "Bash(cmd.exe /c \"timeout /t 5 /nobreak >nul\")",
+      "mcp__chrome-devtools__take_screenshot",
+      "Bash(cmd.exe /c \"cd /d C:\\Users\\bobah\\WebstormProjects\\my-box && npm list antd 2>&1\")",
+      "Bash(cmd.exe /c \"cd /d C:\\Users\\bobah\\WebstormProjects\\my-box && npm install antd @ant-design/icons\")",
+      "Bash(cmd.exe /c \"cd /d C:\\Users\\bobah\\WebstormProjects\\my-box && npm install antd @ant-design/icons --save\")",
+      "Bash(cmd.exe /c \"cd /d C:\\Users\\bobah\\WebstormProjects\\my-box && npm list antd\")",
+      "Bash(cmd.exe /c \"cd /d C:\\Users\\bobah\\WebstormProjects\\my-box && type package.json | findstr antd\")"
     ],
     "deny": [],
     "ask": []

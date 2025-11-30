@@ -26,6 +26,7 @@ import {
 } from '@/services/dataconnect/magicLinkService';
 import { useAuth } from '@/contexts/AuthContext';
 import { CloudFunctionUrls, getCloudFunctionHeaders } from '@/config/cloudFunctions';
+import { modal } from '@/utils/modal';
 
 const AVAILABLE_ROLES = [
   { value: 'super-admin', label: 'Super Admin', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200', description: 'Full system access, can manage admins' },
@@ -133,21 +134,27 @@ export const UserManagement: React.FC = () => {
   const handleRoleChange = async (userId: string, newRole: string) => {
     // Prevent changing own role
     if (userId === currentUser?.id) {
-      alert('You cannot change your own role');
+      modal.warning('You cannot change your own role');
       return;
     }
 
-    if (!confirm(`Are you sure you want to change this user's role to ${newRole}?`)) {
-      return;
-    }
+    const roleInfo = getRoleInfo(newRole);
+    const confirmed = await modal.confirm({
+      title: 'Change User Role',
+      content: `Are you sure you want to change this user's role to ${roleInfo.label}?`,
+      okText: 'Change Role',
+    });
+
+    if (!confirmed) return;
 
     setUpdatingUserId(userId);
     try {
       await updateUserRole(userId, newRole);
       // Update local state
       setUsers(users.map(u => u.id === userId ? { ...u, role: newRole } : u));
+      modal.success('User role updated successfully');
     } catch (err) {
-      alert('Failed to update user role');
+      modal.error('Failed to update user role');
       console.error(err);
     } finally {
       setUpdatingUserId(null);
@@ -200,9 +207,10 @@ export const UserManagement: React.FC = () => {
         loanNumber: '',
         borrowerName: '',
       });
+      modal.success('Loan added successfully');
     } catch (err) {
       console.error('Error adding loan:', err);
-      alert('Failed to add loan');
+      modal.error('Failed to add loan');
     }
   };
 
@@ -237,16 +245,20 @@ export const UserManagement: React.FC = () => {
 
       setShowEditLoanModal(false);
       setSelectedLoan(null);
+      modal.success('Loan updated successfully');
     } catch (err) {
       console.error('Error updating loan:', err);
-      alert('Failed to update loan');
+      modal.error('Failed to update loan');
     }
   };
 
   const handleDeleteLoan = async (loanId: string, userId: string) => {
-    if (!confirm('Are you sure you want to delete this loan?')) {
-      return;
-    }
+    const confirmed = await modal.deleteConfirm('this loan', {
+      title: 'Delete Loan',
+      content: 'Are you sure you want to delete this loan? This action cannot be undone.',
+    });
+
+    if (!confirmed) return;
 
     try {
       await deleteLoan(loanId);
@@ -254,9 +266,10 @@ export const UserManagement: React.FC = () => {
       // Refresh loans for this user
       const loans = await getUserLoans(userId);
       setUserLoans(prev => ({ ...prev, [userId]: loans }));
+      modal.success('Loan deleted successfully');
     } catch (err) {
       console.error('Error deleting loan:', err);
-      alert('Failed to delete loan');
+      modal.error('Failed to delete loan');
     }
   };
 
@@ -289,9 +302,9 @@ export const UserManagement: React.FC = () => {
         throw new Error(data.message || 'Failed to create user');
       }
 
-      alert(
+      modal.success(
         createUserFormData.generateMagicLink && data.magicLink
-          ? `User created successfully! Magic link ${createUserFormData.sendEmail ? 'sent' : 'generated'}: ${data.magicLink}`
+          ? `User created successfully! Magic link ${createUserFormData.sendEmail ? 'sent' : 'generated'}.`
           : 'User created successfully!'
       );
 
@@ -384,14 +397,18 @@ export const UserManagement: React.FC = () => {
   const copyLinkToClipboard = () => {
     if (generatedLink) {
       navigator.clipboard.writeText(generatedLink);
-      alert('Link copied to clipboard!');
+      modal.success('Link copied to clipboard!');
     }
   };
 
   const handleResendMagicLink = async (linkId: string, linkUrl: string) => {
-    if (!confirm('Are you sure you want to resend this magic link?')) {
-      return;
-    }
+    const confirmed = await modal.confirm({
+      title: 'Resend Magic Link',
+      content: 'Are you sure you want to resend this magic link?',
+      okText: 'Resend',
+    });
+
+    if (!confirmed) return;
 
     setResendingLinkId(linkId);
     try {
@@ -401,7 +418,7 @@ export const UserManagement: React.FC = () => {
       // TODO: In production, actually send the email here
       // For now, just copy to clipboard
       navigator.clipboard.writeText(linkUrl);
-      alert('Link send count updated and copied to clipboard! In production, this would send an email.');
+      modal.success('Link send count updated and copied to clipboard! In production, this would send an email.');
 
       // Refresh the links
       if (selectedUserForLink) {
@@ -410,22 +427,27 @@ export const UserManagement: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Error resending magic link:', err);
-      alert(err.message || 'Failed to resend magic link');
+      modal.error(err.message || 'Failed to resend magic link');
     } finally {
       setResendingLinkId(null);
     }
   };
 
   const handleRevokeMagicLink = async (linkId: string) => {
-    if (!confirm('Are you sure you want to revoke this magic link? This action cannot be undone.')) {
-      return;
-    }
+    const confirmed = await modal.confirm({
+      title: 'Revoke Magic Link',
+      content: 'Are you sure you want to revoke this magic link? This action cannot be undone.',
+      okText: 'Revoke',
+      okButtonProps: { danger: true },
+    });
+
+    if (!confirmed) return;
 
     setRevokingLinkId(linkId);
     try {
       await revokeMagicLink(linkId, currentUser?.id, 'Manually revoked by admin');
 
-      alert('Magic link has been revoked successfully.');
+      modal.success('Magic link has been revoked successfully.');
 
       // Refresh the links
       if (selectedUserForLink) {
@@ -434,25 +456,32 @@ export const UserManagement: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Error revoking magic link:', err);
-      alert(err.message || 'Failed to revoke magic link');
+      modal.error(err.message || 'Failed to revoke magic link');
     } finally {
       setRevokingLinkId(null);
     }
   };
 
   const handleExtendMagicLink = async (linkId: string) => {
-    const daysToAdd = prompt('How many days would you like to extend this link?', '7');
-    if (!daysToAdd || isNaN(parseInt(daysToAdd))) {
-      return;
-    }
+    // For now, use a simple fixed extension since we don't have an input modal
+    // In the future, we could create a custom modal for this
+    const daysToAdd = 7;
+
+    const confirmed = await modal.confirm({
+      title: 'Extend Magic Link',
+      content: `Extend this magic link by ${daysToAdd} days?`,
+      okText: 'Extend',
+    });
+
+    if (!confirmed) return;
 
     try {
       const newExpiryDate = new Date();
-      newExpiryDate.setDate(newExpiryDate.getDate() + parseInt(daysToAdd));
+      newExpiryDate.setDate(newExpiryDate.getDate() + daysToAdd);
 
       await extendMagicLink(linkId, newExpiryDate);
 
-      alert(`Magic link extended by ${daysToAdd} days.`);
+      modal.success(`Magic link extended by ${daysToAdd} days.`);
 
       // Refresh the links
       if (selectedUserForLink) {
@@ -461,7 +490,7 @@ export const UserManagement: React.FC = () => {
       }
     } catch (err: any) {
       console.error('Error extending magic link:', err);
-      alert(err.message || 'Failed to extend magic link');
+      modal.error(err.message || 'Failed to extend magic link');
     }
   };
 
@@ -1043,7 +1072,7 @@ export const UserManagement: React.FC = () => {
                                 <>
                                   <button
                                     type="button"
-                                    onClick={() => navigator.clipboard.writeText(link.magicLinkUrl).then(() => alert('Link copied!'))}
+                                    onClick={() => navigator.clipboard.writeText(link.magicLinkUrl).then(() => modal.success('Link copied!'))}
                                     className="px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
                                     title="Copy link"
                                     disabled={isProcessing}
