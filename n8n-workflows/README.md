@@ -1,10 +1,27 @@
 # n8n Workflows for My Box File Management System
 
-This directory contains n8n workflow specifications and exported workflow JSON files for the My Box application.
+> **⚠️ DEPRECATED**: This documentation is obsolete. The project has been migrated from n8n + Azure to Firebase.
+>
+> **Current Architecture:**
+> - Firebase Cloud Functions (replaced n8n webhooks)
+> - Firebase Data Connect (replaced Azure SQL)
+> - Firebase Storage (replaced Azure Blob Storage)
+> - Firebase Email Link Auth (replaced custom magic links)
+>
+> See `docs/IMPLEMENTATION-SUMMARY.md` for current implementation details.
+> See `docs/MIGRATION-STATUS.md` for migration status.
+>
+> These files are kept for historical reference only.
 
-## Overview
+---
 
-All file operations in the My Box application are handled through n8n workflows. This provides a flexible, maintainable middleware layer between the React frontend and Azure cloud services.
+## Historical Documentation (Archived)
+
+This directory contains n8n workflow specifications and exported workflow JSON files that were originally planned for the My Box application.
+
+## Overview (OBSOLETE)
+
+~~All file operations in the My Box application are handled through n8n workflows. This provides a flexible, maintainable middleware layer between the React frontend and Azure cloud services.~~
 
 ## n8n Instance Configuration
 

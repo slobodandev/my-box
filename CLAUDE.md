@@ -2,7 +2,16 @@
 ## Loan File Management System
 
 **Project Type:** React + Vite + TypeScript Web Application
-**Purpose:** File management system for loan-related documents with Azure cloud integration
+**Purpose:** File management system for loan-related documents with Firebase cloud integration
+
+> **Architecture Note:** This project has been **migrated from n8n + Azure to Firebase**.
+> The current architecture uses:
+> - **Firebase Cloud Functions** for backend API
+> - **Firebase Data Connect** (PostgreSQL) for database
+> - **Firebase Storage** for file storage
+> - **Firebase Email Link Auth** for authentication
+>
+> See `docs/IMPLEMENTATION-SUMMARY.md` for complete details.
 
 ---
 
@@ -24,9 +33,10 @@ This is a lightweight web application that allows users to:
 - **Frontend:** React 18+, Vite, TypeScript, Tailwind CSS
 - **Icons:** Material Symbols Outlined (Google Icons)
 - **Font:** Inter (Google Fonts)
-- **Storage:** Azure Blob Storage
-- **Database:** Azure SQL Database
-- **Workflows:** n8n automation
+- **Storage:** Firebase Storage
+- **Database:** Firebase Data Connect (PostgreSQL)
+- **Backend:** Firebase Cloud Functions
+- **Authentication:** Firebase Email Link Auth
 - **Future:** Windows desktop sync
 
 **UI Design Reference:**
@@ -238,7 +248,15 @@ Common icons used:
 ```
 my-box/
 ├── .claude/                  # Claude Code configuration
-├── .idea/                    # IDE settings (ignored)
+├── functions/               # Firebase Cloud Functions
+│   └── src/
+│       ├── auth/           # Authentication functions
+│       ├── files/          # File operation functions
+│       ├── users/          # User management functions
+│       └── index.ts        # Function exports
+├── dataconnect/            # Firebase Data Connect
+│   ├── schema/             # GraphQL schema
+│   └── connector/          # Queries and mutations
 ├── src/
 │   ├── components/          # React components
 │   │   ├── common/         # Reusable UI components
@@ -246,27 +264,23 @@ my-box/
 │   │   ├── loans/          # Loan-related components
 │   │   └── layout/         # Layout components
 │   ├── services/           # API and service layer
-│   │   ├── n8n/           # n8n workflow integrations
-│   │   ├── azure/         # Azure SQL queries
-│   │   └── api/           # API client utilities
+│   │   └── firebase/       # Firebase service integrations
 │   ├── hooks/             # Custom React hooks
 │   ├── types/             # TypeScript type definitions
 │   ├── utils/             # Utility functions
-│   ├── contexts/          # React contexts
-│   ├── config/            # Configuration files
+│   ├── contexts/          # React contexts (AuthContext)
 │   ├── pages/             # Page components
-│   ├── styles/            # Global styles
+│   │   └── auth/          # Authentication pages
 │   ├── App.tsx            # Main app component
 │   └── main.tsx           # Entry point
 ├── public/                # Static assets
-├── n8n-workflows/         # n8n workflow JSON exports
-├── docs/                  # Additional documentation
-├── PDR.md                 # Product Requirements Document
-├── PLANNING.md            # Project plan
+├── docs/                  # Documentation
+│   └── archive/           # Archived/obsolete docs
 ├── TASKS.md               # Task list
 ├── package.json           # Dependencies
 ├── tsconfig.json          # TypeScript config
 ├── vite.config.ts         # Vite configuration
+├── firebase.json          # Firebase configuration
 └── README.md              # Project readme
 
 ```
@@ -387,35 +401,39 @@ export const useUser = () => {
 };
 ```
 
-### 4. API Integration with n8n
+### 4. API Integration with Firebase
 
-All file operations go through n8n workflows:
+All file operations go through Firebase Cloud Functions and Firebase Storage:
 
 ```typescript
-// services/n8n/fileUpload.ts
-import axios from 'axios';
+// services/firebase/fileService.ts
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { getStorage, ref, uploadBytes } from 'firebase/storage';
 import type { FileUploadRequest, FileUploadResponse } from '@/types/file';
 
-const N8N_BASE_URL = import.meta.env.VITE_N8N_BASE_URL;
+const functions = getFunctions();
+const storage = getStorage();
 
-export const uploadFileToN8N = async (
+// Upload file to Firebase Storage, then process with Cloud Function
+export const uploadFile = async (
   file: File,
   request: FileUploadRequest
 ): Promise<FileUploadResponse> => {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('userId', request.userId);
-  formData.append('loanIds', JSON.stringify(request.loanIds || []));
+  // Upload to Firebase Storage
+  const storageRef = ref(storage, `uploads/${request.userId}/${file.name}`);
+  await uploadBytes(storageRef, file);
 
-  const response = await axios.post(
-    `${N8N_BASE_URL}/webhook/file-upload`,
-    formData,
-    {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    }
-  );
+  // Process upload with Cloud Function
+  const processUpload = httpsCallable(functions, 'processUpload');
+  const result = await processUpload({
+    filename: file.name,
+    storagePath: storageRef.fullPath,
+    contentType: file.type,
+    size: file.size,
+    loanIds: request.loanIds || [],
+  });
 
-  return response.data;
+  return result.data as FileUploadResponse;
 };
 ```
 
@@ -580,32 +598,34 @@ export const FileList: React.FC<FileListProps> = ({ files, onDownload, onDelete 
 
 ### 8. Environment Variables
 
-Use Vite's environment variable system:
+Use Vite's environment variable system for Firebase:
 
 ```typescript
 // config/env.ts
 export const config = {
-  n8n: {
-    baseUrl: import.meta.env.VITE_N8N_BASE_URL,
-    uploadWebhook: import.meta.env.VITE_N8N_UPLOAD_WEBHOOK,
-    downloadWebhook: import.meta.env.VITE_N8N_DOWNLOAD_WEBHOOK,
-    listWebhook: import.meta.env.VITE_N8N_LIST_WEBHOOK,
-  },
-  azure: {
-    sqlConnectionString: import.meta.env.VITE_AZURE_SQL_CONNECTION,
+  firebase: {
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
   },
   app: {
     maxFileSize: parseInt(import.meta.env.VITE_MAX_FILE_SIZE || '104857600'), // 100MB
     allowedFileTypes: import.meta.env.VITE_ALLOWED_FILE_TYPES?.split(',') || [],
+    apiKey: import.meta.env.VITE_API_KEY, // For third-party API calls
   },
 } as const;
 
 // .env.example
-VITE_N8N_BASE_URL=https://n8n.example.com
-VITE_N8N_UPLOAD_WEBHOOK=/webhook/file-upload
-VITE_N8N_DOWNLOAD_WEBHOOK=/webhook/file-download
-VITE_N8N_LIST_WEBHOOK=/webhook/file-list
-VITE_AZURE_SQL_CONNECTION=Server=...
+VITE_FIREBASE_API_KEY=your-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=123456789
+VITE_FIREBASE_APP_ID=your-app-id
+VITE_API_KEY=your-api-key-for-cloud-functions
 VITE_MAX_FILE_SIZE=104857600
 VITE_ALLOWED_FILE_TYPES=.pdf,.doc,.docx,.xls,.xlsx,.jpg,.png
 ```
@@ -632,14 +652,14 @@ VITE_ALLOWED_FILE_TYPES=.pdf,.doc,.docx,.xls,.xlsx,.jpg,.png
 5. **Use environment variables** for URLs and secrets
 6. **Add request/response logging** in development
 
-### When Working with n8n Workflows
+### When Working with Firebase Cloud Functions
 
-1. **Document the workflow purpose** in comments
-2. **Export workflows** as JSON to `n8n-workflows/` directory
-3. **Use the n8n MCP server** for workflow creation/modification
-4. **Name workflows clearly**: `file-upload.json`, `file-download.json`
-5. **Include error handling nodes** in all workflows
-6. **Test workflows** before integrating with frontend
+1. **Keep functions focused** - single responsibility per function
+2. **Add proper error handling** with appropriate HTTP status codes
+3. **Validate inputs** before processing
+4. **Use Data Connect** for database operations when possible
+5. **Test with emulators** before deploying to production
+6. **Document function parameters** in JSDoc comments
 
 ### When Handling Files
 
@@ -650,13 +670,13 @@ VITE_ALLOWED_FILE_TYPES=.pdf,.doc,.docx,.xls,.xlsx,.jpg,.png
 5. **Use blob URLs** for file previews when applicable
 6. **Clean up blob URLs** to prevent memory leaks
 
-### When Working with Database
+### When Working with Data Connect
 
-1. **Never hardcode SQL queries** in components
-2. **Create service functions** for all database operations
-3. **Use parameterized queries** to prevent SQL injection
-4. **Handle connection errors** and retry logic
-5. **Log all database errors** for debugging
+1. **Use generated SDK** from `dataconnect/` for type-safe queries
+2. **Define queries in GraphQL** files under `dataconnect/connector/`
+3. **Use mutations for write operations** - queries for reads
+4. **Handle connection errors** gracefully with user feedback
+5. **Test with emulators** before production deployment
 
 ### Testing Considerations
 
@@ -810,38 +830,52 @@ Before deploying, ensure:
 
 ---
 
-## MCP Server Integration
+## Firebase Cloud Functions
 
-### n8n MCP Server
+### Available Functions
 
-This project uses the n8n MCP server for workflow management. When working with n8n workflows:
+The project uses Firebase Cloud Functions for all backend operations:
 
-1. **Use MCP server tools** instead of manual JSON editing
-2. **Document workflow endpoints** in this file
-3. **Test workflows** through MCP server before frontend integration
-
-### Workflow Endpoints
-
+#### Authentication Functions
 ```
-POST /webhook/file-upload
-- Purpose: Upload file to Azure Blob Storage and create DB record
-- Input: multipart/form-data with file and metadata
-- Output: { fileId, blobIdentifier, success }
+generateAuthLink - Generate authentication link for third-party API
+verifyEmailLink - Verify Firebase email link authentication
+verifyMagicLink - Legacy magic link verification
+validateSession - Validate session tokens
+sendVerificationCode - Send SMS/email verification codes
+verifyCode - Verify authentication codes
+createPasswordSession - Create password-based sessions
+```
 
-POST /webhook/file-download
-- Purpose: Download file from Azure Blob Storage
-- Input: { fileId }
-- Output: Binary file stream
+#### User Functions
+```
+createUserWithMagicLink - Create user and send magic link email
+```
 
-POST /webhook/file-list
-- Purpose: Get list of files for user
-- Input: { userId, loanId?, filters? }
-- Output: Array of FileMetadata
+#### File Functions
+```
+processUpload - Process uploaded files, create DB records
+listFiles - List files with filters and pagination
+deleteFile - Soft delete files
+generateDownloadURL - Generate signed download URLs
+batchGenerateDownloadURLs - Bulk download URL generation
+onFileUploaded - Storage trigger for file processing
+```
 
-DELETE /webhook/file-delete
-- Purpose: Delete file from storage and DB
-- Input: { fileId, userId }
-- Output: { success, message }
+### Development Commands
+
+```bash
+# Start emulators for local development
+firebase emulators:start
+
+# Deploy all functions
+firebase deploy --only functions
+
+# Deploy specific function
+firebase deploy --only functions:processUpload
+
+# View function logs
+firebase functions:log
 ```
 
 ---
@@ -857,5 +891,6 @@ If you encounter ambiguous requirements:
 
 ---
 
-**Last Updated:** 2025-11-10
+**Last Updated:** 2025-11-30
 **Maintained By:** Development Team
+**Architecture:** Firebase (migrated from n8n + Azure)

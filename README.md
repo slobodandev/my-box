@@ -1,212 +1,166 @@
 # MyBox - Loan File Management System
 
-A modern, lightweight loan file management system built with React, TypeScript, Vite, and Tailwind CSS.
+A modern, secure document management platform for organizing and managing loan-related files.
 
-## 🎯 Overview
+## Overview
 
-MyBox is a secure document management platform that allows users to organize and manage files related to their loans and personal documents. Built with a modern tech stack and integrated with n8n workflow automation and Azure cloud services.
+MyBox enables users to:
+- Upload and manage loan-related documents
+- Organize files by loan association
+- Store personal files securely
+- Access files through a responsive web interface
 
-## ✨ Features
+## Technology Stack
 
-### Implemented ✅
-- 📁 File browsing with search and filtering
-- 🏦 Loan-based file organization
-- 🔍 Real-time search across all files
-- 📄 Support for multiple file types (PDF, DOC, DOCX, XLS, XLSX, images)
-- 🌓 Dark mode support
-- 📱 Responsive design
-- 🔄 Loading states and error handling
-- 📊 Pagination for large file lists
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18+, TypeScript, Vite, Tailwind CSS |
+| Backend | Firebase Cloud Functions |
+| Database | Firebase Data Connect (PostgreSQL) |
+| Storage | Firebase Storage |
+| Authentication | Firebase Email Link Auth |
+| Email | Resend |
 
-### Coming Soon 🚧
-- 📤 File upload functionality
-- 📥 File download
-- 🗑️ File deletion
-- 🔐 User authentication
-- 👤 Personal file management
-- 💼 Loan details pages
-- 🔄 Windows desktop sync
+## Features
 
-## 🛠️ Tech Stack
+### Implemented
+- File upload/download/delete operations
+- Loan-based file organization
+- Search and filtering
+- Passwordless authentication (Email Link)
+- Dark mode support
+- Responsive design
 
-### Frontend
-- **React 18+** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **Tailwind CSS** - Styling framework
-- **React Router v7** - Navigation
-- **Axios** - HTTP client
-- **date-fns** - Date formatting
+### Pending
+- End-to-end testing
+- Production deployment
 
-### Backend Services
-- **n8n** - Workflow automation (http://48.223.194.241:5678)
-- **Azure Blob Storage** - File storage (to be configured)
-- **Azure SQL Database** - Data persistence (to be configured)
-
-### Design
-- **Material Symbols Outlined** - Icons
-- **Inter Font** - Typography
-- **Custom Tailwind Theme** - Matching UI mockup
-
-## 🚀 Getting Started
+## Quick Start
 
 ### Prerequisites
-- Node.js 18+ (Windows installation)
-- npm or yarn
-- Access to n8n instance
+- Node.js 18+
+- Firebase CLI (`npm install -g firebase-tools`)
+- Firebase project configured
 
 ### Installation
 
-1. Clone the repository:
 ```bash
+# Clone repository
 git clone <repository-url>
 cd my-box
-```
 
-2. Install dependencies:
-```bash
+# Install dependencies
 npm install
-```
 
-3. Configure environment variables:
-```bash
-# Copy .env.example to .env
+# Install Cloud Functions dependencies
+cd functions && npm install && cd ..
+
+# Configure environment
 cp .env.example .env
-
-# Edit .env with your configuration
-# - n8n webhook URLs are pre-configured
-# - Azure credentials (when available)
-# - Mock user settings for development
+# Edit .env with your Firebase credentials
 ```
 
-### Running the Application
+### Development
 
-**Development mode:**
 ```bash
+# Start Firebase emulators
+firebase emulators:start
+
+# In another terminal, start frontend
 npm run dev
 ```
-The application will be available at http://localhost:5173/
 
-**Build for production:**
+Application runs at http://localhost:5173
+
+### Build & Deploy
+
 ```bash
+# Build frontend
 npm run build
+
+# Deploy everything
+firebase deploy
+
+# Or deploy specific services
+firebase deploy --only functions
+firebase deploy --only hosting
+firebase deploy --only dataconnect
 ```
 
-**Preview production build:**
-```bash
-npm run preview
-```
-
-### Testing
-```bash
-# Run unit tests
-npm test
-
-# Run linting
-npm run lint
-```
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 my-box/
-├── src/
-│   ├── components/      # React components
-│   │   ├── layout/      # Layout components (Sidebar, etc.)
-│   │   ├── files/       # File-related components
-│   │   └── common/      # Reusable components
-│   ├── pages/           # Page components
-│   ├── services/        # API services
-│   │   └── n8n/         # n8n integration services
-│   ├── hooks/           # Custom React hooks
-│   ├── types/           # TypeScript type definitions
-│   ├── utils/           # Utility functions
-│   └── constants/       # App constants
-├── n8n-workflows/       # n8n workflow specifications
-├── ui-design/           # UI mockup files
-├── PDR.md              # Product Requirements Document
-├── CLAUDE.md           # AI agent instructions
-├── PLANNING.md         # Project plan
-├── TASKS.md            # Task breakdown
-└── PROJECT-SUMMARY.md  # Current project status
+├── functions/           # Firebase Cloud Functions
+│   └── src/
+│       ├── auth/       # Authentication functions
+│       ├── files/      # File operation functions
+│       └── users/      # User management functions
+├── dataconnect/        # Firebase Data Connect
+│   ├── schema/         # GraphQL schema
+│   └── connector/      # Queries and mutations
+├── src/                # React frontend
+│   ├── components/     # UI components
+│   ├── pages/          # Page components
+│   ├── hooks/          # Custom hooks
+│   ├── contexts/       # React contexts
+│   └── services/       # Firebase services
+├── docs/               # Documentation
+└── public/             # Static assets
 ```
 
-## 🔗 n8n Workflows
+## Cloud Functions
 
-The following workflows are deployed and active:
+| Function | Purpose |
+|----------|---------|
+| `generateAuthLink` | Generate auth links for third-party API |
+| `verifyEmailLink` | Handle email link verification |
+| `validateSession` | Validate session tokens |
+| `processUpload` | Process file uploads |
+| `listFiles` | List files with filters |
+| `deleteFile` | Soft delete files |
+| `generateDownloadURL` | Generate signed download URLs |
 
-| Workflow | Endpoint | Purpose |
-|----------|----------|---------|
-| Get Loan List | `/webhook/get-loans` | Retrieve user's loans |
-| File List | `/webhook/file-list` | List files with filters |
-| File Upload | `/webhook/file-upload` | Upload files to Azure |
-| File Download | `/webhook/file-download` | Download files securely |
-| File Delete | `/webhook/file-delete` | Soft delete files |
+## Documentation
 
-## 📚 Documentation
+- [Implementation Summary](docs/IMPLEMENTATION-SUMMARY.md)
+- [Migration Status](docs/MIGRATION-STATUS.md)
+- [Cloud Functions Config](docs/CLOUD-FUNCTIONS-CONFIG.md)
+- [Firebase Emulators](docs/FIREBASE-EMULATORS.md)
+- [Deployment Guide](docs/DEPLOYMENT-GUIDE.md)
+- [Hooks Guide](docs/HOOKS-GUIDE.md)
 
-- **[PDR.md](./PDR.md)** - Complete product requirements and architecture
-- **[CLAUDE.md](./CLAUDE.md)** - Development guidelines and UI design system
-- **[PLANNING.md](./PLANNING.md)** - 6-phase project plan
-- **[TASKS.md](./TASKS.md)** - Detailed task breakdown
-- **[PROJECT-SUMMARY.md](./PROJECT-SUMMARY.md)** - Current implementation status
+## Development Scripts
 
-## 🎨 Design System
+```bash
+npm run dev          # Start development server
+npm run build        # Production build
+npm run lint         # Run ESLint
+npm run lint:fix     # Fix linting issues
+npm test             # Run tests
+npm run preview      # Preview production build
+```
 
-### Colors
-- **Primary:** #135bec (Blue)
-- **Background Light:** #f6f6f8
-- **Background Dark:** #101622
+## Environment Variables
 
-### Typography
-- **Font Family:** Inter
-- **Weights:** 400, 500, 700, 900
+```bash
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+VITE_API_KEY=
+```
 
-### Layout
-- **Sidebar:** 256px fixed width
-- **Icons:** Material Symbols Outlined
-- **Responsive:** Mobile-first design
+## Architecture Note
 
-## 🧪 Development Status
+This project was migrated from n8n + Azure to Firebase in November 2025. Historical documentation is available in `docs/archive/`.
 
-**Phase 0: Project Setup** ✅ **COMPLETE**
-- [x] Project initialization
-- [x] UI components matching mockup
-- [x] n8n workflow creation
-- [x] Service layer implementation
-- [x] Type definitions
-- [x] Utility functions
-- [x] Custom React hooks
-- [x] Component integration with APIs
-
-**Phase 1: Core Features** 🚧 **IN PROGRESS**
-- [ ] File upload functionality
-- [ ] File download implementation
-- [ ] Authentication system
-- [ ] Complete all pages
-- [ ] Unit testing
-
-## 🤝 Contributing
-
-This is a test project. For development:
-
-1. Follow the coding guidelines in [CLAUDE.md](./CLAUDE.md)
-2. Use the defined type definitions
-3. Match the UI design system
-4. Write tests for new features
-5. Use ESLint and Prettier for code formatting
-
-## 📝 Notes
-
-- Currently using mock user ID (`user-123`) for development
-- All API calls go through n8n webhooks
-- Azure Blob Storage and SQL Database to be configured in Phase 1
-- UI exactly matches the design mockup in `ui-design/`
-
-## 📄 License
+## License
 
 This is a test project for demonstration purposes.
 
 ---
 
-**Status:** Phase 0 Complete - Ready for Phase 1 Development 🎉
+**Status:** Migration Complete - Ready for Testing & Deployment
