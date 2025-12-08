@@ -38,6 +38,44 @@ extend type Query {
     first: AuthSession_FirstRow
   ): AuthSession @fdc_generated(from: "AuthSession", purpose: QUERY_SINGLE)
   """
+  ✨ Look up a single `DocumentMaster` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  documentMaster(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: DocumentMaster_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: DocumentMaster_FirstRow
+  ): DocumentMaster @fdc_generated(from: "DocumentMaster", purpose: QUERY_SINGLE)
+  """
+  ✨ Look up a single `DocumentPath` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
+  """
+  documentPath(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: DocumentPath_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: DocumentPath_FirstRow
+  ): DocumentPath @fdc_generated(from: "DocumentPath", purpose: QUERY_SINGLE)
+  """
   ✨ Look up a single `File` based on `id`, `key` or `first` and return selected fields (or `null` if not found).
   """
   file(
@@ -238,6 +276,74 @@ extend type Query {
     """
     having: AuthSession_Having
   ): [AuthSession!]! @fdc_generated(from: "AuthSession", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `DocumentMaster` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  documentMasters(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: DocumentMaster_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [DocumentMaster_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: DocumentMaster_Having
+  ): [DocumentMaster!]! @fdc_generated(from: "DocumentMaster", purpose: QUERY_MULTIPLE)
+  """
+  ✨ List `DocumentPath` objects in the table and return selected fields, optionally filtered by `where` conditions
+  """
+  documentPaths(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: DocumentPath_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [DocumentPath_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: DocumentPath_Having
+  ): [DocumentPath!]! @fdc_generated(from: "DocumentPath", purpose: QUERY_MULTIPLE)
   """
   ✨ List `File` objects in the table and return selected fields, optionally filtered by `where` conditions
   """

@@ -162,6 +162,8 @@
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
+    "chrome-devtools",
+    "atlassian",
     "n8n-mcp"
   ]
 }

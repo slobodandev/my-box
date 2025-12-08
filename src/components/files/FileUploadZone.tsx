@@ -71,7 +71,8 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
     return file.type === 'application/zip' || file.type === 'application/x-zip-compressed' || file.name.endsWith('.zip');
   };
 
-  const getMimeTypeFromExtension = (filename: string): string => {
+  // Utility for future use when we need to infer mime types from extensions
+  const _getMimeTypeFromExtension = (filename: string): string => {
     const ext = filename.split('.').pop()?.toLowerCase();
 
     const mimeTypes: { [key: string]: string } = {
@@ -90,6 +91,7 @@ export const FileUploadZone: React.FC<FileUploadZoneProps> = ({
 
     return mimeTypes[ext || ''] || 'application/octet-stream';
   };
+  void _getMimeTypeFromExtension;
 
   const validateFile = (file: File): string | null => {
     // Skip validation for ZIP files - they'll be extracted

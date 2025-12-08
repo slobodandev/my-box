@@ -11,6 +11,18 @@ It has the same format as `AuthSession_Key`, but is only used as mutation return
 """
 scalar AuthSession_KeyOutput
 """
+✨ `DocumentMaster_KeyOutput` returns the primary key fields of table type `DocumentMaster`.
+
+It has the same format as `DocumentMaster_Key`, but is only used as mutation return value.
+"""
+scalar DocumentMaster_KeyOutput
+"""
+✨ `DocumentPath_KeyOutput` returns the primary key fields of table type `DocumentPath`.
+
+It has the same format as `DocumentPath_Key`, but is only used as mutation return value.
+"""
+scalar DocumentPath_KeyOutput
+"""
 ✨ `File_KeyOutput` returns the primary key fields of table type `File`.
 
 It has the same format as `File_Key`, but is only used as mutation return value.
@@ -1215,6 +1227,984 @@ input AuthSession_Order {
   verifiedAt_max: OrderDirection
 }
 """
+✨ Generated data input type for table 'DocumentMaster'. It includes all necessary fields for creating or upserting rows into table.
+"""
+input DocumentMaster_Data {
+  """
+  ✨ Generated from Field `DocumentMaster`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `DocumentMaster`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+  """
+  ✨ Generated from Field `DocumentMaster`.`documentPathId` of type `UUID`
+  """
+  documentPathId: UUID
+  """
+  ✨ `_expr` server value variant of `documentPathId` (✨ Generated from Field `DocumentMaster`.`documentPathId` of type `UUID`)
+  """
+  documentPathId_expr: UUID_Expr
+  """
+  ✨ Generated from Field `DocumentMaster`.`documentPath` of type `DocumentPath`
+  """
+  documentPath: DocumentPath_Key
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdBy` of type `String`
+  """
+  createdBy: String
+  """
+  ✨ `_expr` server value variant of `createdBy` (✨ Generated from Field `DocumentMaster`.`createdBy` of type `String`)
+  """
+  createdBy_expr: String_Expr
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdOn` of type `Timestamp!`
+  """
+  createdOn: Timestamp
+  """
+  ✨ `_expr` server value variant of `createdOn` (✨ Generated from Field `DocumentMaster`.`createdOn` of type `Timestamp!`)
+  """
+  createdOn_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `createdOn` (✨ Generated from Field `DocumentMaster`.`createdOn` of type `Timestamp!`)
+  """
+  createdOn_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `createdOn` (✨ Generated from Field `DocumentMaster`.`createdOn` of type `Timestamp!`)
+  """
+  createdOn_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `DocumentMaster`.`description` of type `String`
+  """
+  description: String
+  """
+  ✨ `_expr` server value variant of `description` (✨ Generated from Field `DocumentMaster`.`description` of type `String`)
+  """
+  description_expr: String_Expr
+  """
+  ✨ Generated from Field `DocumentMaster`.`display` of type `String`
+  """
+  display: String
+  """
+  ✨ `_expr` server value variant of `display` (✨ Generated from Field `DocumentMaster`.`display` of type `String`)
+  """
+  display_expr: String_Expr
+  """
+  ✨ Generated from Field `DocumentMaster`.`isActive` of type `Boolean!`
+  """
+  isActive: Boolean
+  """
+  ✨ `_expr` server value variant of `isActive` (✨ Generated from Field `DocumentMaster`.`isActive` of type `Boolean!`)
+  """
+  isActive_expr: Boolean_Expr
+  """
+  ✨ Generated from Field `DocumentMaster`.`isSystemGenerated` of type `Boolean!`
+  """
+  isSystemGenerated: Boolean
+  """
+  ✨ `_expr` server value variant of `isSystemGenerated` (✨ Generated from Field `DocumentMaster`.`isSystemGenerated` of type `Boolean!`)
+  """
+  isSystemGenerated_expr: Boolean_Expr
+  """
+  ✨ Generated from Field `DocumentMaster`.`isVersioningEnabled` of type `Boolean!`
+  """
+  isVersioningEnabled: Boolean
+  """
+  ✨ `_expr` server value variant of `isVersioningEnabled` (✨ Generated from Field `DocumentMaster`.`isVersioningEnabled` of type `Boolean!`)
+  """
+  isVersioningEnabled_expr: Boolean_Expr
+  """
+  ✨ Generated from Field `DocumentMaster`.`name` of type `String!`
+  """
+  name: String
+  """
+  ✨ `_expr` server value variant of `name` (✨ Generated from Field `DocumentMaster`.`name` of type `String!`)
+  """
+  name_expr: String_Expr
+  """
+  ✨ Generated from Field `DocumentMaster`.`namingConvention` of type `String`
+  """
+  namingConvention: String
+  """
+  ✨ `_expr` server value variant of `namingConvention` (✨ Generated from Field `DocumentMaster`.`namingConvention` of type `String`)
+  """
+  namingConvention_expr: String_Expr
+  """
+  ✨ Generated from Field `DocumentMaster`.`reviewRequired` of type `Boolean!`
+  """
+  reviewRequired: Boolean
+  """
+  ✨ `_expr` server value variant of `reviewRequired` (✨ Generated from Field `DocumentMaster`.`reviewRequired` of type `Boolean!`)
+  """
+  reviewRequired_expr: Boolean_Expr
+  """
+  ✨ Generated from Field `DocumentMaster`.`sortOrder` of type `Int!`
+  """
+  sortOrder: Int
+  """
+  ✨ `_expr` server value variant of `sortOrder` (✨ Generated from Field `DocumentMaster`.`sortOrder` of type `Int!`)
+  """
+  sortOrder_expr: Int_Expr
+  """
+  ✨ `_update` server value variant of `sortOrder` (✨ Generated from Field `DocumentMaster`.`sortOrder` of type `Int!`)
+  """
+  sortOrder_update: [Int_Update!]
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedBy` of type `String`
+  """
+  updatedBy: String
+  """
+  ✨ `_expr` server value variant of `updatedBy` (✨ Generated from Field `DocumentMaster`.`updatedBy` of type `String`)
+  """
+  updatedBy_expr: String_Expr
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedOn` of type `Timestamp!`
+  """
+  updatedOn: Timestamp
+  """
+  ✨ `_expr` server value variant of `updatedOn` (✨ Generated from Field `DocumentMaster`.`updatedOn` of type `Timestamp!`)
+  """
+  updatedOn_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `updatedOn` (✨ Generated from Field `DocumentMaster`.`updatedOn` of type `Timestamp!`)
+  """
+  updatedOn_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `updatedOn` (✨ Generated from Field `DocumentMaster`.`updatedOn` of type `Timestamp!`)
+  """
+  updatedOn_update: [Timestamp_Update!]
+}
+"""
+✨ Generated filter input type for table 'DocumentMaster'. This input allows filtering objects using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input DocumentMaster_Filter {
+  """
+  Apply multiple filter conditions using `AND` logic.
+  """
+  _and: [DocumentMaster_Filter!]
+  """
+  Negate the result of the provided filter condition.
+  """
+  _not: DocumentMaster_Filter
+  """
+  Apply multiple filter conditions using `OR` logic.
+  """
+  _or: [DocumentMaster_Filter!]
+  """
+  ✨ Generated from Field `DocumentMaster`.`id` of type `UUID!`
+  """
+  id: UUID_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`documentPathId` of type `UUID`
+  """
+  documentPathId: UUID_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`documentPath` of type `DocumentPath`
+  """
+  documentPath: DocumentPath_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdBy` of type `String`
+  """
+  createdBy: String_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdOn` of type `Timestamp!`
+  """
+  createdOn: Timestamp_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`description` of type `String`
+  """
+  description: String_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`display` of type `String`
+  """
+  display: String_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`isActive` of type `Boolean!`
+  """
+  isActive: Boolean_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`isSystemGenerated` of type `Boolean!`
+  """
+  isSystemGenerated: Boolean_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`isVersioningEnabled` of type `Boolean!`
+  """
+  isVersioningEnabled: Boolean_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`name` of type `String!`
+  """
+  name: String_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`namingConvention` of type `String`
+  """
+  namingConvention: String_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`reviewRequired` of type `Boolean!`
+  """
+  reviewRequired: Boolean_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`sortOrder` of type `Int!`
+  """
+  sortOrder: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedBy` of type `String`
+  """
+  updatedBy: String_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedOn` of type `Timestamp!`
+  """
+  updatedOn: Timestamp_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`files_on_documentMaster` of type `[File!]!`
+  """
+  files_on_documentMaster: File_ListFilter
+}
+"""
+✨ Generated first-row input type for table 'DocumentMaster'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
+"""
+input DocumentMaster_FirstRow {
+  """
+  Order the result by the specified fields.
+  """
+  orderBy: [DocumentMaster_Order!]
+  """
+  Filters rows based on the specified conditions.
+  """
+  where: DocumentMaster_Filter
+}
+"""
+✨ Generated having input type for table 'DocumentMaster'. This input allows you to filter groups during aggregate queries using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input DocumentMaster_Having {
+  """
+  Apply multiple Having conditions using `AND` logic.
+  """
+  _and: [DocumentMaster_Having!]
+  """
+  Whether to apply DISTINCT to the aggregate function.
+  """
+  _distinct: Boolean
+  """
+  Negate the result of the provided Having condition.
+  """
+  _not: DocumentMaster_Having
+  """
+  Apply multiple Having conditions using `OR` logic.
+  """
+  _or: [DocumentMaster_Having!]
+  """
+  ✨ Generated from Field `DocumentMaster`.`_count` of type `Int!`
+  """
+  _count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdBy_count` of type `Int!`
+  """
+  createdBy_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdOn_count` of type `Int!`
+  """
+  createdOn_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`description_count` of type `Int!`
+  """
+  description_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`display_count` of type `Int!`
+  """
+  display_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`documentPathId_count` of type `Int!`
+  """
+  documentPathId_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`id_count` of type `Int!`
+  """
+  id_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`isActive_count` of type `Int!`
+  """
+  isActive_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`isSystemGenerated_count` of type `Int!`
+  """
+  isSystemGenerated_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`isVersioningEnabled_count` of type `Int!`
+  """
+  isVersioningEnabled_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`name_count` of type `Int!`
+  """
+  name_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`namingConvention_count` of type `Int!`
+  """
+  namingConvention_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`reviewRequired_count` of type `Int!`
+  """
+  reviewRequired_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`sortOrder_count` of type `Int!`
+  """
+  sortOrder_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedBy_count` of type `Int!`
+  """
+  updatedBy_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedOn_count` of type `Int!`
+  """
+  updatedOn_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`sortOrder_sum` of type `Int`
+  """
+  sortOrder_sum: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`sortOrder_avg` of type `Float`
+  """
+  sortOrder_avg: Float_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdOn_min` of type `Timestamp`
+  """
+  createdOn_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`sortOrder_min` of type `Int`
+  """
+  sortOrder_min: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedOn_min` of type `Timestamp`
+  """
+  updatedOn_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdOn_max` of type `Timestamp`
+  """
+  createdOn_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`sortOrder_max` of type `Int`
+  """
+  sortOrder_max: Int_Filter
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedOn_max` of type `Timestamp`
+  """
+  updatedOn_max: Timestamp_Filter
+}
+"""
+✨ Generated key input type for table 'DocumentMaster'. It represents the primary key fields used to uniquely identify a row in the table.
+"""
+input DocumentMaster_Key {
+  """
+  ✨ Generated from Field `DocumentMaster`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `DocumentMaster`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+}
+"""
+✨ Generated list filter input type for table 'DocumentMaster'. This input applies filtering logic based on the count or existence of related objects that matches certain criteria.
+"""
+input DocumentMaster_ListFilter {
+  """
+  The desired number of objects that match the condition (defaults to at least one).
+  """
+  count: Int_Filter = {gt:0}
+  """
+  Condition of the related objects to filter for.
+  """
+  exist: DocumentMaster_Filter
+}
+"""
+✨ Generated order input type for table 'DocumentMaster'. This input defines the sorting order of rows in query results based on one or more fields.
+"""
+input DocumentMaster_Order {
+  """
+  ✨ Generated from Field `DocumentMaster`.`id` of type `UUID!`
+  """
+  id: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`documentPathId` of type `UUID`
+  """
+  documentPathId: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`documentPath` of type `DocumentPath`
+  """
+  documentPath: DocumentPath_Order
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdBy` of type `String`
+  """
+  createdBy: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdOn` of type `Timestamp!`
+  """
+  createdOn: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`description` of type `String`
+  """
+  description: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`display` of type `String`
+  """
+  display: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`isActive` of type `Boolean!`
+  """
+  isActive: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`isSystemGenerated` of type `Boolean!`
+  """
+  isSystemGenerated: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`isVersioningEnabled` of type `Boolean!`
+  """
+  isVersioningEnabled: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`name` of type `String!`
+  """
+  name: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`namingConvention` of type `String`
+  """
+  namingConvention: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`reviewRequired` of type `Boolean!`
+  """
+  reviewRequired: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`sortOrder` of type `Int!`
+  """
+  sortOrder: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedBy` of type `String`
+  """
+  updatedBy: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedOn` of type `Timestamp!`
+  """
+  updatedOn: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`_count` of type `Int!`
+  """
+  _count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdBy_count` of type `Int!`
+  """
+  createdBy_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdOn_count` of type `Int!`
+  """
+  createdOn_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`description_count` of type `Int!`
+  """
+  description_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`display_count` of type `Int!`
+  """
+  display_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`documentPathId_count` of type `Int!`
+  """
+  documentPathId_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`id_count` of type `Int!`
+  """
+  id_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`isActive_count` of type `Int!`
+  """
+  isActive_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`isSystemGenerated_count` of type `Int!`
+  """
+  isSystemGenerated_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`isVersioningEnabled_count` of type `Int!`
+  """
+  isVersioningEnabled_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`name_count` of type `Int!`
+  """
+  name_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`namingConvention_count` of type `Int!`
+  """
+  namingConvention_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`reviewRequired_count` of type `Int!`
+  """
+  reviewRequired_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`sortOrder_count` of type `Int!`
+  """
+  sortOrder_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedBy_count` of type `Int!`
+  """
+  updatedBy_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedOn_count` of type `Int!`
+  """
+  updatedOn_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`sortOrder_sum` of type `Int`
+  """
+  sortOrder_sum: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`sortOrder_avg` of type `Float`
+  """
+  sortOrder_avg: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdOn_min` of type `Timestamp`
+  """
+  createdOn_min: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`sortOrder_min` of type `Int`
+  """
+  sortOrder_min: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedOn_min` of type `Timestamp`
+  """
+  updatedOn_min: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`createdOn_max` of type `Timestamp`
+  """
+  createdOn_max: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`sortOrder_max` of type `Int`
+  """
+  sortOrder_max: OrderDirection
+  """
+  ✨ Generated from Field `DocumentMaster`.`updatedOn_max` of type `Timestamp`
+  """
+  updatedOn_max: OrderDirection
+}
+"""
+✨ Generated data input type for table 'DocumentPath'. It includes all necessary fields for creating or upserting rows into table.
+"""
+input DocumentPath_Data {
+  """
+  ✨ Generated from Field `DocumentPath`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `DocumentPath`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+  """
+  ✨ Generated from Field `DocumentPath`.`createdBy` of type `String`
+  """
+  createdBy: String
+  """
+  ✨ `_expr` server value variant of `createdBy` (✨ Generated from Field `DocumentPath`.`createdBy` of type `String`)
+  """
+  createdBy_expr: String_Expr
+  """
+  ✨ Generated from Field `DocumentPath`.`createdOn` of type `Timestamp!`
+  """
+  createdOn: Timestamp
+  """
+  ✨ `_expr` server value variant of `createdOn` (✨ Generated from Field `DocumentPath`.`createdOn` of type `Timestamp!`)
+  """
+  createdOn_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `createdOn` (✨ Generated from Field `DocumentPath`.`createdOn` of type `Timestamp!`)
+  """
+  createdOn_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `createdOn` (✨ Generated from Field `DocumentPath`.`createdOn` of type `Timestamp!`)
+  """
+  createdOn_update: [Timestamp_Update!]
+  """
+  ✨ Generated from Field `DocumentPath`.`description` of type `String`
+  """
+  description: String
+  """
+  ✨ `_expr` server value variant of `description` (✨ Generated from Field `DocumentPath`.`description` of type `String`)
+  """
+  description_expr: String_Expr
+  """
+  ✨ Generated from Field `DocumentPath`.`isActive` of type `Boolean!`
+  """
+  isActive: Boolean
+  """
+  ✨ `_expr` server value variant of `isActive` (✨ Generated from Field `DocumentPath`.`isActive` of type `Boolean!`)
+  """
+  isActive_expr: Boolean_Expr
+  """
+  ✨ Generated from Field `DocumentPath`.`name` of type `String!`
+  """
+  name: String
+  """
+  ✨ `_expr` server value variant of `name` (✨ Generated from Field `DocumentPath`.`name` of type `String!`)
+  """
+  name_expr: String_Expr
+  """
+  ✨ Generated from Field `DocumentPath`.`sortOrder` of type `Int!`
+  """
+  sortOrder: Int
+  """
+  ✨ `_expr` server value variant of `sortOrder` (✨ Generated from Field `DocumentPath`.`sortOrder` of type `Int!`)
+  """
+  sortOrder_expr: Int_Expr
+  """
+  ✨ `_update` server value variant of `sortOrder` (✨ Generated from Field `DocumentPath`.`sortOrder` of type `Int!`)
+  """
+  sortOrder_update: [Int_Update!]
+  """
+  ✨ Generated from Field `DocumentPath`.`sourceLookupId` of type `UUID`
+  """
+  sourceLookupId: UUID
+  """
+  ✨ `_expr` server value variant of `sourceLookupId` (✨ Generated from Field `DocumentPath`.`sourceLookupId` of type `UUID`)
+  """
+  sourceLookupId_expr: UUID_Expr
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedBy` of type `String`
+  """
+  updatedBy: String
+  """
+  ✨ `_expr` server value variant of `updatedBy` (✨ Generated from Field `DocumentPath`.`updatedBy` of type `String`)
+  """
+  updatedBy_expr: String_Expr
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedOn` of type `Timestamp!`
+  """
+  updatedOn: Timestamp
+  """
+  ✨ `_expr` server value variant of `updatedOn` (✨ Generated from Field `DocumentPath`.`updatedOn` of type `Timestamp!`)
+  """
+  updatedOn_expr: Timestamp_Expr
+  """
+  ✨ `_time` server value variant of `updatedOn` (✨ Generated from Field `DocumentPath`.`updatedOn` of type `Timestamp!`)
+  """
+  updatedOn_time: Timestamp_Relative
+  """
+  ✨ `_update` server value variant of `updatedOn` (✨ Generated from Field `DocumentPath`.`updatedOn` of type `Timestamp!`)
+  """
+  updatedOn_update: [Timestamp_Update!]
+}
+"""
+✨ Generated filter input type for table 'DocumentPath'. This input allows filtering objects using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input DocumentPath_Filter {
+  """
+  Apply multiple filter conditions using `AND` logic.
+  """
+  _and: [DocumentPath_Filter!]
+  """
+  Negate the result of the provided filter condition.
+  """
+  _not: DocumentPath_Filter
+  """
+  Apply multiple filter conditions using `OR` logic.
+  """
+  _or: [DocumentPath_Filter!]
+  """
+  ✨ Generated from Field `DocumentPath`.`id` of type `UUID!`
+  """
+  id: UUID_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`createdBy` of type `String`
+  """
+  createdBy: String_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`createdOn` of type `Timestamp!`
+  """
+  createdOn: Timestamp_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`description` of type `String`
+  """
+  description: String_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`isActive` of type `Boolean!`
+  """
+  isActive: Boolean_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`name` of type `String!`
+  """
+  name: String_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`sortOrder` of type `Int!`
+  """
+  sortOrder: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`sourceLookupId` of type `UUID`
+  """
+  sourceLookupId: UUID_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedBy` of type `String`
+  """
+  updatedBy: String_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedOn` of type `Timestamp!`
+  """
+  updatedOn: Timestamp_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`documentMasters_on_documentPath` of type `[DocumentMaster!]!`
+  """
+  documentMasters_on_documentPath: DocumentMaster_ListFilter
+}
+"""
+✨ Generated first-row input type for table 'DocumentPath'. This input selects the first row matching the filter criteria, ordered according to the specified conditions.
+"""
+input DocumentPath_FirstRow {
+  """
+  Order the result by the specified fields.
+  """
+  orderBy: [DocumentPath_Order!]
+  """
+  Filters rows based on the specified conditions.
+  """
+  where: DocumentPath_Filter
+}
+"""
+✨ Generated having input type for table 'DocumentPath'. This input allows you to filter groups during aggregate queries using various conditions. Use `_or`, `_and`, and `_not` to compose complex filters.
+"""
+input DocumentPath_Having {
+  """
+  Apply multiple Having conditions using `AND` logic.
+  """
+  _and: [DocumentPath_Having!]
+  """
+  Whether to apply DISTINCT to the aggregate function.
+  """
+  _distinct: Boolean
+  """
+  Negate the result of the provided Having condition.
+  """
+  _not: DocumentPath_Having
+  """
+  Apply multiple Having conditions using `OR` logic.
+  """
+  _or: [DocumentPath_Having!]
+  """
+  ✨ Generated from Field `DocumentPath`.`_count` of type `Int!`
+  """
+  _count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`createdBy_count` of type `Int!`
+  """
+  createdBy_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`createdOn_count` of type `Int!`
+  """
+  createdOn_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`description_count` of type `Int!`
+  """
+  description_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`id_count` of type `Int!`
+  """
+  id_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`isActive_count` of type `Int!`
+  """
+  isActive_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`name_count` of type `Int!`
+  """
+  name_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`sortOrder_count` of type `Int!`
+  """
+  sortOrder_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`sourceLookupId_count` of type `Int!`
+  """
+  sourceLookupId_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedBy_count` of type `Int!`
+  """
+  updatedBy_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedOn_count` of type `Int!`
+  """
+  updatedOn_count: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`sortOrder_sum` of type `Int`
+  """
+  sortOrder_sum: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`sortOrder_avg` of type `Float`
+  """
+  sortOrder_avg: Float_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`createdOn_min` of type `Timestamp`
+  """
+  createdOn_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`sortOrder_min` of type `Int`
+  """
+  sortOrder_min: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedOn_min` of type `Timestamp`
+  """
+  updatedOn_min: Timestamp_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`createdOn_max` of type `Timestamp`
+  """
+  createdOn_max: Timestamp_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`sortOrder_max` of type `Int`
+  """
+  sortOrder_max: Int_Filter
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedOn_max` of type `Timestamp`
+  """
+  updatedOn_max: Timestamp_Filter
+}
+"""
+✨ Generated key input type for table 'DocumentPath'. It represents the primary key fields used to uniquely identify a row in the table.
+"""
+input DocumentPath_Key {
+  """
+  ✨ Generated from Field `DocumentPath`.`id` of type `UUID!`
+  """
+  id: UUID
+  """
+  ✨ `_expr` server value variant of `id` (✨ Generated from Field `DocumentPath`.`id` of type `UUID!`)
+  """
+  id_expr: UUID_Expr
+}
+"""
+✨ Generated list filter input type for table 'DocumentPath'. This input applies filtering logic based on the count or existence of related objects that matches certain criteria.
+"""
+input DocumentPath_ListFilter {
+  """
+  The desired number of objects that match the condition (defaults to at least one).
+  """
+  count: Int_Filter = {gt:0}
+  """
+  Condition of the related objects to filter for.
+  """
+  exist: DocumentPath_Filter
+}
+"""
+✨ Generated order input type for table 'DocumentPath'. This input defines the sorting order of rows in query results based on one or more fields.
+"""
+input DocumentPath_Order {
+  """
+  ✨ Generated from Field `DocumentPath`.`id` of type `UUID!`
+  """
+  id: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`createdBy` of type `String`
+  """
+  createdBy: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`createdOn` of type `Timestamp!`
+  """
+  createdOn: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`description` of type `String`
+  """
+  description: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`isActive` of type `Boolean!`
+  """
+  isActive: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`name` of type `String!`
+  """
+  name: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`sortOrder` of type `Int!`
+  """
+  sortOrder: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`sourceLookupId` of type `UUID`
+  """
+  sourceLookupId: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedBy` of type `String`
+  """
+  updatedBy: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedOn` of type `Timestamp!`
+  """
+  updatedOn: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`_count` of type `Int!`
+  """
+  _count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`createdBy_count` of type `Int!`
+  """
+  createdBy_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`createdOn_count` of type `Int!`
+  """
+  createdOn_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`description_count` of type `Int!`
+  """
+  description_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`id_count` of type `Int!`
+  """
+  id_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`isActive_count` of type `Int!`
+  """
+  isActive_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`name_count` of type `Int!`
+  """
+  name_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`sortOrder_count` of type `Int!`
+  """
+  sortOrder_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`sourceLookupId_count` of type `Int!`
+  """
+  sourceLookupId_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedBy_count` of type `Int!`
+  """
+  updatedBy_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedOn_count` of type `Int!`
+  """
+  updatedOn_count: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`sortOrder_sum` of type `Int`
+  """
+  sortOrder_sum: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`sortOrder_avg` of type `Float`
+  """
+  sortOrder_avg: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`createdOn_min` of type `Timestamp`
+  """
+  createdOn_min: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`sortOrder_min` of type `Int`
+  """
+  sortOrder_min: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedOn_min` of type `Timestamp`
+  """
+  updatedOn_min: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`createdOn_max` of type `Timestamp`
+  """
+  createdOn_max: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`sortOrder_max` of type `Int`
+  """
+  sortOrder_max: OrderDirection
+  """
+  ✨ Generated from Field `DocumentPath`.`updatedOn_max` of type `Timestamp`
+  """
+  updatedOn_max: OrderDirection
+}
+"""
 ✨ Generated data input type for table 'File'. It includes all necessary fields for creating or upserting rows into table.
 """
 input File_Data {
@@ -1227,6 +2217,14 @@ input File_Data {
   """
   id_expr: UUID_Expr
   """
+  ✨ Generated from Field `File`.`documentMasterId` of type `UUID`
+  """
+  documentMasterId: UUID
+  """
+  ✨ `_expr` server value variant of `documentMasterId` (✨ Generated from Field `File`.`documentMasterId` of type `UUID`)
+  """
+  documentMasterId_expr: UUID_Expr
+  """
   ✨ Generated from Field `File`.`loanId` of type `UUID`
   """
   loanId: UUID
@@ -1234,6 +2232,10 @@ input File_Data {
   ✨ `_expr` server value variant of `loanId` (✨ Generated from Field `File`.`loanId` of type `UUID`)
   """
   loanId_expr: UUID_Expr
+  """
+  ✨ Generated from Field `File`.`documentMaster` of type `DocumentMaster`
+  """
+  documentMaster: DocumentMaster_Key
   """
   ✨ Generated from Field `File`.`loan` of type `Loan`
   """
@@ -1400,9 +2402,17 @@ input File_Filter {
   """
   id: UUID_Filter
   """
+  ✨ Generated from Field `File`.`documentMasterId` of type `UUID`
+  """
+  documentMasterId: UUID_Filter
+  """
   ✨ Generated from Field `File`.`loanId` of type `UUID`
   """
   loanId: UUID_Filter
+  """
+  ✨ Generated from Field `File`.`documentMaster` of type `DocumentMaster`
+  """
+  documentMaster: DocumentMaster_Filter
   """
   ✨ Generated from Field `File`.`loan` of type `Loan`
   """
@@ -1513,6 +2523,10 @@ input File_Having {
   ✨ Generated from Field `File`.`description_count` of type `Int!`
   """
   description_count: Int_Filter
+  """
+  ✨ Generated from Field `File`.`documentMasterId_count` of type `Int!`
+  """
+  documentMasterId_count: Int_Filter
   """
   ✨ Generated from Field `File`.`downloadUrl_count` of type `Int!`
   """
@@ -1641,9 +2655,17 @@ input File_Order {
   """
   id: OrderDirection
   """
+  ✨ Generated from Field `File`.`documentMasterId` of type `UUID`
+  """
+  documentMasterId: OrderDirection
+  """
   ✨ Generated from Field `File`.`loanId` of type `UUID`
   """
   loanId: OrderDirection
+  """
+  ✨ Generated from Field `File`.`documentMaster` of type `DocumentMaster`
+  """
+  documentMaster: DocumentMaster_Order
   """
   ✨ Generated from Field `File`.`loan` of type `Loan`
   """
@@ -1720,6 +2742,10 @@ input File_Order {
   ✨ Generated from Field `File`.`description_count` of type `Int!`
   """
   description_count: OrderDirection
+  """
+  ✨ Generated from Field `File`.`documentMasterId_count` of type `Int!`
+  """
+  documentMasterId_count: OrderDirection
   """
   ✨ Generated from Field `File`.`downloadUrl_count` of type `Int!`
   """

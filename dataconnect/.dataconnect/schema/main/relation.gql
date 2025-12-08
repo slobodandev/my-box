@@ -380,6 +380,411 @@ extend type AuthSession {
   """
   _id: ID! @fdc_generated(from: "AuthSession.id", purpose: GLOBAL_ID)
 }
+extend type DocumentMaster {
+  """
+  ✨ List `File` objects in a one-to-many relationship (where `File`.`documentMaster` is this object).
+  """
+  files_on_documentMaster(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: File_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [File_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: File_Having
+  ): [File!]! @fdc_generated(from: "File.documentMaster", purpose: QUERY_MULTIPLE_ONE_TO_MANY)
+  """
+  Implicit metadata field that cannot be written. It provides extra information about query results.
+  """
+  _metadata: _Metadata @fdc_generated(from: "DocumentMaster", purpose: METADATA_FIELD)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table.
+  """
+  _count: Int! @fdc_generated(from: "DocumentMaster.", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `createdBy` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  createdBy_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.createdBy", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `createdOn` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  createdOn_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.createdOn", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `description` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  description_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.description", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `display` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  display_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.display", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `documentPathId` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  documentPathId_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.documentPathId", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `id` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  id_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.id", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `isActive` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  isActive_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.isActive", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `isSystemGenerated` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  isSystemGenerated_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.isSystemGenerated", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `isVersioningEnabled` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  isVersioningEnabled_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.isVersioningEnabled", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `name` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  name_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.name", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `namingConvention` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  namingConvention_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.namingConvention", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `reviewRequired` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  reviewRequired_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.reviewRequired", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `sortOrder` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  sortOrder_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.sortOrder", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `updatedBy` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  updatedBy_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.updatedBy", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentMaster` table where the `updatedOn` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  updatedOn_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster.updatedOn", purpose: QUERY_COUNT)
+  """
+  ✨ Sum the `sortOrder` field in the `DocumentMaster` table.
+  """
+  sortOrder_sum(
+    """
+    Set to true to sum the distinct values.
+    """
+    distinct: Boolean = false
+  ): Int @fdc_generated(from: "DocumentMaster.sortOrder", purpose: QUERY_SUM)
+  """
+  ✨ Average the `sortOrder` field in the `DocumentMaster` table.
+  """
+  sortOrder_avg(
+    """
+    Set to true to average the distinct values.
+    """
+    distinct: Boolean = false
+  ): Float @fdc_generated(from: "DocumentMaster.sortOrder", purpose: QUERY_AVG)
+  """
+  ✨ Minimum of the `createdOn` field in the `DocumentMaster` table.
+  """
+  createdOn_min: Timestamp @fdc_generated(from: "DocumentMaster.createdOn", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `sortOrder` field in the `DocumentMaster` table.
+  """
+  sortOrder_min: Int @fdc_generated(from: "DocumentMaster.sortOrder", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `updatedOn` field in the `DocumentMaster` table.
+  """
+  updatedOn_min: Timestamp @fdc_generated(from: "DocumentMaster.updatedOn", purpose: QUERY_MIN)
+  """
+  ✨ Maximum of the `createdOn` field in the `DocumentMaster` table.
+  """
+  createdOn_max: Timestamp @fdc_generated(from: "DocumentMaster.createdOn", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `sortOrder` field in the `DocumentMaster` table.
+  """
+  sortOrder_max: Int @fdc_generated(from: "DocumentMaster.sortOrder", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `updatedOn` field in the `DocumentMaster` table.
+  """
+  updatedOn_max: Timestamp @fdc_generated(from: "DocumentMaster.updatedOn", purpose: QUERY_MAX)
+  """
+  A generated field that is used for caching results in SDKs.
+  """
+  _id: ID! @fdc_generated(from: "DocumentMaster.id", purpose: GLOBAL_ID)
+}
+extend type DocumentPath {
+  """
+  ✨ List `DocumentMaster` objects in a one-to-many relationship (where `DocumentMaster`.`documentPath` is this object).
+  """
+  documentMasters_on_documentPath(
+    """
+    Filter condition to narrow down the query results.
+    """
+    where: DocumentMaster_Filter
+
+    """
+    Order the query results by specific fields.
+    """
+    orderBy: [DocumentMaster_Order!]
+
+    """
+    Number of rows to skip before starting to return the results.
+    """
+    offset: Int
+
+    """
+    Maximum number of rows to return (defaults to 100 rows).
+    """
+    limit: Int = 100
+
+    """
+    Set to true to return distinct results.
+    """
+    distinct: Boolean = false
+
+    """
+    Filter condition to apply to the groups of aggregate queries.
+    """
+    having: DocumentMaster_Having
+  ): [DocumentMaster!]! @fdc_generated(from: "DocumentMaster.documentPath", purpose: QUERY_MULTIPLE_ONE_TO_MANY)
+  """
+  Implicit metadata field that cannot be written. It provides extra information about query results.
+  """
+  _metadata: _Metadata @fdc_generated(from: "DocumentPath", purpose: METADATA_FIELD)
+  """
+  ✨ Count the number of rows in the `DocumentPath` table.
+  """
+  _count: Int! @fdc_generated(from: "DocumentPath.", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentPath` table where the `createdBy` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  createdBy_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentPath.createdBy", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentPath` table where the `createdOn` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  createdOn_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentPath.createdOn", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentPath` table where the `description` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  description_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentPath.description", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentPath` table where the `id` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  id_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentPath.id", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentPath` table where the `isActive` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  isActive_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentPath.isActive", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentPath` table where the `name` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  name_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentPath.name", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentPath` table where the `sortOrder` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  sortOrder_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentPath.sortOrder", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentPath` table where the `sourceLookupId` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  sourceLookupId_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentPath.sourceLookupId", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentPath` table where the `updatedBy` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  updatedBy_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentPath.updatedBy", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `DocumentPath` table where the `updatedOn` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  updatedOn_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentPath.updatedOn", purpose: QUERY_COUNT)
+  """
+  ✨ Sum the `sortOrder` field in the `DocumentPath` table.
+  """
+  sortOrder_sum(
+    """
+    Set to true to sum the distinct values.
+    """
+    distinct: Boolean = false
+  ): Int @fdc_generated(from: "DocumentPath.sortOrder", purpose: QUERY_SUM)
+  """
+  ✨ Average the `sortOrder` field in the `DocumentPath` table.
+  """
+  sortOrder_avg(
+    """
+    Set to true to average the distinct values.
+    """
+    distinct: Boolean = false
+  ): Float @fdc_generated(from: "DocumentPath.sortOrder", purpose: QUERY_AVG)
+  """
+  ✨ Minimum of the `createdOn` field in the `DocumentPath` table.
+  """
+  createdOn_min: Timestamp @fdc_generated(from: "DocumentPath.createdOn", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `sortOrder` field in the `DocumentPath` table.
+  """
+  sortOrder_min: Int @fdc_generated(from: "DocumentPath.sortOrder", purpose: QUERY_MIN)
+  """
+  ✨ Minimum of the `updatedOn` field in the `DocumentPath` table.
+  """
+  updatedOn_min: Timestamp @fdc_generated(from: "DocumentPath.updatedOn", purpose: QUERY_MIN)
+  """
+  ✨ Maximum of the `createdOn` field in the `DocumentPath` table.
+  """
+  createdOn_max: Timestamp @fdc_generated(from: "DocumentPath.createdOn", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `sortOrder` field in the `DocumentPath` table.
+  """
+  sortOrder_max: Int @fdc_generated(from: "DocumentPath.sortOrder", purpose: QUERY_MAX)
+  """
+  ✨ Maximum of the `updatedOn` field in the `DocumentPath` table.
+  """
+  updatedOn_max: Timestamp @fdc_generated(from: "DocumentPath.updatedOn", purpose: QUERY_MAX)
+  """
+  A generated field that is used for caching results in SDKs.
+  """
+  _id: ID! @fdc_generated(from: "DocumentPath.id", purpose: GLOBAL_ID)
+}
 extend type File {
   """
   Implicit metadata field that cannot be written. It provides extra information about query results.
@@ -416,6 +821,15 @@ extend type File {
     """
     distinct: Boolean = false
   ): Int! @fdc_generated(from: "File.description", purpose: QUERY_COUNT)
+  """
+  ✨ Count the number of rows in the `File` table where the `documentMasterId` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
+  """
+  documentMasterId_count(
+    """
+    Set to true to count the number of distinct values.
+    """
+    distinct: Boolean = false
+  ): Int! @fdc_generated(from: "File.documentMasterId", purpose: QUERY_COUNT)
   """
   ✨ Count the number of rows in the `File` table where the `downloadUrl` field is non-null. Pass the `distinct` argument to instead count the number of distinct values.
   """

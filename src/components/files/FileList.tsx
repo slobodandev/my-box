@@ -4,6 +4,7 @@ import { getFileIcon, formatFileSize } from '@/utils'
 import { getUserFiles } from '@/services/fileService'
 import { deleteFile } from '@/services/fileOperations'
 import { getLoan, type Loan } from '@/services/dataconnect/loanService'
+import { getDocumentMaster } from '@/services/dataconnect/documentMasterService'
 import { useAuth } from '@/contexts/AuthContext'
 import { ref, getDownloadURL, getBlob } from 'firebase/storage'
 import { storage } from '@/config/firebase'
@@ -13,6 +14,10 @@ import {
   type FolderDownloadProgress,
 } from '@/utils/folderDownload'
 import { modal } from '@/utils/modal'
+import {
+  applyNamingConvention,
+  buildNamingConventionContext,
+} from '@/utils/namingConvention'
 
 interface FileListProps {
   searchTerm: string
@@ -121,6 +126,52 @@ export default function FileList({ searchTerm, userId, loanId, showPersonalOnly 
         return
       }
 
+      // Determine final filename (with naming convention if applicable)
+      let downloadFilename = file.originalFilename
+
+      if (file.documentMasterId) {
+        try {
+          const docMaster = await getDocumentMaster(file.documentMasterId)
+
+          if (docMaster?.namingConvention) {
+            // Build context for naming convention
+            let loanData = undefined
+            if (file.loanId) {
+              const loan = loanCache.get(file.loanId) || await getLoan(file.loanId)
+              if (loan) {
+                loanData = { id: loan.id, loanNumber: loan.loanNumber }
+              }
+            }
+
+            const context = buildNamingConventionContext({
+              loan: loanData,
+              user: user ? {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+              } : undefined,
+              uploadedAt: file.uploadedAt,
+            })
+
+            // Apply naming convention
+            const result = applyNamingConvention({
+              pattern: docMaster.namingConvention,
+              context,
+              originalFilename: file.originalFilename,
+              isVersioningEnabled: docMaster.isVersioningEnabled,
+            })
+
+            if (result.success && result.renamedFilename !== file.originalFilename) {
+              downloadFilename = result.renamedFilename
+            }
+          }
+        } catch (ncError) {
+          // If naming convention fails, continue with original filename
+          console.error('Error applying naming convention:', ncError)
+        }
+      }
+
       // Get blob from Firebase Storage (CORS is now configured)
       const storageRef = ref(storage, file.storagePath)
       const blob = await getBlob(storageRef)
@@ -129,7 +180,7 @@ export default function FileList({ searchTerm, userId, loanId, showPersonalOnly 
       const blobUrl = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = blobUrl
-      link.download = file.originalFilename
+      link.download = downloadFilename
       link.style.display = 'none'
       document.body.appendChild(link)
       link.click()

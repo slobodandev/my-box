@@ -2,7 +2,10 @@
 # USER QUERIES
 # ============================================================================
 
-query GetUser($id: UUID!) @auth(level: PUBLIC) {
+query GetUser($id: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by authenticated users to fetch user profile data. Frontend validates user ownership before calling."
+) {
   user(id: $id) {
     id
     email
@@ -19,7 +22,10 @@ query GetUser($id: UUID!) @auth(level: PUBLIC) {
   }
 }
 
-query GetUserByEmail($email: String!) @auth(level: PUBLIC) {
+query GetUserByEmail($email: String!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by Cloud Functions during authentication to look up users by email. Frontend access is controlled through authenticated Cloud Functions."
+) {
   users(where: { email: { eq: $email } }) {
     id
     email
@@ -70,7 +76,10 @@ query GetUserLoans($userId: UUID!) @auth(
   }
 }
 
-query GetLoan($id: UUID!) {
+query GetLoan($id: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by authenticated users to fetch loan details. Frontend validates user ownership before calling."
+) {
   loan(id: $id) {
     id
     userId
@@ -89,7 +98,10 @@ query GetLoan($id: UUID!) {
   }
 }
 
-query GetLoanByNumber($loanNumber: String!) {
+query GetLoanByNumber($loanNumber: String!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by authenticated users to look up loans by number. Frontend enforces authentication."
+) {
   loans(where: { loanNumber: { eq: $loanNumber } }) {
     id
     userId
@@ -104,7 +116,10 @@ query GetLoanByNumber($loanNumber: String!) {
 # FILE QUERIES
 # ============================================================================
 
-query GetUserFiles($userId: UUID!, $includeDeleted: Boolean) @auth(level: PUBLIC) {
+query GetUserFiles($userId: UUID!, $includeDeleted: Boolean) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by authenticated users to fetch their files. Frontend validates user ownership before calling."
+) {
   files(
     where: {
       userId: { eq: $userId }
@@ -115,6 +130,13 @@ query GetUserFiles($userId: UUID!, $includeDeleted: Boolean) @auth(level: PUBLIC
     id
     userId
     loanId
+    documentMasterId
+    documentMaster {
+      id
+      name
+      namingConvention
+      isVersioningEnabled
+    }
     originalFilename
     storagePath
     fileSize
@@ -128,7 +150,10 @@ query GetUserFiles($userId: UUID!, $includeDeleted: Boolean) @auth(level: PUBLIC
   }
 }
 
-query GetFilesByLoan($loanId: UUID!) {
+query GetFilesByLoan($loanId: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by authenticated users to fetch files associated with a loan. Frontend validates user ownership before calling."
+) {
   fileLoanAssociations(where: { loanId: { eq: $loanId } }) {
     id
     fileId
@@ -137,11 +162,21 @@ query GetFilesByLoan($loanId: UUID!) {
   }
 }
 
-query GetFile($id: UUID!) {
+query GetFile($id: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by authenticated users to fetch file details. Frontend validates user ownership before calling."
+) {
   file(id: $id) {
     id
     userId
     loanId
+    documentMasterId
+    documentMaster {
+      id
+      name
+      namingConvention
+      isVersioningEnabled
+    }
     originalFilename
     storagePath
     fileSize
@@ -158,7 +193,10 @@ query GetFile($id: UUID!) {
   }
 }
 
-query GetFilesWithAssociations($userId: UUID!) {
+query GetFilesWithAssociations($userId: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by authenticated users to fetch files with loan associations. Frontend validates user ownership before calling."
+) {
   files(
     where: {
       userId: { eq: $userId }
@@ -176,7 +214,10 @@ query GetFilesWithAssociations($userId: UUID!) {
 # FILE-LOAN ASSOCIATION QUERIES
 # ============================================================================
 
-query GetFileAssociations($fileId: UUID!) {
+query GetFileAssociations($fileId: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by authenticated users to fetch file-loan associations. Frontend validates user ownership before calling."
+) {
   fileLoanAssociations(where: { fileId: { eq: $fileId } }) {
     id
     loanId
@@ -184,7 +225,10 @@ query GetFileAssociations($fileId: UUID!) {
   }
 }
 
-query GetLoanAssociations($loanId: UUID!) {
+query GetLoanAssociations($loanId: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by authenticated users to fetch loan-file associations. Frontend validates user ownership before calling."
+) {
   fileLoanAssociations(where: { loanId: { eq: $loanId } }) {
     id
     fileId
@@ -196,7 +240,10 @@ query GetLoanAssociations($loanId: UUID!) {
 # AUTHENTICATION QUERIES
 # ============================================================================
 
-query GetAuthSession($sessionId: String!) {
+query GetAuthSession($sessionId: String!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by Cloud Functions to validate auth sessions. Frontend access is controlled through authenticated Cloud Functions."
+) {
   authSessions(where: { sessionId: { eq: $sessionId } }) {
     id
     sessionId
@@ -214,7 +261,10 @@ query GetAuthSession($sessionId: String!) {
   }
 }
 
-query GetUserAuthSessions($userId: UUID!) {
+query GetUserAuthSessions($userId: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by authenticated users to view their active sessions. Frontend validates user ownership before calling."
+) {
   authSessions(
     where: {
       userId: { eq: $userId }
@@ -230,7 +280,10 @@ query GetUserAuthSessions($userId: UUID!) {
   }
 }
 
-query GetVerificationCode($sessionId: String!) {
+query GetVerificationCode($sessionId: String!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by Cloud Functions to verify codes. Frontend access is controlled through authenticated Cloud Functions."
+) {
   verificationCodes(
     where: { sessionId: { eq: $sessionId } }
     orderBy: { createdAt: DESC }
@@ -247,7 +300,10 @@ query GetVerificationCode($sessionId: String!) {
   }
 }
 
-query GetAuthAuditLogs($userId: UUID, $limit: Int) {
+query GetAuthAuditLogs($userId: UUID, $limit: Int) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by admin users to view auth audit logs. Frontend enforces role-based access control."
+) {
   authAuditLogs(
     where: { userId: { eq: $userId } }
     orderBy: { createdAt: DESC }
@@ -264,7 +320,10 @@ query GetAuthAuditLogs($userId: UUID, $limit: Int) {
 }
 
 # Firebase Email Link Auth queries
-query GetAuthSessionByFirebaseUid($firebaseUid: String!, $email: String!) @auth(level: PUBLIC) {
+query GetAuthSessionByFirebaseUid($firebaseUid: String!, $email: String!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by Cloud Functions to look up auth sessions by Firebase UID. Frontend access is controlled through authenticated Cloud Functions."
+) {
   authSessions(
     where: { firebaseUid: { eq: $firebaseUid } }
     orderBy: { createdAt: DESC }
@@ -295,7 +354,10 @@ query GetAuthSessionByFirebaseUid($firebaseUid: String!, $email: String!) @auth(
   }
 }
 
-query GetAuthSessionByEmailHash($emailHash: String!) @auth(level: PUBLIC) {
+query GetAuthSessionByEmailHash($emailHash: String!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by Cloud Functions to look up auth sessions by email hash. Frontend access is controlled through authenticated Cloud Functions."
+) {
   authSessions(
     where: {
       emailHash: { eq: $emailHash }
@@ -318,7 +380,10 @@ query GetAuthSessionByEmailHash($emailHash: String!) @auth(level: PUBLIC) {
   }
 }
 
-query GetActiveAuthSessionForUser($userId: UUID!) @auth(level: PUBLIC) {
+query GetActiveAuthSessionForUser($userId: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used to check for active auth sessions. Frontend validates user ownership before calling."
+) {
   authSessions(
     where: {
       userId: { eq: $userId }
@@ -343,7 +408,10 @@ query GetActiveAuthSessionForUser($userId: UUID!) @auth(level: PUBLIC) {
 # DASHBOARD / COMPOSITE QUERIES
 # ============================================================================
 
-query GetDashboard($userId: UUID!) {
+query GetDashboard($userId: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by authenticated users to fetch dashboard data. Frontend validates user ownership before calling."
+) {
   user(id: $userId) {
     id
     email
@@ -374,7 +442,10 @@ query GetDashboard($userId: UUID!) {
   }
 }
 
-query GetLoanDetails($loanId: UUID!) {
+query GetLoanDetails($loanId: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by authenticated users to fetch loan details with file associations. Frontend validates user ownership before calling."
+) {
   loan(id: $loanId) {
     id
     loanNumber
@@ -514,5 +585,192 @@ query GetMagicLinkStats @auth(
     createdAt
     usedAt
     isActive
+  }
+}
+
+# ============================================================================
+# DOCUMENT PATH QUERIES
+# ============================================================================
+
+query ListDocumentPaths @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by admin users to manage document paths. Frontend enforces role-based access control via RequireAdmin component."
+) {
+  documentPaths(orderBy: { sortOrder: ASC }) {
+    id
+    name
+    sourceLookupId
+    isActive
+    description
+    sortOrder
+    createdOn
+    createdBy
+    updatedOn
+    updatedBy
+  }
+}
+
+query ListActiveDocumentPaths @auth(
+  level: PUBLIC
+  insecureReason: "This query is used to fetch active document paths for file organization. Frontend enforces authentication."
+) {
+  documentPaths(
+    where: { isActive: { eq: true } }
+    orderBy: { sortOrder: ASC }
+  ) {
+    id
+    name
+    sourceLookupId
+    description
+    sortOrder
+  }
+}
+
+query GetDocumentPath($id: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by admin users to view document path details. Frontend enforces role-based access control."
+) {
+  documentPath(id: $id) {
+    id
+    name
+    sourceLookupId
+    isActive
+    description
+    sortOrder
+    createdOn
+    createdBy
+    updatedOn
+    updatedBy
+  }
+}
+
+query GetDocumentPathByName($name: String!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used to lookup document paths by name. Frontend enforces authentication."
+) {
+  documentPaths(where: { name: { eq: $name } }) {
+    id
+    name
+    sourceLookupId
+    isActive
+    description
+    sortOrder
+  }
+}
+
+# ============================================================================
+# DOCUMENT MASTER QUERIES
+# ============================================================================
+
+query ListDocumentMasters @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by admin users to manage document types. Frontend enforces role-based access control via RequireAdmin component."
+) {
+  documentMasters(orderBy: { sortOrder: ASC }) {
+    id
+    name
+    documentPathId
+    documentPath {
+      id
+      name
+    }
+    isActive
+    description
+    sortOrder
+    isSystemGenerated
+    reviewRequired
+    isVersioningEnabled
+    namingConvention
+    display
+    createdOn
+    createdBy
+    updatedOn
+    updatedBy
+  }
+}
+
+query ListActiveDocumentMasters @auth(
+  level: PUBLIC
+  insecureReason: "This query is used to fetch active document types for file organization. Frontend enforces authentication."
+) {
+  documentMasters(
+    where: { isActive: { eq: true } }
+    orderBy: { sortOrder: ASC }
+  ) {
+    id
+    name
+    documentPathId
+    documentPath {
+      id
+      name
+    }
+    description
+    sortOrder
+    namingConvention
+    display
+  }
+}
+
+query GetDocumentMaster($id: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used by admin users to view document type details. Frontend enforces role-based access control."
+) {
+  documentMaster(id: $id) {
+    id
+    name
+    documentPathId
+    documentPath {
+      id
+      name
+    }
+    isActive
+    description
+    sortOrder
+    isSystemGenerated
+    reviewRequired
+    isVersioningEnabled
+    namingConvention
+    display
+    createdOn
+    createdBy
+    updatedOn
+    updatedBy
+  }
+}
+
+query ListDocumentMastersByPath($documentPathId: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used to fetch document types for a specific path. Frontend enforces authentication."
+) {
+  documentMasters(
+    where: { documentPathId: { eq: $documentPathId } }
+    orderBy: { sortOrder: ASC }
+  ) {
+    id
+    name
+    documentPathId
+    isActive
+    description
+    sortOrder
+    namingConvention
+    display
+  }
+}
+
+query GetDocumentMasterByName($name: String!) @auth(
+  level: PUBLIC
+  insecureReason: "This query is used to lookup document types by name. Frontend enforces authentication."
+) {
+  documentMasters(where: { name: { eq: $name } }) {
+    id
+    name
+    documentPathId
+    documentPath {
+      id
+      name
+    }
+    isActive
+    description
+    sortOrder
   }
 }

@@ -424,6 +424,116 @@ export function extendMagicLink(dcOrVars, vars) {
   return executeMutation(extendMagicLinkRef(dcOrVars, vars));
 }
 
+export const createDocumentPathRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CreateDocumentPath', inputVars);
+}
+createDocumentPathRef.operationName = 'CreateDocumentPath';
+
+export function createDocumentPath(dcOrVars, vars) {
+  return executeMutation(createDocumentPathRef(dcOrVars, vars));
+}
+
+export const createDocumentPathWithIdRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CreateDocumentPathWithId', inputVars);
+}
+createDocumentPathWithIdRef.operationName = 'CreateDocumentPathWithId';
+
+export function createDocumentPathWithId(dcOrVars, vars) {
+  return executeMutation(createDocumentPathWithIdRef(dcOrVars, vars));
+}
+
+export const updateDocumentPathRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpdateDocumentPath', inputVars);
+}
+updateDocumentPathRef.operationName = 'UpdateDocumentPath';
+
+export function updateDocumentPath(dcOrVars, vars) {
+  return executeMutation(updateDocumentPathRef(dcOrVars, vars));
+}
+
+export const deactivateDocumentPathRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeactivateDocumentPath', inputVars);
+}
+deactivateDocumentPathRef.operationName = 'DeactivateDocumentPath';
+
+export function deactivateDocumentPath(dcOrVars, vars) {
+  return executeMutation(deactivateDocumentPathRef(dcOrVars, vars));
+}
+
+export const deleteDocumentPathRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteDocumentPath', inputVars);
+}
+deleteDocumentPathRef.operationName = 'DeleteDocumentPath';
+
+export function deleteDocumentPath(dcOrVars, vars) {
+  return executeMutation(deleteDocumentPathRef(dcOrVars, vars));
+}
+
+export const createDocumentMasterRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CreateDocumentMaster', inputVars);
+}
+createDocumentMasterRef.operationName = 'CreateDocumentMaster';
+
+export function createDocumentMaster(dcOrVars, vars) {
+  return executeMutation(createDocumentMasterRef(dcOrVars, vars));
+}
+
+export const createDocumentMasterWithIdRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'CreateDocumentMasterWithId', inputVars);
+}
+createDocumentMasterWithIdRef.operationName = 'CreateDocumentMasterWithId';
+
+export function createDocumentMasterWithId(dcOrVars, vars) {
+  return executeMutation(createDocumentMasterWithIdRef(dcOrVars, vars));
+}
+
+export const updateDocumentMasterRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpdateDocumentMaster', inputVars);
+}
+updateDocumentMasterRef.operationName = 'UpdateDocumentMaster';
+
+export function updateDocumentMaster(dcOrVars, vars) {
+  return executeMutation(updateDocumentMasterRef(dcOrVars, vars));
+}
+
+export const deactivateDocumentMasterRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeactivateDocumentMaster', inputVars);
+}
+deactivateDocumentMasterRef.operationName = 'DeactivateDocumentMaster';
+
+export function deactivateDocumentMaster(dcOrVars, vars) {
+  return executeMutation(deactivateDocumentMasterRef(dcOrVars, vars));
+}
+
+export const deleteDocumentMasterRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteDocumentMaster', inputVars);
+}
+deleteDocumentMasterRef.operationName = 'DeleteDocumentMaster';
+
+export function deleteDocumentMaster(dcOrVars, vars) {
+  return executeMutation(deleteDocumentMasterRef(dcOrVars, vars));
+}
+
 export const getUserRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
@@ -708,5 +818,104 @@ getMagicLinkStatsRef.operationName = 'GetMagicLinkStats';
 
 export function getMagicLinkStats(dc) {
   return executeQuery(getMagicLinkStatsRef(dc));
+}
+
+export const listDocumentPathsRef = (dc) => {
+  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'ListDocumentPaths');
+}
+listDocumentPathsRef.operationName = 'ListDocumentPaths';
+
+export function listDocumentPaths(dc) {
+  return executeQuery(listDocumentPathsRef(dc));
+}
+
+export const listActiveDocumentPathsRef = (dc) => {
+  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'ListActiveDocumentPaths');
+}
+listActiveDocumentPathsRef.operationName = 'ListActiveDocumentPaths';
+
+export function listActiveDocumentPaths(dc) {
+  return executeQuery(listActiveDocumentPathsRef(dc));
+}
+
+export const getDocumentPathRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetDocumentPath', inputVars);
+}
+getDocumentPathRef.operationName = 'GetDocumentPath';
+
+export function getDocumentPath(dcOrVars, vars) {
+  return executeQuery(getDocumentPathRef(dcOrVars, vars));
+}
+
+export const getDocumentPathByNameRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetDocumentPathByName', inputVars);
+}
+getDocumentPathByNameRef.operationName = 'GetDocumentPathByName';
+
+export function getDocumentPathByName(dcOrVars, vars) {
+  return executeQuery(getDocumentPathByNameRef(dcOrVars, vars));
+}
+
+export const listDocumentMastersRef = (dc) => {
+  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'ListDocumentMasters');
+}
+listDocumentMastersRef.operationName = 'ListDocumentMasters';
+
+export function listDocumentMasters(dc) {
+  return executeQuery(listDocumentMastersRef(dc));
+}
+
+export const listActiveDocumentMastersRef = (dc) => {
+  const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'ListActiveDocumentMasters');
+}
+listActiveDocumentMastersRef.operationName = 'ListActiveDocumentMasters';
+
+export function listActiveDocumentMasters(dc) {
+  return executeQuery(listActiveDocumentMastersRef(dc));
+}
+
+export const getDocumentMasterRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetDocumentMaster', inputVars);
+}
+getDocumentMasterRef.operationName = 'GetDocumentMaster';
+
+export function getDocumentMaster(dcOrVars, vars) {
+  return executeQuery(getDocumentMasterRef(dcOrVars, vars));
+}
+
+export const listDocumentMastersByPathRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'ListDocumentMastersByPath', inputVars);
+}
+listDocumentMastersByPathRef.operationName = 'ListDocumentMastersByPath';
+
+export function listDocumentMastersByPath(dcOrVars, vars) {
+  return executeQuery(listDocumentMastersByPathRef(dcOrVars, vars));
+}
+
+export const getDocumentMasterByNameRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return queryRef(dcInstance, 'GetDocumentMasterByName', inputVars);
+}
+getDocumentMasterByNameRef.operationName = 'GetDocumentMasterByName';
+
+export function getDocumentMasterByName(dcOrVars, vars) {
+  return executeQuery(getDocumentMasterByNameRef(dcOrVars, vars));
 }
 

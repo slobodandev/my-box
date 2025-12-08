@@ -516,16 +516,47 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Bottom Section */}
+      {/* Bottom Section - Admin Tools */}
       <div className="p-6 border-t border-gray-200 dark:border-gray-700">
         {isAdmin && (
-          <Link
-            to="/admin/users"
-            className="w-full bg-primary text-white font-semibold py-3 rounded-lg hover:bg-blue-600 transition-colors text-base flex items-center justify-center"
-          >
-            <span className="material-symbols-outlined align-middle mr-2">group</span>
-            Manage Users
-          </Link>
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase mb-3">
+              ADMIN TOOLS
+            </p>
+            <Link
+              to="/admin/users"
+              className={`w-full py-2.5 px-3 rounded-lg text-sm font-medium flex items-center transition-colors ${
+                isActive('/admin/users')
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              <span className="material-symbols-outlined align-middle mr-2 text-base">group</span>
+              Manage Users
+            </Link>
+            <Link
+              to="/admin/document-paths"
+              className={`w-full py-2.5 px-3 rounded-lg text-sm font-medium flex items-center transition-colors ${
+                isActive('/admin/document-paths')
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              <span className="material-symbols-outlined align-middle mr-2 text-base">folder_open</span>
+              Document Paths
+            </Link>
+            <Link
+              to="/admin/document-types"
+              className={`w-full py-2.5 px-3 rounded-lg text-sm font-medium flex items-center transition-colors ${
+                isActive('/admin/document-types')
+                  ? 'bg-primary text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              <span className="material-symbols-outlined align-middle mr-2 text-base">description</span>
+              Document Types
+            </Link>
+          </div>
         )}
       </div>
 

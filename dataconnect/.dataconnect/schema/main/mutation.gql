@@ -18,6 +18,24 @@ extend type Mutation {
     data: AuthSession_Data!
   ): AuthSession_KeyOutput! @fdc_generated(from: "AuthSession", purpose: INSERT_SINGLE)
   """
+  ✨ Insert a single `DocumentMaster` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  documentMaster_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: DocumentMaster_Data!
+  ): DocumentMaster_KeyOutput! @fdc_generated(from: "DocumentMaster", purpose: INSERT_SINGLE)
+  """
+  ✨ Insert a single `DocumentPath` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  documentPath_insert(
+    """
+    Data object to insert into the table.
+    """
+    data: DocumentPath_Data!
+  ): DocumentPath_KeyOutput! @fdc_generated(from: "DocumentPath", purpose: INSERT_SINGLE)
+  """
   ✨ Insert a single `File` into the table and return its key. Columns not specified in `data` will receive defaults (e.g. `null`).
   """
   file_insert(
@@ -98,6 +116,24 @@ extend type Mutation {
     """
     data: [AuthSession_Data!]!
   ): [AuthSession_KeyOutput!]! @fdc_generated(from: "AuthSession", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `DocumentMaster` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  documentMaster_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [DocumentMaster_Data!]!
+  ): [DocumentMaster_KeyOutput!]! @fdc_generated(from: "DocumentMaster", purpose: INSERT_MULTIPLE)
+  """
+  ✨ Insert `DocumentPath` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
+  """
+  documentPath_insertMany(
+    """
+    List of data objects to insert into the table.
+    """
+    data: [DocumentPath_Data!]!
+  ): [DocumentPath_KeyOutput!]! @fdc_generated(from: "DocumentPath", purpose: INSERT_MULTIPLE)
   """
   ✨ Insert `File` objects into the table and return their keys. Columns not specified in `data` will receive defaults (e.g. `null`).
   """
@@ -180,6 +216,24 @@ extend type Mutation {
     data: AuthSession_Data!
   ): AuthSession_KeyOutput! @fdc_generated(from: "AuthSession", purpose: UPSERT_SINGLE)
   """
+  ✨ Insert or update a single `DocumentMaster` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `DocumentMaster`.
+  """
+  documentMaster_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: DocumentMaster_Data!
+  ): DocumentMaster_KeyOutput! @fdc_generated(from: "DocumentMaster", purpose: UPSERT_SINGLE)
+  """
+  ✨ Insert or update a single `DocumentPath` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `DocumentPath`.
+  """
+  documentPath_upsert(
+    """
+    Data object to insert or update if it already exists.
+    """
+    data: DocumentPath_Data!
+  ): DocumentPath_KeyOutput! @fdc_generated(from: "DocumentPath", purpose: UPSERT_SINGLE)
+  """
   ✨ Insert or update a single `File` into the table, based on the primary key. Returns the key of the newly inserted or existing updated `File`.
   """
   file_upsert(
@@ -260,6 +314,24 @@ extend type Mutation {
     """
     data: [AuthSession_Data!]!
   ): [AuthSession_KeyOutput!]! @fdc_generated(from: "AuthSession", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `DocumentMaster` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `DocumentMaster`.
+  """
+  documentMaster_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [DocumentMaster_Data!]!
+  ): [DocumentMaster_KeyOutput!]! @fdc_generated(from: "DocumentMaster", purpose: UPSERT_MULTIPLE)
+  """
+  ✨ Insert or update `DocumentPath` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `DocumentPath`.
+  """
+  documentPath_upsertMany(
+    """
+    List of data objects to insert or update if it already exists.
+    """
+    data: [DocumentPath_Data!]!
+  ): [DocumentPath_KeyOutput!]! @fdc_generated(from: "DocumentPath", purpose: UPSERT_MULTIPLE)
   """
   ✨ Insert or update `File` objects into the table, based on the primary key. Returns the key of the newly inserted or existing updated `File`.
   """
@@ -371,6 +443,54 @@ extend type Mutation {
     """
     data: AuthSession_Data!
   ): AuthSession_KeyOutput @fdc_generated(from: "AuthSession", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `DocumentMaster` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `DocumentMaster` or `null` if not found.
+  """
+  documentMaster_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: DocumentMaster_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: DocumentMaster_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: DocumentMaster_Data!
+  ): DocumentMaster_KeyOutput @fdc_generated(from: "DocumentMaster", purpose: UPDATE_SINGLE)
+  """
+  ✨ Update a single `DocumentPath` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `DocumentPath` or `null` if not found.
+  """
+  documentPath_update(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: DocumentPath_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: DocumentPath_FirstRow
+
+    """
+    Data object containing fields to be updated.
+    """
+    data: DocumentPath_Data!
+  ): DocumentPath_KeyOutput @fdc_generated(from: "DocumentPath", purpose: UPDATE_SINGLE)
   """
   ✨ Update a single `File` based on `id`, `key` or `first`, setting columns specified in `data`. Returns the key of the updated `File` or `null` if not found.
   """
@@ -578,6 +698,44 @@ extend type Mutation {
     data: AuthSession_Data!
   ): Int! @fdc_generated(from: "AuthSession", purpose: UPDATE_MULTIPLE)
   """
+  ✨ Update `DocumentMaster` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  documentMaster_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: DocumentMaster_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: DocumentMaster_Data!
+  ): Int! @fdc_generated(from: "DocumentMaster", purpose: UPDATE_MULTIPLE)
+  """
+  ✨ Update `DocumentPath` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
+  """
+  documentPath_updateMany(
+    """
+    Filter condition to specify which rows to update.
+    """
+    where: DocumentPath_Filter
+
+    """
+    Set to true to update all rows.
+    """
+    all: Boolean = false
+
+    """
+    Data object containing fields to update.
+    """
+    data: DocumentPath_Data!
+  ): Int! @fdc_generated(from: "DocumentPath", purpose: UPDATE_MULTIPLE)
+  """
   ✨ Update `File` objects matching `where` conditions (or `all`, if true) according to `data`. Returns the number of rows updated.
   """
   file_updateMany(
@@ -749,6 +907,44 @@ extend type Mutation {
     first: AuthSession_FirstRow
   ): AuthSession_KeyOutput @fdc_generated(from: "AuthSession", purpose: DELETE_SINGLE)
   """
+  ✨ Delete a single `DocumentMaster` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  documentMaster_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: DocumentMaster_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: DocumentMaster_FirstRow
+  ): DocumentMaster_KeyOutput @fdc_generated(from: "DocumentMaster", purpose: DELETE_SINGLE)
+  """
+  ✨ Delete a single `DocumentPath` based on `id`, `key` or `first` and return its key (or `null` if not found).
+  """
+  documentPath_delete(
+    """
+    The unique ID of the object.
+    """
+    id: UUID
+
+    """
+    The key used to identify the object.
+    """
+    key: DocumentPath_Key
+
+    """
+    Fetch the first row based on the filters and ordering.
+    """
+    first: DocumentPath_FirstRow
+  ): DocumentPath_KeyOutput @fdc_generated(from: "DocumentPath", purpose: DELETE_SINGLE)
+  """
   ✨ Delete a single `File` based on `id`, `key` or `first` and return its key (or `null` if not found).
   """
   file_delete(
@@ -909,6 +1105,34 @@ extend type Mutation {
     """
     all: Boolean = false
   ): Int! @fdc_generated(from: "AuthSession", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `DocumentMaster` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  documentMaster_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: DocumentMaster_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentMaster", purpose: DELETE_MULTIPLE)
+  """
+  ✨ Delete `DocumentPath` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
+  """
+  documentPath_deleteMany(
+    """
+    Filter condition to specify which rows to delete.
+    """
+    where: DocumentPath_Filter
+
+    """
+    Set to true to delete all rows.
+    """
+    all: Boolean = false
+  ): Int! @fdc_generated(from: "DocumentPath", purpose: DELETE_MULTIPLE)
   """
   ✨ Delete `File` objects matching `where` conditions (or `all`, if true). Returns the number of rows deleted.
   """

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Confirm Auto-Pay Setup</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#1d4ed8",
+            "background-light": "#f1f5f9",
+            "background-dark": "#0f172a",
+          },
+          fontFamily: {
+            display: ["Roboto", "sans-serif"],
+          },
+          borderRadius: {
+            DEFAULT: "0.5rem",
+          },
+        },
+      },
+    };
+  </script>
+<style>
+    body {
+      font-family: 'Roboto', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display flex items-center justify-center min-h-screen p-4">
+<div class="relative w-full max-w-3xl bg-white dark:bg-slate-800 rounded-lg shadow-2xl p-8 text-slate-800 dark:text-slate-200">
+<button class="absolute top-4 right-4 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+<span class="material-icons">close</span>
+</button>
+<h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Confirm Auto-Pay Setup</h1>
+<p class="text-slate-600 dark:text-slate-300 mb-4">
+      You are requesting a payment today in the amount of <span class="font-bold text-slate-900 dark:text-white">$3,666.00</span> for <span class="font-bold text-slate-900 dark:text-white">2 loans</span>.
+    </p>
+<p class="text-slate-600 dark:text-slate-300 mb-6">
+      Your monthly payments are scheduled for the <span class="font-bold text-slate-900 dark:text-white">3rd</span> of each month, with your next payment scheduled for <span class="font-bold text-slate-900 dark:text-white">January 3, 2026</span>.
+    </p>
+<div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-500/30 rounded-lg p-4 mb-8">
+<p class="text-amber-800 dark:text-amber-200 text-sm">
+        The amount selected for payment today is <span class="font-bold">MORE THAN</span> your current outstanding balance due. Payment amount above current outstanding balance due ($27,561.47) <span class="font-bold">will be applied to the loan principal.</span>
+</p>
+</div>
+<div class="mb-8">
+<div class="grid grid-cols-4 gap-4 pb-2 border-b border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-500 dark:text-slate-400">
+<div class="col-span-1">Loan</div>
+<div class="col-span-1 text-right">Outstanding Balance</div>
+<div class="col-span-1 text-right">Payment Amount</div>
+<div class="col-span-1 text-right">Applied to Principal</div>
+</div>
+<div class="divide-y divide-slate-200 dark:divide-slate-700">
+<div class="grid grid-cols-4 gap-4 py-4 items-center">
+<div class="col-span-1">
+<p class="font-semibold text-slate-900 dark:text-white">74243V001 - OE Bismarck - Vertical</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">OE Bismarck - Vertical</p>
+</div>
+<div class="col-span-1 text-right text-slate-600 dark:text-slate-300">$0.00</div>
+<div class="col-span-1 text-right text-slate-600 dark:text-slate-300">$333.00</div>
+<div class="col-span-1 text-right text-slate-600 dark:text-slate-300">$333.00</div>
+</div>
+<div class="grid grid-cols-4 gap-4 py-4 items-center">
+<div class="col-span-1">
+<p class="font-semibold text-slate-900 dark:text-white">74243D01 - OE Bismarck</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">OE Bismarck</p>
+</div>
+<div class="col-span-1 text-right text-slate-600 dark:text-slate-300">$0.00</div>
+<div class="col-span-1 text-right text-slate-600 dark:text-slate-300">$3,333.00</div>
+<div class="col-span-1 text-right text-slate-600 dark:text-slate-300">$3,333.00</div>
+</div>
+<div class="grid grid-cols-4 gap-4 pt-4 font-bold text-slate-900 dark:text-white">
+<div class="col-span-1">Total</div>
+<div class="col-span-1 text-right">$0.00</div>
+<div class="col-span-1 text-right">$3,666.00</div>
+<div class="col-span-1 text-right">$3,666.00</div>
+</div>
+</div>
+</div>
+<div>
+<p class="text-slate-600 dark:text-slate-300 mb-6">Please confirm how you would like to proceed:</p>
+<div class="flex justify-end space-x-4">
+<button class="px-6 py-3 rounded-lg font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">
+          Cancel
+        </button>
+<button class="px-6 py-3 rounded-lg font-semibold text-white bg-primary hover:bg-blue-700 transition-colors">
+          Pay $3,666.00 (entered amount)
+        </button>
+</div>
+</div>
+</div>
+
+</body></html>

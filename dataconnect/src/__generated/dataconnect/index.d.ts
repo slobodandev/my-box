@@ -46,6 +46,7 @@ export interface CopyFileData {
 export interface CopyFileVariables {
   userId: UUIDString;
   loanId?: UUIDString | null;
+  documentMasterId?: UUIDString | null;
   originalFilename: string;
   storagePath: string;
   fileSize: number;
@@ -89,6 +90,66 @@ export interface CreateAuthSessionWithFirebaseVariables {
   userAgent?: string | null;
 }
 
+export interface CreateDocumentMasterData {
+  documentMaster_insert: DocumentMaster_Key;
+}
+
+export interface CreateDocumentMasterVariables {
+  name: string;
+  documentPathId?: UUIDString | null;
+  description?: string | null;
+  sortOrder?: number | null;
+  isSystemGenerated?: boolean | null;
+  reviewRequired?: boolean | null;
+  isVersioningEnabled?: boolean | null;
+  namingConvention?: string | null;
+  display?: string | null;
+  createdBy?: string | null;
+}
+
+export interface CreateDocumentMasterWithIdData {
+  documentMaster_insert: DocumentMaster_Key;
+}
+
+export interface CreateDocumentMasterWithIdVariables {
+  id: UUIDString;
+  name: string;
+  documentPathId?: UUIDString | null;
+  description?: string | null;
+  sortOrder?: number | null;
+  isSystemGenerated?: boolean | null;
+  reviewRequired?: boolean | null;
+  isVersioningEnabled?: boolean | null;
+  namingConvention?: string | null;
+  display?: string | null;
+  createdBy?: string | null;
+}
+
+export interface CreateDocumentPathData {
+  documentPath_insert: DocumentPath_Key;
+}
+
+export interface CreateDocumentPathVariables {
+  name: string;
+  sourceLookupId?: UUIDString | null;
+  description?: string | null;
+  sortOrder?: number | null;
+  createdBy?: string | null;
+}
+
+export interface CreateDocumentPathWithIdData {
+  documentPath_insert: DocumentPath_Key;
+}
+
+export interface CreateDocumentPathWithIdVariables {
+  id: UUIDString;
+  name: string;
+  sourceLookupId?: UUIDString | null;
+  description?: string | null;
+  sortOrder?: number | null;
+  createdBy?: string | null;
+}
+
 export interface CreateFileData {
   file_insert: File_Key;
 }
@@ -96,6 +157,7 @@ export interface CreateFileData {
 export interface CreateFileVariables {
   userId: UUIDString;
   loanId?: UUIDString | null;
+  documentMasterId?: UUIDString | null;
   originalFilename: string;
   storagePath: string;
   fileSize: number;
@@ -158,11 +220,45 @@ export interface CreateVerificationCodeVariables {
   expiresAt: TimestampString;
 }
 
+export interface DeactivateDocumentMasterData {
+  documentMaster_update?: DocumentMaster_Key | null;
+}
+
+export interface DeactivateDocumentMasterVariables {
+  id: UUIDString;
+  updatedBy?: string | null;
+}
+
+export interface DeactivateDocumentPathData {
+  documentPath_update?: DocumentPath_Key | null;
+}
+
+export interface DeactivateDocumentPathVariables {
+  id: UUIDString;
+  updatedBy?: string | null;
+}
+
 export interface DeactivateUserData {
   user_update?: User_Key | null;
 }
 
 export interface DeactivateUserVariables {
+  id: UUIDString;
+}
+
+export interface DeleteDocumentMasterData {
+  documentMaster_delete?: DocumentMaster_Key | null;
+}
+
+export interface DeleteDocumentMasterVariables {
+  id: UUIDString;
+}
+
+export interface DeleteDocumentPathData {
+  documentPath_delete?: DocumentPath_Key | null;
+}
+
+export interface DeleteDocumentPathVariables {
   id: UUIDString;
 }
 
@@ -188,6 +284,16 @@ export interface DeleteLoanData {
 
 export interface DeleteLoanVariables {
   id: UUIDString;
+}
+
+export interface DocumentMaster_Key {
+  id: UUIDString;
+  __typename?: 'DocumentMaster_Key';
+}
+
+export interface DocumentPath_Key {
+  id: UUIDString;
+  __typename?: 'DocumentPath_Key';
 }
 
 export interface ExtendMagicLinkData {
@@ -366,6 +472,87 @@ export interface GetDashboardVariables {
   userId: UUIDString;
 }
 
+export interface GetDocumentMasterByNameData {
+  documentMasters: ({
+    id: UUIDString;
+    name: string;
+    documentPathId?: UUIDString | null;
+    documentPath?: {
+      id: UUIDString;
+      name: string;
+    } & DocumentPath_Key;
+      isActive: boolean;
+      description?: string | null;
+      sortOrder: number;
+  } & DocumentMaster_Key)[];
+}
+
+export interface GetDocumentMasterByNameVariables {
+  name: string;
+}
+
+export interface GetDocumentMasterData {
+  documentMaster?: {
+    id: UUIDString;
+    name: string;
+    documentPathId?: UUIDString | null;
+    documentPath?: {
+      id: UUIDString;
+      name: string;
+    } & DocumentPath_Key;
+      isActive: boolean;
+      description?: string | null;
+      sortOrder: number;
+      isSystemGenerated: boolean;
+      reviewRequired: boolean;
+      isVersioningEnabled: boolean;
+      namingConvention?: string | null;
+      display?: string | null;
+      createdOn: TimestampString;
+      createdBy?: string | null;
+      updatedOn: TimestampString;
+      updatedBy?: string | null;
+  } & DocumentMaster_Key;
+}
+
+export interface GetDocumentMasterVariables {
+  id: UUIDString;
+}
+
+export interface GetDocumentPathByNameData {
+  documentPaths: ({
+    id: UUIDString;
+    name: string;
+    sourceLookupId?: UUIDString | null;
+    isActive: boolean;
+    description?: string | null;
+    sortOrder: number;
+  } & DocumentPath_Key)[];
+}
+
+export interface GetDocumentPathByNameVariables {
+  name: string;
+}
+
+export interface GetDocumentPathData {
+  documentPath?: {
+    id: UUIDString;
+    name: string;
+    sourceLookupId?: UUIDString | null;
+    isActive: boolean;
+    description?: string | null;
+    sortOrder: number;
+    createdOn: TimestampString;
+    createdBy?: string | null;
+    updatedOn: TimestampString;
+    updatedBy?: string | null;
+  } & DocumentPath_Key;
+}
+
+export interface GetDocumentPathVariables {
+  id: UUIDString;
+}
+
 export interface GetFileAssociationsData {
   fileLoanAssociations: ({
     id: UUIDString;
@@ -383,19 +570,26 @@ export interface GetFileData {
     id: UUIDString;
     userId: UUIDString;
     loanId?: UUIDString | null;
-    originalFilename: string;
-    storagePath: string;
-    fileSize: number;
-    mimeType?: string | null;
-    fileExtension?: string | null;
-    uploadedAt: TimestampString;
-    updatedAt: TimestampString;
-    tags?: string | null;
-    description?: string | null;
-    downloadUrl?: string | null;
-    isDeleted: boolean;
-    deletedAt?: TimestampString | null;
-    deletedBy?: UUIDString | null;
+    documentMasterId?: UUIDString | null;
+    documentMaster?: {
+      id: UUIDString;
+      name: string;
+      namingConvention?: string | null;
+      isVersioningEnabled: boolean;
+    } & DocumentMaster_Key;
+      originalFilename: string;
+      storagePath: string;
+      fileSize: number;
+      mimeType?: string | null;
+      fileExtension?: string | null;
+      uploadedAt: TimestampString;
+      updatedAt: TimestampString;
+      tags?: string | null;
+      description?: string | null;
+      downloadUrl?: string | null;
+      isDeleted: boolean;
+      deletedAt?: TimestampString | null;
+      deletedBy?: UUIDString | null;
   } & File_Key;
 }
 
@@ -617,16 +811,23 @@ export interface GetUserFilesData {
     id: UUIDString;
     userId: UUIDString;
     loanId?: UUIDString | null;
-    originalFilename: string;
-    storagePath: string;
-    fileSize: number;
-    mimeType?: string | null;
-    fileExtension?: string | null;
-    uploadedAt: TimestampString;
-    tags?: string | null;
-    description?: string | null;
-    downloadUrl?: string | null;
-    isDeleted: boolean;
+    documentMasterId?: UUIDString | null;
+    documentMaster?: {
+      id: UUIDString;
+      name: string;
+      namingConvention?: string | null;
+      isVersioningEnabled: boolean;
+    } & DocumentMaster_Key;
+      originalFilename: string;
+      storagePath: string;
+      fileSize: number;
+      mimeType?: string | null;
+      fileExtension?: string | null;
+      uploadedAt: TimestampString;
+      tags?: string | null;
+      description?: string | null;
+      downloadUrl?: string | null;
+      isDeleted: boolean;
   } & File_Key)[];
 }
 
@@ -709,6 +910,32 @@ export interface HardDeleteFileVariables {
   id: UUIDString;
 }
 
+export interface ListActiveDocumentMastersData {
+  documentMasters: ({
+    id: UUIDString;
+    name: string;
+    documentPathId?: UUIDString | null;
+    documentPath?: {
+      id: UUIDString;
+      name: string;
+    } & DocumentPath_Key;
+      description?: string | null;
+      sortOrder: number;
+      namingConvention?: string | null;
+      display?: string | null;
+  } & DocumentMaster_Key)[];
+}
+
+export interface ListActiveDocumentPathsData {
+  documentPaths: ({
+    id: UUIDString;
+    name: string;
+    sourceLookupId?: UUIDString | null;
+    description?: string | null;
+    sortOrder: number;
+  } & DocumentPath_Key)[];
+}
+
 export interface ListAllUsersData {
   users: ({
     id: UUIDString;
@@ -719,6 +946,62 @@ export interface ListAllUsersData {
     isActive: boolean;
     createdAt: TimestampString;
   } & User_Key)[];
+}
+
+export interface ListDocumentMastersByPathData {
+  documentMasters: ({
+    id: UUIDString;
+    name: string;
+    documentPathId?: UUIDString | null;
+    isActive: boolean;
+    description?: string | null;
+    sortOrder: number;
+    namingConvention?: string | null;
+    display?: string | null;
+  } & DocumentMaster_Key)[];
+}
+
+export interface ListDocumentMastersByPathVariables {
+  documentPathId: UUIDString;
+}
+
+export interface ListDocumentMastersData {
+  documentMasters: ({
+    id: UUIDString;
+    name: string;
+    documentPathId?: UUIDString | null;
+    documentPath?: {
+      id: UUIDString;
+      name: string;
+    } & DocumentPath_Key;
+      isActive: boolean;
+      description?: string | null;
+      sortOrder: number;
+      isSystemGenerated: boolean;
+      reviewRequired: boolean;
+      isVersioningEnabled: boolean;
+      namingConvention?: string | null;
+      display?: string | null;
+      createdOn: TimestampString;
+      createdBy?: string | null;
+      updatedOn: TimestampString;
+      updatedBy?: string | null;
+  } & DocumentMaster_Key)[];
+}
+
+export interface ListDocumentPathsData {
+  documentPaths: ({
+    id: UUIDString;
+    name: string;
+    sourceLookupId?: UUIDString | null;
+    isActive: boolean;
+    description?: string | null;
+    sortOrder: number;
+    createdOn: TimestampString;
+    createdBy?: string | null;
+    updatedOn: TimestampString;
+    updatedBy?: string | null;
+  } & DocumentPath_Key)[];
 }
 
 export interface Loan_Key {
@@ -860,12 +1143,46 @@ export interface UpdateAuthSessionVariables {
   lastAccessedAt?: TimestampString | null;
 }
 
+export interface UpdateDocumentMasterData {
+  documentMaster_update?: DocumentMaster_Key | null;
+}
+
+export interface UpdateDocumentMasterVariables {
+  id: UUIDString;
+  name?: string | null;
+  documentPathId?: UUIDString | null;
+  description?: string | null;
+  sortOrder?: number | null;
+  isActive?: boolean | null;
+  isSystemGenerated?: boolean | null;
+  reviewRequired?: boolean | null;
+  isVersioningEnabled?: boolean | null;
+  namingConvention?: string | null;
+  display?: string | null;
+  updatedBy?: string | null;
+}
+
+export interface UpdateDocumentPathData {
+  documentPath_update?: DocumentPath_Key | null;
+}
+
+export interface UpdateDocumentPathVariables {
+  id: UUIDString;
+  name?: string | null;
+  sourceLookupId?: UUIDString | null;
+  description?: string | null;
+  sortOrder?: number | null;
+  isActive?: boolean | null;
+  updatedBy?: string | null;
+}
+
 export interface UpdateFileData {
   file_update?: File_Key | null;
 }
 
 export interface UpdateFileVariables {
   id: UUIDString;
+  documentMasterId?: UUIDString | null;
   tags?: string | null;
   description?: string | null;
   downloadUrl?: string | null;
@@ -1427,6 +1744,126 @@ export const extendMagicLinkRef: ExtendMagicLinkRef;
 export function extendMagicLink(vars: ExtendMagicLinkVariables): MutationPromise<ExtendMagicLinkData, ExtendMagicLinkVariables>;
 export function extendMagicLink(dc: DataConnect, vars: ExtendMagicLinkVariables): MutationPromise<ExtendMagicLinkData, ExtendMagicLinkVariables>;
 
+interface CreateDocumentPathRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateDocumentPathVariables): MutationRef<CreateDocumentPathData, CreateDocumentPathVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateDocumentPathVariables): MutationRef<CreateDocumentPathData, CreateDocumentPathVariables>;
+  operationName: string;
+}
+export const createDocumentPathRef: CreateDocumentPathRef;
+
+export function createDocumentPath(vars: CreateDocumentPathVariables): MutationPromise<CreateDocumentPathData, CreateDocumentPathVariables>;
+export function createDocumentPath(dc: DataConnect, vars: CreateDocumentPathVariables): MutationPromise<CreateDocumentPathData, CreateDocumentPathVariables>;
+
+interface CreateDocumentPathWithIdRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateDocumentPathWithIdVariables): MutationRef<CreateDocumentPathWithIdData, CreateDocumentPathWithIdVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateDocumentPathWithIdVariables): MutationRef<CreateDocumentPathWithIdData, CreateDocumentPathWithIdVariables>;
+  operationName: string;
+}
+export const createDocumentPathWithIdRef: CreateDocumentPathWithIdRef;
+
+export function createDocumentPathWithId(vars: CreateDocumentPathWithIdVariables): MutationPromise<CreateDocumentPathWithIdData, CreateDocumentPathWithIdVariables>;
+export function createDocumentPathWithId(dc: DataConnect, vars: CreateDocumentPathWithIdVariables): MutationPromise<CreateDocumentPathWithIdData, CreateDocumentPathWithIdVariables>;
+
+interface UpdateDocumentPathRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateDocumentPathVariables): MutationRef<UpdateDocumentPathData, UpdateDocumentPathVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpdateDocumentPathVariables): MutationRef<UpdateDocumentPathData, UpdateDocumentPathVariables>;
+  operationName: string;
+}
+export const updateDocumentPathRef: UpdateDocumentPathRef;
+
+export function updateDocumentPath(vars: UpdateDocumentPathVariables): MutationPromise<UpdateDocumentPathData, UpdateDocumentPathVariables>;
+export function updateDocumentPath(dc: DataConnect, vars: UpdateDocumentPathVariables): MutationPromise<UpdateDocumentPathData, UpdateDocumentPathVariables>;
+
+interface DeactivateDocumentPathRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeactivateDocumentPathVariables): MutationRef<DeactivateDocumentPathData, DeactivateDocumentPathVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeactivateDocumentPathVariables): MutationRef<DeactivateDocumentPathData, DeactivateDocumentPathVariables>;
+  operationName: string;
+}
+export const deactivateDocumentPathRef: DeactivateDocumentPathRef;
+
+export function deactivateDocumentPath(vars: DeactivateDocumentPathVariables): MutationPromise<DeactivateDocumentPathData, DeactivateDocumentPathVariables>;
+export function deactivateDocumentPath(dc: DataConnect, vars: DeactivateDocumentPathVariables): MutationPromise<DeactivateDocumentPathData, DeactivateDocumentPathVariables>;
+
+interface DeleteDocumentPathRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteDocumentPathVariables): MutationRef<DeleteDocumentPathData, DeleteDocumentPathVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeleteDocumentPathVariables): MutationRef<DeleteDocumentPathData, DeleteDocumentPathVariables>;
+  operationName: string;
+}
+export const deleteDocumentPathRef: DeleteDocumentPathRef;
+
+export function deleteDocumentPath(vars: DeleteDocumentPathVariables): MutationPromise<DeleteDocumentPathData, DeleteDocumentPathVariables>;
+export function deleteDocumentPath(dc: DataConnect, vars: DeleteDocumentPathVariables): MutationPromise<DeleteDocumentPathData, DeleteDocumentPathVariables>;
+
+interface CreateDocumentMasterRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateDocumentMasterVariables): MutationRef<CreateDocumentMasterData, CreateDocumentMasterVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateDocumentMasterVariables): MutationRef<CreateDocumentMasterData, CreateDocumentMasterVariables>;
+  operationName: string;
+}
+export const createDocumentMasterRef: CreateDocumentMasterRef;
+
+export function createDocumentMaster(vars: CreateDocumentMasterVariables): MutationPromise<CreateDocumentMasterData, CreateDocumentMasterVariables>;
+export function createDocumentMaster(dc: DataConnect, vars: CreateDocumentMasterVariables): MutationPromise<CreateDocumentMasterData, CreateDocumentMasterVariables>;
+
+interface CreateDocumentMasterWithIdRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateDocumentMasterWithIdVariables): MutationRef<CreateDocumentMasterWithIdData, CreateDocumentMasterWithIdVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: CreateDocumentMasterWithIdVariables): MutationRef<CreateDocumentMasterWithIdData, CreateDocumentMasterWithIdVariables>;
+  operationName: string;
+}
+export const createDocumentMasterWithIdRef: CreateDocumentMasterWithIdRef;
+
+export function createDocumentMasterWithId(vars: CreateDocumentMasterWithIdVariables): MutationPromise<CreateDocumentMasterWithIdData, CreateDocumentMasterWithIdVariables>;
+export function createDocumentMasterWithId(dc: DataConnect, vars: CreateDocumentMasterWithIdVariables): MutationPromise<CreateDocumentMasterWithIdData, CreateDocumentMasterWithIdVariables>;
+
+interface UpdateDocumentMasterRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateDocumentMasterVariables): MutationRef<UpdateDocumentMasterData, UpdateDocumentMasterVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpdateDocumentMasterVariables): MutationRef<UpdateDocumentMasterData, UpdateDocumentMasterVariables>;
+  operationName: string;
+}
+export const updateDocumentMasterRef: UpdateDocumentMasterRef;
+
+export function updateDocumentMaster(vars: UpdateDocumentMasterVariables): MutationPromise<UpdateDocumentMasterData, UpdateDocumentMasterVariables>;
+export function updateDocumentMaster(dc: DataConnect, vars: UpdateDocumentMasterVariables): MutationPromise<UpdateDocumentMasterData, UpdateDocumentMasterVariables>;
+
+interface DeactivateDocumentMasterRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeactivateDocumentMasterVariables): MutationRef<DeactivateDocumentMasterData, DeactivateDocumentMasterVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeactivateDocumentMasterVariables): MutationRef<DeactivateDocumentMasterData, DeactivateDocumentMasterVariables>;
+  operationName: string;
+}
+export const deactivateDocumentMasterRef: DeactivateDocumentMasterRef;
+
+export function deactivateDocumentMaster(vars: DeactivateDocumentMasterVariables): MutationPromise<DeactivateDocumentMasterData, DeactivateDocumentMasterVariables>;
+export function deactivateDocumentMaster(dc: DataConnect, vars: DeactivateDocumentMasterVariables): MutationPromise<DeactivateDocumentMasterData, DeactivateDocumentMasterVariables>;
+
+interface DeleteDocumentMasterRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteDocumentMasterVariables): MutationRef<DeleteDocumentMasterData, DeleteDocumentMasterVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeleteDocumentMasterVariables): MutationRef<DeleteDocumentMasterData, DeleteDocumentMasterVariables>;
+  operationName: string;
+}
+export const deleteDocumentMasterRef: DeleteDocumentMasterRef;
+
+export function deleteDocumentMaster(vars: DeleteDocumentMasterVariables): MutationPromise<DeleteDocumentMasterData, DeleteDocumentMasterVariables>;
+export function deleteDocumentMaster(dc: DataConnect, vars: DeleteDocumentMasterVariables): MutationPromise<DeleteDocumentMasterData, DeleteDocumentMasterVariables>;
+
 interface GetUserRef {
   /* Allow users to create refs without passing in DataConnect */
   (vars: GetUserVariables): QueryRef<GetUserData, GetUserVariables>;
@@ -1738,4 +2175,112 @@ export const getMagicLinkStatsRef: GetMagicLinkStatsRef;
 
 export function getMagicLinkStats(): QueryPromise<GetMagicLinkStatsData, undefined>;
 export function getMagicLinkStats(dc: DataConnect): QueryPromise<GetMagicLinkStatsData, undefined>;
+
+interface ListDocumentPathsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<ListDocumentPathsData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<ListDocumentPathsData, undefined>;
+  operationName: string;
+}
+export const listDocumentPathsRef: ListDocumentPathsRef;
+
+export function listDocumentPaths(): QueryPromise<ListDocumentPathsData, undefined>;
+export function listDocumentPaths(dc: DataConnect): QueryPromise<ListDocumentPathsData, undefined>;
+
+interface ListActiveDocumentPathsRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<ListActiveDocumentPathsData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<ListActiveDocumentPathsData, undefined>;
+  operationName: string;
+}
+export const listActiveDocumentPathsRef: ListActiveDocumentPathsRef;
+
+export function listActiveDocumentPaths(): QueryPromise<ListActiveDocumentPathsData, undefined>;
+export function listActiveDocumentPaths(dc: DataConnect): QueryPromise<ListActiveDocumentPathsData, undefined>;
+
+interface GetDocumentPathRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetDocumentPathVariables): QueryRef<GetDocumentPathData, GetDocumentPathVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetDocumentPathVariables): QueryRef<GetDocumentPathData, GetDocumentPathVariables>;
+  operationName: string;
+}
+export const getDocumentPathRef: GetDocumentPathRef;
+
+export function getDocumentPath(vars: GetDocumentPathVariables): QueryPromise<GetDocumentPathData, GetDocumentPathVariables>;
+export function getDocumentPath(dc: DataConnect, vars: GetDocumentPathVariables): QueryPromise<GetDocumentPathData, GetDocumentPathVariables>;
+
+interface GetDocumentPathByNameRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetDocumentPathByNameVariables): QueryRef<GetDocumentPathByNameData, GetDocumentPathByNameVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetDocumentPathByNameVariables): QueryRef<GetDocumentPathByNameData, GetDocumentPathByNameVariables>;
+  operationName: string;
+}
+export const getDocumentPathByNameRef: GetDocumentPathByNameRef;
+
+export function getDocumentPathByName(vars: GetDocumentPathByNameVariables): QueryPromise<GetDocumentPathByNameData, GetDocumentPathByNameVariables>;
+export function getDocumentPathByName(dc: DataConnect, vars: GetDocumentPathByNameVariables): QueryPromise<GetDocumentPathByNameData, GetDocumentPathByNameVariables>;
+
+interface ListDocumentMastersRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<ListDocumentMastersData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<ListDocumentMastersData, undefined>;
+  operationName: string;
+}
+export const listDocumentMastersRef: ListDocumentMastersRef;
+
+export function listDocumentMasters(): QueryPromise<ListDocumentMastersData, undefined>;
+export function listDocumentMasters(dc: DataConnect): QueryPromise<ListDocumentMastersData, undefined>;
+
+interface ListActiveDocumentMastersRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<ListActiveDocumentMastersData, undefined>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect): QueryRef<ListActiveDocumentMastersData, undefined>;
+  operationName: string;
+}
+export const listActiveDocumentMastersRef: ListActiveDocumentMastersRef;
+
+export function listActiveDocumentMasters(): QueryPromise<ListActiveDocumentMastersData, undefined>;
+export function listActiveDocumentMasters(dc: DataConnect): QueryPromise<ListActiveDocumentMastersData, undefined>;
+
+interface GetDocumentMasterRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetDocumentMasterVariables): QueryRef<GetDocumentMasterData, GetDocumentMasterVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetDocumentMasterVariables): QueryRef<GetDocumentMasterData, GetDocumentMasterVariables>;
+  operationName: string;
+}
+export const getDocumentMasterRef: GetDocumentMasterRef;
+
+export function getDocumentMaster(vars: GetDocumentMasterVariables): QueryPromise<GetDocumentMasterData, GetDocumentMasterVariables>;
+export function getDocumentMaster(dc: DataConnect, vars: GetDocumentMasterVariables): QueryPromise<GetDocumentMasterData, GetDocumentMasterVariables>;
+
+interface ListDocumentMastersByPathRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ListDocumentMastersByPathVariables): QueryRef<ListDocumentMastersByPathData, ListDocumentMastersByPathVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: ListDocumentMastersByPathVariables): QueryRef<ListDocumentMastersByPathData, ListDocumentMastersByPathVariables>;
+  operationName: string;
+}
+export const listDocumentMastersByPathRef: ListDocumentMastersByPathRef;
+
+export function listDocumentMastersByPath(vars: ListDocumentMastersByPathVariables): QueryPromise<ListDocumentMastersByPathData, ListDocumentMastersByPathVariables>;
+export function listDocumentMastersByPath(dc: DataConnect, vars: ListDocumentMastersByPathVariables): QueryPromise<ListDocumentMastersByPathData, ListDocumentMastersByPathVariables>;
+
+interface GetDocumentMasterByNameRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetDocumentMasterByNameVariables): QueryRef<GetDocumentMasterByNameData, GetDocumentMasterByNameVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: GetDocumentMasterByNameVariables): QueryRef<GetDocumentMasterByNameData, GetDocumentMasterByNameVariables>;
+  operationName: string;
+}
+export const getDocumentMasterByNameRef: GetDocumentMasterByNameRef;
+
+export function getDocumentMasterByName(vars: GetDocumentMasterByNameVariables): QueryPromise<GetDocumentMasterByNameData, GetDocumentMasterByNameVariables>;
+export function getDocumentMasterByName(dc: DataConnect, vars: GetDocumentMasterByNameVariables): QueryPromise<GetDocumentMasterByNameData, GetDocumentMasterByNameVariables>;
 

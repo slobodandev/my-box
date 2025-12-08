@@ -10,6 +10,7 @@ import { getAuth, Auth } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
 import { getAnalytics, Analytics, isSupported } from 'firebase/analytics';
+import { getDataConnect, DataConnect, connectDataConnectEmulator } from 'firebase/data-connect';
 
 // Firebase configuration object
 const firebaseConfig = {
@@ -51,6 +52,14 @@ let auth: Auth;
 let db: Firestore;
 let storage: FirebaseStorage;
 let analytics: Analytics | null = null;
+let dataConnect: DataConnect;
+
+// Data Connect configuration
+const dataConnectConfig = {
+  connector: 'mybox-connector',
+  service: 'mybox-dataconnect',
+  location: 'us-central1',
+};
 
 try {
   validateConfig();
@@ -68,6 +77,7 @@ try {
   auth = getAuth(app);
   db = getFirestore(app);
   storage = getStorage(app);
+  dataConnect = getDataConnect(app, dataConnectConfig);
 
   // Connect to emulators if enabled via environment variable
   const useEmulators = import.meta.env.VITE_USE_FIREBASE_EMULATORS === 'true';
@@ -90,8 +100,8 @@ try {
 
     // Connect to Firestore emulator
     try {
-      connectFirestoreEmulator(db, '127.0.0.1', 8081);
-      console.log('✅ Connected to Firestore emulator on port 8081');
+      connectFirestoreEmulator(db, '127.0.0.1', 8082);
+      console.log('✅ Connected to Firestore emulator on port 8082');
     } catch (error) {
       console.warn('⚠️ Firestore emulator connection failed:', error);
     }
@@ -102,6 +112,14 @@ try {
       console.log('✅ Connected to Storage emulator on port 9199');
     } catch (error) {
       console.warn('⚠️ Storage emulator connection failed:', error);
+    }
+
+    // Connect to Data Connect emulator
+    try {
+      connectDataConnectEmulator(dataConnect, '127.0.0.1', 9399);
+      console.log('✅ Connected to Data Connect emulator on port 9399');
+    } catch (error) {
+      console.warn('⚠️ Data Connect emulator connection failed:', error);
     }
   } else {
     console.log('🌐 Firebase Production Mode');
@@ -122,13 +140,14 @@ try {
 }
 
 // Export Firebase services
-export { app, auth, db, storage, analytics };
+export { app, auth, db, storage, analytics, dataConnect };
 
 // Export Firebase service getters for lazy initialization
 export const getFirebaseAuth = (): Auth => auth;
 export const getFirebaseFirestore = (): Firestore => db;
 export const getFirebaseStorage = (): FirebaseStorage => storage;
 export const getFirebaseAnalytics = (): Analytics | null => analytics;
+export const getFirebaseDataConnect = (): DataConnect => dataConnect;
 
 // Default export
 export default app;

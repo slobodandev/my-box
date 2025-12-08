@@ -34,6 +34,15 @@ This README will guide you through the process of using the generated JavaScript
   - [*GetMagicLink*](#getmagiclink)
   - [*GetMagicLinkBySessionId*](#getmagiclinkbysessionid)
   - [*GetMagicLinkStats*](#getmagiclinkstats)
+  - [*ListDocumentPaths*](#listdocumentpaths)
+  - [*ListActiveDocumentPaths*](#listactivedocumentpaths)
+  - [*GetDocumentPath*](#getdocumentpath)
+  - [*GetDocumentPathByName*](#getdocumentpathbyname)
+  - [*ListDocumentMasters*](#listdocumentmasters)
+  - [*ListActiveDocumentMasters*](#listactivedocumentmasters)
+  - [*GetDocumentMaster*](#getdocumentmaster)
+  - [*ListDocumentMastersByPath*](#listdocumentmastersbypath)
+  - [*GetDocumentMasterByName*](#getdocumentmasterbyname)
 - [**Mutations**](#mutations)
   - [*CreateUser*](#createuser)
   - [*UpdateUser*](#updateuser)
@@ -73,6 +82,16 @@ This README will guide you through the process of using the generated JavaScript
   - [*RevokeMagicLink*](#revokemagiclink)
   - [*MarkMagicLinkUsed*](#markmagiclinkused)
   - [*ExtendMagicLink*](#extendmagiclink)
+  - [*CreateDocumentPath*](#createdocumentpath)
+  - [*CreateDocumentPathWithId*](#createdocumentpathwithid)
+  - [*UpdateDocumentPath*](#updatedocumentpath)
+  - [*DeactivateDocumentPath*](#deactivatedocumentpath)
+  - [*DeleteDocumentPath*](#deletedocumentpath)
+  - [*CreateDocumentMaster*](#createdocumentmaster)
+  - [*CreateDocumentMasterWithId*](#createdocumentmasterwithid)
+  - [*UpdateDocumentMaster*](#updatedocumentmaster)
+  - [*DeactivateDocumentMaster*](#deactivatedocumentmaster)
+  - [*DeleteDocumentMaster*](#deletedocumentmaster)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `mybox-connector`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -867,16 +886,23 @@ export interface GetUserFilesData {
     id: UUIDString;
     userId: UUIDString;
     loanId?: UUIDString | null;
-    originalFilename: string;
-    storagePath: string;
-    fileSize: number;
-    mimeType?: string | null;
-    fileExtension?: string | null;
-    uploadedAt: TimestampString;
-    tags?: string | null;
-    description?: string | null;
-    downloadUrl?: string | null;
-    isDeleted: boolean;
+    documentMasterId?: UUIDString | null;
+    documentMaster?: {
+      id: UUIDString;
+      name: string;
+      namingConvention?: string | null;
+      isVersioningEnabled: boolean;
+    } & DocumentMaster_Key;
+      originalFilename: string;
+      storagePath: string;
+      fileSize: number;
+      mimeType?: string | null;
+      fileExtension?: string | null;
+      uploadedAt: TimestampString;
+      tags?: string | null;
+      description?: string | null;
+      downloadUrl?: string | null;
+      isDeleted: boolean;
   } & File_Key)[];
 }
 ```
@@ -1106,19 +1132,26 @@ export interface GetFileData {
     id: UUIDString;
     userId: UUIDString;
     loanId?: UUIDString | null;
-    originalFilename: string;
-    storagePath: string;
-    fileSize: number;
-    mimeType?: string | null;
-    fileExtension?: string | null;
-    uploadedAt: TimestampString;
-    updatedAt: TimestampString;
-    tags?: string | null;
-    description?: string | null;
-    downloadUrl?: string | null;
-    isDeleted: boolean;
-    deletedAt?: TimestampString | null;
-    deletedBy?: UUIDString | null;
+    documentMasterId?: UUIDString | null;
+    documentMaster?: {
+      id: UUIDString;
+      name: string;
+      namingConvention?: string | null;
+      isVersioningEnabled: boolean;
+    } & DocumentMaster_Key;
+      originalFilename: string;
+      storagePath: string;
+      fileSize: number;
+      mimeType?: string | null;
+      fileExtension?: string | null;
+      uploadedAt: TimestampString;
+      updatedAt: TimestampString;
+      tags?: string | null;
+      description?: string | null;
+      downloadUrl?: string | null;
+      isDeleted: boolean;
+      deletedAt?: TimestampString | null;
+      deletedBy?: UUIDString | null;
   } & File_Key;
 }
 ```
@@ -3243,6 +3276,1022 @@ executeQuery(ref).then((response) => {
 });
 ```
 
+## ListDocumentPaths
+You can execute the `ListDocumentPaths` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+listDocumentPaths(): QueryPromise<ListDocumentPathsData, undefined>;
+
+interface ListDocumentPathsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<ListDocumentPathsData, undefined>;
+}
+export const listDocumentPathsRef: ListDocumentPathsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+listDocumentPaths(dc: DataConnect): QueryPromise<ListDocumentPathsData, undefined>;
+
+interface ListDocumentPathsRef {
+  ...
+  (dc: DataConnect): QueryRef<ListDocumentPathsData, undefined>;
+}
+export const listDocumentPathsRef: ListDocumentPathsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the listDocumentPathsRef:
+```typescript
+const name = listDocumentPathsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ListDocumentPaths` query has no variables.
+### Return Type
+Recall that executing the `ListDocumentPaths` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ListDocumentPathsData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ListDocumentPathsData {
+  documentPaths: ({
+    id: UUIDString;
+    name: string;
+    sourceLookupId?: UUIDString | null;
+    isActive: boolean;
+    description?: string | null;
+    sortOrder: number;
+    createdOn: TimestampString;
+    createdBy?: string | null;
+    updatedOn: TimestampString;
+    updatedBy?: string | null;
+  } & DocumentPath_Key)[];
+}
+```
+### Using `ListDocumentPaths`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, listDocumentPaths } from '@mybox/dataconnect';
+
+
+// Call the `listDocumentPaths()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await listDocumentPaths();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await listDocumentPaths(dataConnect);
+
+console.log(data.documentPaths);
+
+// Or, you can use the `Promise` API.
+listDocumentPaths().then((response) => {
+  const data = response.data;
+  console.log(data.documentPaths);
+});
+```
+
+### Using `ListDocumentPaths`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, listDocumentPathsRef } from '@mybox/dataconnect';
+
+
+// Call the `listDocumentPathsRef()` function to get a reference to the query.
+const ref = listDocumentPathsRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = listDocumentPathsRef(dataConnect);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.documentPaths);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentPaths);
+});
+```
+
+## ListActiveDocumentPaths
+You can execute the `ListActiveDocumentPaths` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+listActiveDocumentPaths(): QueryPromise<ListActiveDocumentPathsData, undefined>;
+
+interface ListActiveDocumentPathsRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<ListActiveDocumentPathsData, undefined>;
+}
+export const listActiveDocumentPathsRef: ListActiveDocumentPathsRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+listActiveDocumentPaths(dc: DataConnect): QueryPromise<ListActiveDocumentPathsData, undefined>;
+
+interface ListActiveDocumentPathsRef {
+  ...
+  (dc: DataConnect): QueryRef<ListActiveDocumentPathsData, undefined>;
+}
+export const listActiveDocumentPathsRef: ListActiveDocumentPathsRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the listActiveDocumentPathsRef:
+```typescript
+const name = listActiveDocumentPathsRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ListActiveDocumentPaths` query has no variables.
+### Return Type
+Recall that executing the `ListActiveDocumentPaths` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ListActiveDocumentPathsData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ListActiveDocumentPathsData {
+  documentPaths: ({
+    id: UUIDString;
+    name: string;
+    sourceLookupId?: UUIDString | null;
+    description?: string | null;
+    sortOrder: number;
+  } & DocumentPath_Key)[];
+}
+```
+### Using `ListActiveDocumentPaths`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, listActiveDocumentPaths } from '@mybox/dataconnect';
+
+
+// Call the `listActiveDocumentPaths()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await listActiveDocumentPaths();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await listActiveDocumentPaths(dataConnect);
+
+console.log(data.documentPaths);
+
+// Or, you can use the `Promise` API.
+listActiveDocumentPaths().then((response) => {
+  const data = response.data;
+  console.log(data.documentPaths);
+});
+```
+
+### Using `ListActiveDocumentPaths`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, listActiveDocumentPathsRef } from '@mybox/dataconnect';
+
+
+// Call the `listActiveDocumentPathsRef()` function to get a reference to the query.
+const ref = listActiveDocumentPathsRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = listActiveDocumentPathsRef(dataConnect);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.documentPaths);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentPaths);
+});
+```
+
+## GetDocumentPath
+You can execute the `GetDocumentPath` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getDocumentPath(vars: GetDocumentPathVariables): QueryPromise<GetDocumentPathData, GetDocumentPathVariables>;
+
+interface GetDocumentPathRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetDocumentPathVariables): QueryRef<GetDocumentPathData, GetDocumentPathVariables>;
+}
+export const getDocumentPathRef: GetDocumentPathRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getDocumentPath(dc: DataConnect, vars: GetDocumentPathVariables): QueryPromise<GetDocumentPathData, GetDocumentPathVariables>;
+
+interface GetDocumentPathRef {
+  ...
+  (dc: DataConnect, vars: GetDocumentPathVariables): QueryRef<GetDocumentPathData, GetDocumentPathVariables>;
+}
+export const getDocumentPathRef: GetDocumentPathRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getDocumentPathRef:
+```typescript
+const name = getDocumentPathRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetDocumentPath` query requires an argument of type `GetDocumentPathVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetDocumentPathVariables {
+  id: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetDocumentPath` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetDocumentPathData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetDocumentPathData {
+  documentPath?: {
+    id: UUIDString;
+    name: string;
+    sourceLookupId?: UUIDString | null;
+    isActive: boolean;
+    description?: string | null;
+    sortOrder: number;
+    createdOn: TimestampString;
+    createdBy?: string | null;
+    updatedOn: TimestampString;
+    updatedBy?: string | null;
+  } & DocumentPath_Key;
+}
+```
+### Using `GetDocumentPath`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getDocumentPath, GetDocumentPathVariables } from '@mybox/dataconnect';
+
+// The `GetDocumentPath` query requires an argument of type `GetDocumentPathVariables`:
+const getDocumentPathVars: GetDocumentPathVariables = {
+  id: ..., 
+};
+
+// Call the `getDocumentPath()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getDocumentPath(getDocumentPathVars);
+// Variables can be defined inline as well.
+const { data } = await getDocumentPath({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getDocumentPath(dataConnect, getDocumentPathVars);
+
+console.log(data.documentPath);
+
+// Or, you can use the `Promise` API.
+getDocumentPath(getDocumentPathVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentPath);
+});
+```
+
+### Using `GetDocumentPath`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getDocumentPathRef, GetDocumentPathVariables } from '@mybox/dataconnect';
+
+// The `GetDocumentPath` query requires an argument of type `GetDocumentPathVariables`:
+const getDocumentPathVars: GetDocumentPathVariables = {
+  id: ..., 
+};
+
+// Call the `getDocumentPathRef()` function to get a reference to the query.
+const ref = getDocumentPathRef(getDocumentPathVars);
+// Variables can be defined inline as well.
+const ref = getDocumentPathRef({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getDocumentPathRef(dataConnect, getDocumentPathVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.documentPath);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentPath);
+});
+```
+
+## GetDocumentPathByName
+You can execute the `GetDocumentPathByName` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getDocumentPathByName(vars: GetDocumentPathByNameVariables): QueryPromise<GetDocumentPathByNameData, GetDocumentPathByNameVariables>;
+
+interface GetDocumentPathByNameRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetDocumentPathByNameVariables): QueryRef<GetDocumentPathByNameData, GetDocumentPathByNameVariables>;
+}
+export const getDocumentPathByNameRef: GetDocumentPathByNameRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getDocumentPathByName(dc: DataConnect, vars: GetDocumentPathByNameVariables): QueryPromise<GetDocumentPathByNameData, GetDocumentPathByNameVariables>;
+
+interface GetDocumentPathByNameRef {
+  ...
+  (dc: DataConnect, vars: GetDocumentPathByNameVariables): QueryRef<GetDocumentPathByNameData, GetDocumentPathByNameVariables>;
+}
+export const getDocumentPathByNameRef: GetDocumentPathByNameRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getDocumentPathByNameRef:
+```typescript
+const name = getDocumentPathByNameRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetDocumentPathByName` query requires an argument of type `GetDocumentPathByNameVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetDocumentPathByNameVariables {
+  name: string;
+}
+```
+### Return Type
+Recall that executing the `GetDocumentPathByName` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetDocumentPathByNameData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetDocumentPathByNameData {
+  documentPaths: ({
+    id: UUIDString;
+    name: string;
+    sourceLookupId?: UUIDString | null;
+    isActive: boolean;
+    description?: string | null;
+    sortOrder: number;
+  } & DocumentPath_Key)[];
+}
+```
+### Using `GetDocumentPathByName`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getDocumentPathByName, GetDocumentPathByNameVariables } from '@mybox/dataconnect';
+
+// The `GetDocumentPathByName` query requires an argument of type `GetDocumentPathByNameVariables`:
+const getDocumentPathByNameVars: GetDocumentPathByNameVariables = {
+  name: ..., 
+};
+
+// Call the `getDocumentPathByName()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getDocumentPathByName(getDocumentPathByNameVars);
+// Variables can be defined inline as well.
+const { data } = await getDocumentPathByName({ name: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getDocumentPathByName(dataConnect, getDocumentPathByNameVars);
+
+console.log(data.documentPaths);
+
+// Or, you can use the `Promise` API.
+getDocumentPathByName(getDocumentPathByNameVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentPaths);
+});
+```
+
+### Using `GetDocumentPathByName`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getDocumentPathByNameRef, GetDocumentPathByNameVariables } from '@mybox/dataconnect';
+
+// The `GetDocumentPathByName` query requires an argument of type `GetDocumentPathByNameVariables`:
+const getDocumentPathByNameVars: GetDocumentPathByNameVariables = {
+  name: ..., 
+};
+
+// Call the `getDocumentPathByNameRef()` function to get a reference to the query.
+const ref = getDocumentPathByNameRef(getDocumentPathByNameVars);
+// Variables can be defined inline as well.
+const ref = getDocumentPathByNameRef({ name: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getDocumentPathByNameRef(dataConnect, getDocumentPathByNameVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.documentPaths);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentPaths);
+});
+```
+
+## ListDocumentMasters
+You can execute the `ListDocumentMasters` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+listDocumentMasters(): QueryPromise<ListDocumentMastersData, undefined>;
+
+interface ListDocumentMastersRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<ListDocumentMastersData, undefined>;
+}
+export const listDocumentMastersRef: ListDocumentMastersRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+listDocumentMasters(dc: DataConnect): QueryPromise<ListDocumentMastersData, undefined>;
+
+interface ListDocumentMastersRef {
+  ...
+  (dc: DataConnect): QueryRef<ListDocumentMastersData, undefined>;
+}
+export const listDocumentMastersRef: ListDocumentMastersRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the listDocumentMastersRef:
+```typescript
+const name = listDocumentMastersRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ListDocumentMasters` query has no variables.
+### Return Type
+Recall that executing the `ListDocumentMasters` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ListDocumentMastersData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ListDocumentMastersData {
+  documentMasters: ({
+    id: UUIDString;
+    name: string;
+    documentPathId?: UUIDString | null;
+    documentPath?: {
+      id: UUIDString;
+      name: string;
+    } & DocumentPath_Key;
+      isActive: boolean;
+      description?: string | null;
+      sortOrder: number;
+      isSystemGenerated: boolean;
+      reviewRequired: boolean;
+      isVersioningEnabled: boolean;
+      namingConvention?: string | null;
+      display?: string | null;
+      createdOn: TimestampString;
+      createdBy?: string | null;
+      updatedOn: TimestampString;
+      updatedBy?: string | null;
+  } & DocumentMaster_Key)[];
+}
+```
+### Using `ListDocumentMasters`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, listDocumentMasters } from '@mybox/dataconnect';
+
+
+// Call the `listDocumentMasters()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await listDocumentMasters();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await listDocumentMasters(dataConnect);
+
+console.log(data.documentMasters);
+
+// Or, you can use the `Promise` API.
+listDocumentMasters().then((response) => {
+  const data = response.data;
+  console.log(data.documentMasters);
+});
+```
+
+### Using `ListDocumentMasters`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, listDocumentMastersRef } from '@mybox/dataconnect';
+
+
+// Call the `listDocumentMastersRef()` function to get a reference to the query.
+const ref = listDocumentMastersRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = listDocumentMastersRef(dataConnect);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.documentMasters);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentMasters);
+});
+```
+
+## ListActiveDocumentMasters
+You can execute the `ListActiveDocumentMasters` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+listActiveDocumentMasters(): QueryPromise<ListActiveDocumentMastersData, undefined>;
+
+interface ListActiveDocumentMastersRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (): QueryRef<ListActiveDocumentMastersData, undefined>;
+}
+export const listActiveDocumentMastersRef: ListActiveDocumentMastersRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+listActiveDocumentMasters(dc: DataConnect): QueryPromise<ListActiveDocumentMastersData, undefined>;
+
+interface ListActiveDocumentMastersRef {
+  ...
+  (dc: DataConnect): QueryRef<ListActiveDocumentMastersData, undefined>;
+}
+export const listActiveDocumentMastersRef: ListActiveDocumentMastersRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the listActiveDocumentMastersRef:
+```typescript
+const name = listActiveDocumentMastersRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ListActiveDocumentMasters` query has no variables.
+### Return Type
+Recall that executing the `ListActiveDocumentMasters` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ListActiveDocumentMastersData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ListActiveDocumentMastersData {
+  documentMasters: ({
+    id: UUIDString;
+    name: string;
+    documentPathId?: UUIDString | null;
+    documentPath?: {
+      id: UUIDString;
+      name: string;
+    } & DocumentPath_Key;
+      description?: string | null;
+      sortOrder: number;
+      namingConvention?: string | null;
+      display?: string | null;
+  } & DocumentMaster_Key)[];
+}
+```
+### Using `ListActiveDocumentMasters`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, listActiveDocumentMasters } from '@mybox/dataconnect';
+
+
+// Call the `listActiveDocumentMasters()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await listActiveDocumentMasters();
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await listActiveDocumentMasters(dataConnect);
+
+console.log(data.documentMasters);
+
+// Or, you can use the `Promise` API.
+listActiveDocumentMasters().then((response) => {
+  const data = response.data;
+  console.log(data.documentMasters);
+});
+```
+
+### Using `ListActiveDocumentMasters`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, listActiveDocumentMastersRef } from '@mybox/dataconnect';
+
+
+// Call the `listActiveDocumentMastersRef()` function to get a reference to the query.
+const ref = listActiveDocumentMastersRef();
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = listActiveDocumentMastersRef(dataConnect);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.documentMasters);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentMasters);
+});
+```
+
+## GetDocumentMaster
+You can execute the `GetDocumentMaster` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getDocumentMaster(vars: GetDocumentMasterVariables): QueryPromise<GetDocumentMasterData, GetDocumentMasterVariables>;
+
+interface GetDocumentMasterRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetDocumentMasterVariables): QueryRef<GetDocumentMasterData, GetDocumentMasterVariables>;
+}
+export const getDocumentMasterRef: GetDocumentMasterRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getDocumentMaster(dc: DataConnect, vars: GetDocumentMasterVariables): QueryPromise<GetDocumentMasterData, GetDocumentMasterVariables>;
+
+interface GetDocumentMasterRef {
+  ...
+  (dc: DataConnect, vars: GetDocumentMasterVariables): QueryRef<GetDocumentMasterData, GetDocumentMasterVariables>;
+}
+export const getDocumentMasterRef: GetDocumentMasterRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getDocumentMasterRef:
+```typescript
+const name = getDocumentMasterRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetDocumentMaster` query requires an argument of type `GetDocumentMasterVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetDocumentMasterVariables {
+  id: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `GetDocumentMaster` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetDocumentMasterData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetDocumentMasterData {
+  documentMaster?: {
+    id: UUIDString;
+    name: string;
+    documentPathId?: UUIDString | null;
+    documentPath?: {
+      id: UUIDString;
+      name: string;
+    } & DocumentPath_Key;
+      isActive: boolean;
+      description?: string | null;
+      sortOrder: number;
+      isSystemGenerated: boolean;
+      reviewRequired: boolean;
+      isVersioningEnabled: boolean;
+      namingConvention?: string | null;
+      display?: string | null;
+      createdOn: TimestampString;
+      createdBy?: string | null;
+      updatedOn: TimestampString;
+      updatedBy?: string | null;
+  } & DocumentMaster_Key;
+}
+```
+### Using `GetDocumentMaster`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getDocumentMaster, GetDocumentMasterVariables } from '@mybox/dataconnect';
+
+// The `GetDocumentMaster` query requires an argument of type `GetDocumentMasterVariables`:
+const getDocumentMasterVars: GetDocumentMasterVariables = {
+  id: ..., 
+};
+
+// Call the `getDocumentMaster()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getDocumentMaster(getDocumentMasterVars);
+// Variables can be defined inline as well.
+const { data } = await getDocumentMaster({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getDocumentMaster(dataConnect, getDocumentMasterVars);
+
+console.log(data.documentMaster);
+
+// Or, you can use the `Promise` API.
+getDocumentMaster(getDocumentMasterVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentMaster);
+});
+```
+
+### Using `GetDocumentMaster`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getDocumentMasterRef, GetDocumentMasterVariables } from '@mybox/dataconnect';
+
+// The `GetDocumentMaster` query requires an argument of type `GetDocumentMasterVariables`:
+const getDocumentMasterVars: GetDocumentMasterVariables = {
+  id: ..., 
+};
+
+// Call the `getDocumentMasterRef()` function to get a reference to the query.
+const ref = getDocumentMasterRef(getDocumentMasterVars);
+// Variables can be defined inline as well.
+const ref = getDocumentMasterRef({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getDocumentMasterRef(dataConnect, getDocumentMasterVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.documentMaster);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentMaster);
+});
+```
+
+## ListDocumentMastersByPath
+You can execute the `ListDocumentMastersByPath` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+listDocumentMastersByPath(vars: ListDocumentMastersByPathVariables): QueryPromise<ListDocumentMastersByPathData, ListDocumentMastersByPathVariables>;
+
+interface ListDocumentMastersByPathRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: ListDocumentMastersByPathVariables): QueryRef<ListDocumentMastersByPathData, ListDocumentMastersByPathVariables>;
+}
+export const listDocumentMastersByPathRef: ListDocumentMastersByPathRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+listDocumentMastersByPath(dc: DataConnect, vars: ListDocumentMastersByPathVariables): QueryPromise<ListDocumentMastersByPathData, ListDocumentMastersByPathVariables>;
+
+interface ListDocumentMastersByPathRef {
+  ...
+  (dc: DataConnect, vars: ListDocumentMastersByPathVariables): QueryRef<ListDocumentMastersByPathData, ListDocumentMastersByPathVariables>;
+}
+export const listDocumentMastersByPathRef: ListDocumentMastersByPathRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the listDocumentMastersByPathRef:
+```typescript
+const name = listDocumentMastersByPathRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `ListDocumentMastersByPath` query requires an argument of type `ListDocumentMastersByPathVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface ListDocumentMastersByPathVariables {
+  documentPathId: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `ListDocumentMastersByPath` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `ListDocumentMastersByPathData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface ListDocumentMastersByPathData {
+  documentMasters: ({
+    id: UUIDString;
+    name: string;
+    documentPathId?: UUIDString | null;
+    isActive: boolean;
+    description?: string | null;
+    sortOrder: number;
+    namingConvention?: string | null;
+    display?: string | null;
+  } & DocumentMaster_Key)[];
+}
+```
+### Using `ListDocumentMastersByPath`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, listDocumentMastersByPath, ListDocumentMastersByPathVariables } from '@mybox/dataconnect';
+
+// The `ListDocumentMastersByPath` query requires an argument of type `ListDocumentMastersByPathVariables`:
+const listDocumentMastersByPathVars: ListDocumentMastersByPathVariables = {
+  documentPathId: ..., 
+};
+
+// Call the `listDocumentMastersByPath()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await listDocumentMastersByPath(listDocumentMastersByPathVars);
+// Variables can be defined inline as well.
+const { data } = await listDocumentMastersByPath({ documentPathId: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await listDocumentMastersByPath(dataConnect, listDocumentMastersByPathVars);
+
+console.log(data.documentMasters);
+
+// Or, you can use the `Promise` API.
+listDocumentMastersByPath(listDocumentMastersByPathVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentMasters);
+});
+```
+
+### Using `ListDocumentMastersByPath`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, listDocumentMastersByPathRef, ListDocumentMastersByPathVariables } from '@mybox/dataconnect';
+
+// The `ListDocumentMastersByPath` query requires an argument of type `ListDocumentMastersByPathVariables`:
+const listDocumentMastersByPathVars: ListDocumentMastersByPathVariables = {
+  documentPathId: ..., 
+};
+
+// Call the `listDocumentMastersByPathRef()` function to get a reference to the query.
+const ref = listDocumentMastersByPathRef(listDocumentMastersByPathVars);
+// Variables can be defined inline as well.
+const ref = listDocumentMastersByPathRef({ documentPathId: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = listDocumentMastersByPathRef(dataConnect, listDocumentMastersByPathVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.documentMasters);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentMasters);
+});
+```
+
+## GetDocumentMasterByName
+You can execute the `GetDocumentMasterByName` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+getDocumentMasterByName(vars: GetDocumentMasterByNameVariables): QueryPromise<GetDocumentMasterByNameData, GetDocumentMasterByNameVariables>;
+
+interface GetDocumentMasterByNameRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: GetDocumentMasterByNameVariables): QueryRef<GetDocumentMasterByNameData, GetDocumentMasterByNameVariables>;
+}
+export const getDocumentMasterByNameRef: GetDocumentMasterByNameRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
+```typescript
+getDocumentMasterByName(dc: DataConnect, vars: GetDocumentMasterByNameVariables): QueryPromise<GetDocumentMasterByNameData, GetDocumentMasterByNameVariables>;
+
+interface GetDocumentMasterByNameRef {
+  ...
+  (dc: DataConnect, vars: GetDocumentMasterByNameVariables): QueryRef<GetDocumentMasterByNameData, GetDocumentMasterByNameVariables>;
+}
+export const getDocumentMasterByNameRef: GetDocumentMasterByNameRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the getDocumentMasterByNameRef:
+```typescript
+const name = getDocumentMasterByNameRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `GetDocumentMasterByName` query requires an argument of type `GetDocumentMasterByNameVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface GetDocumentMasterByNameVariables {
+  name: string;
+}
+```
+### Return Type
+Recall that executing the `GetDocumentMasterByName` query returns a `QueryPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `GetDocumentMasterByNameData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface GetDocumentMasterByNameData {
+  documentMasters: ({
+    id: UUIDString;
+    name: string;
+    documentPathId?: UUIDString | null;
+    documentPath?: {
+      id: UUIDString;
+      name: string;
+    } & DocumentPath_Key;
+      isActive: boolean;
+      description?: string | null;
+      sortOrder: number;
+  } & DocumentMaster_Key)[];
+}
+```
+### Using `GetDocumentMasterByName`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, getDocumentMasterByName, GetDocumentMasterByNameVariables } from '@mybox/dataconnect';
+
+// The `GetDocumentMasterByName` query requires an argument of type `GetDocumentMasterByNameVariables`:
+const getDocumentMasterByNameVars: GetDocumentMasterByNameVariables = {
+  name: ..., 
+};
+
+// Call the `getDocumentMasterByName()` function to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await getDocumentMasterByName(getDocumentMasterByNameVars);
+// Variables can be defined inline as well.
+const { data } = await getDocumentMasterByName({ name: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await getDocumentMasterByName(dataConnect, getDocumentMasterByNameVars);
+
+console.log(data.documentMasters);
+
+// Or, you can use the `Promise` API.
+getDocumentMasterByName(getDocumentMasterByNameVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentMasters);
+});
+```
+
+### Using `GetDocumentMasterByName`'s `QueryRef` function
+
+```typescript
+import { getDataConnect, executeQuery } from 'firebase/data-connect';
+import { connectorConfig, getDocumentMasterByNameRef, GetDocumentMasterByNameVariables } from '@mybox/dataconnect';
+
+// The `GetDocumentMasterByName` query requires an argument of type `GetDocumentMasterByNameVariables`:
+const getDocumentMasterByNameVars: GetDocumentMasterByNameVariables = {
+  name: ..., 
+};
+
+// Call the `getDocumentMasterByNameRef()` function to get a reference to the query.
+const ref = getDocumentMasterByNameRef(getDocumentMasterByNameVars);
+// Variables can be defined inline as well.
+const ref = getDocumentMasterByNameRef({ name: ..., });
+
+// You can also pass in a `DataConnect` instance to the `QueryRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = getDocumentMasterByNameRef(dataConnect, getDocumentMasterByNameVars);
+
+// Call `executeQuery()` on the reference to execute the query.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeQuery(ref);
+
+console.log(data.documentMasters);
+
+// Or, you can use the `Promise` API.
+executeQuery(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentMasters);
+});
+```
+
 # Mutations
 
 There are two ways to execute a Data Connect Mutation using the generated Web SDK:
@@ -4341,6 +5390,7 @@ The `CreateFile` mutation requires an argument of type `CreateFileVariables`, wh
 export interface CreateFileVariables {
   userId: UUIDString;
   loanId?: UUIDString | null;
+  documentMasterId?: UUIDString | null;
   originalFilename: string;
   storagePath: string;
   fileSize: number;
@@ -4370,6 +5420,7 @@ import { connectorConfig, createFile, CreateFileVariables } from '@mybox/datacon
 const createFileVars: CreateFileVariables = {
   userId: ..., 
   loanId: ..., // optional
+  documentMasterId: ..., // optional
   originalFilename: ..., 
   storagePath: ..., 
   fileSize: ..., 
@@ -4384,7 +5435,7 @@ const createFileVars: CreateFileVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await createFile(createFileVars);
 // Variables can be defined inline as well.
-const { data } = await createFile({ userId: ..., loanId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., downloadUrl: ..., tags: ..., description: ..., });
+const { data } = await createFile({ userId: ..., loanId: ..., documentMasterId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., downloadUrl: ..., tags: ..., description: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -4409,6 +5460,7 @@ import { connectorConfig, createFileRef, CreateFileVariables } from '@mybox/data
 const createFileVars: CreateFileVariables = {
   userId: ..., 
   loanId: ..., // optional
+  documentMasterId: ..., // optional
   originalFilename: ..., 
   storagePath: ..., 
   fileSize: ..., 
@@ -4422,7 +5474,7 @@ const createFileVars: CreateFileVariables = {
 // Call the `createFileRef()` function to get a reference to the mutation.
 const ref = createFileRef(createFileVars);
 // Variables can be defined inline as well.
-const ref = createFileRef({ userId: ..., loanId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., downloadUrl: ..., tags: ..., description: ..., });
+const ref = createFileRef({ userId: ..., loanId: ..., documentMasterId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., downloadUrl: ..., tags: ..., description: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -4476,6 +5528,7 @@ The `UpdateFile` mutation requires an argument of type `UpdateFileVariables`, wh
 ```typescript
 export interface UpdateFileVariables {
   id: UUIDString;
+  documentMasterId?: UUIDString | null;
   tags?: string | null;
   description?: string | null;
   downloadUrl?: string | null;
@@ -4499,6 +5552,7 @@ import { connectorConfig, updateFile, UpdateFileVariables } from '@mybox/datacon
 // The `UpdateFile` mutation requires an argument of type `UpdateFileVariables`:
 const updateFileVars: UpdateFileVariables = {
   id: ..., 
+  documentMasterId: ..., // optional
   tags: ..., // optional
   description: ..., // optional
   downloadUrl: ..., // optional
@@ -4508,7 +5562,7 @@ const updateFileVars: UpdateFileVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await updateFile(updateFileVars);
 // Variables can be defined inline as well.
-const { data } = await updateFile({ id: ..., tags: ..., description: ..., downloadUrl: ..., });
+const { data } = await updateFile({ id: ..., documentMasterId: ..., tags: ..., description: ..., downloadUrl: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -4532,6 +5586,7 @@ import { connectorConfig, updateFileRef, UpdateFileVariables } from '@mybox/data
 // The `UpdateFile` mutation requires an argument of type `UpdateFileVariables`:
 const updateFileVars: UpdateFileVariables = {
   id: ..., 
+  documentMasterId: ..., // optional
   tags: ..., // optional
   description: ..., // optional
   downloadUrl: ..., // optional
@@ -4540,7 +5595,7 @@ const updateFileVars: UpdateFileVariables = {
 // Call the `updateFileRef()` function to get a reference to the mutation.
 const ref = updateFileRef(updateFileVars);
 // Variables can be defined inline as well.
-const ref = updateFileRef({ id: ..., tags: ..., description: ..., downloadUrl: ..., });
+const ref = updateFileRef({ id: ..., documentMasterId: ..., tags: ..., description: ..., downloadUrl: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -5046,6 +6101,7 @@ The `CopyFile` mutation requires an argument of type `CopyFileVariables`, which 
 export interface CopyFileVariables {
   userId: UUIDString;
   loanId?: UUIDString | null;
+  documentMasterId?: UUIDString | null;
   originalFilename: string;
   storagePath: string;
   fileSize: number;
@@ -5075,6 +6131,7 @@ import { connectorConfig, copyFile, CopyFileVariables } from '@mybox/dataconnect
 const copyFileVars: CopyFileVariables = {
   userId: ..., 
   loanId: ..., // optional
+  documentMasterId: ..., // optional
   originalFilename: ..., 
   storagePath: ..., 
   fileSize: ..., 
@@ -5089,7 +6146,7 @@ const copyFileVars: CopyFileVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await copyFile(copyFileVars);
 // Variables can be defined inline as well.
-const { data } = await copyFile({ userId: ..., loanId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., downloadUrl: ..., tags: ..., description: ..., });
+const { data } = await copyFile({ userId: ..., loanId: ..., documentMasterId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., downloadUrl: ..., tags: ..., description: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -5114,6 +6171,7 @@ import { connectorConfig, copyFileRef, CopyFileVariables } from '@mybox/dataconn
 const copyFileVars: CopyFileVariables = {
   userId: ..., 
   loanId: ..., // optional
+  documentMasterId: ..., // optional
   originalFilename: ..., 
   storagePath: ..., 
   fileSize: ..., 
@@ -5127,7 +6185,7 @@ const copyFileVars: CopyFileVariables = {
 // Call the `copyFileRef()` function to get a reference to the mutation.
 const ref = copyFileRef(copyFileVars);
 // Variables can be defined inline as well.
-const ref = copyFileRef({ userId: ..., loanId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., downloadUrl: ..., tags: ..., description: ..., });
+const ref = copyFileRef({ userId: ..., loanId: ..., documentMasterId: ..., originalFilename: ..., storagePath: ..., fileSize: ..., mimeType: ..., fileExtension: ..., downloadUrl: ..., tags: ..., description: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -7721,6 +8779,1237 @@ console.log(data.magicLink_update);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.magicLink_update);
+});
+```
+
+## CreateDocumentPath
+You can execute the `CreateDocumentPath` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+createDocumentPath(vars: CreateDocumentPathVariables): MutationPromise<CreateDocumentPathData, CreateDocumentPathVariables>;
+
+interface CreateDocumentPathRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateDocumentPathVariables): MutationRef<CreateDocumentPathData, CreateDocumentPathVariables>;
+}
+export const createDocumentPathRef: CreateDocumentPathRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+createDocumentPath(dc: DataConnect, vars: CreateDocumentPathVariables): MutationPromise<CreateDocumentPathData, CreateDocumentPathVariables>;
+
+interface CreateDocumentPathRef {
+  ...
+  (dc: DataConnect, vars: CreateDocumentPathVariables): MutationRef<CreateDocumentPathData, CreateDocumentPathVariables>;
+}
+export const createDocumentPathRef: CreateDocumentPathRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the createDocumentPathRef:
+```typescript
+const name = createDocumentPathRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CreateDocumentPath` mutation requires an argument of type `CreateDocumentPathVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CreateDocumentPathVariables {
+  name: string;
+  sourceLookupId?: UUIDString | null;
+  description?: string | null;
+  sortOrder?: number | null;
+  createdBy?: string | null;
+}
+```
+### Return Type
+Recall that executing the `CreateDocumentPath` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CreateDocumentPathData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CreateDocumentPathData {
+  documentPath_insert: DocumentPath_Key;
+}
+```
+### Using `CreateDocumentPath`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, createDocumentPath, CreateDocumentPathVariables } from '@mybox/dataconnect';
+
+// The `CreateDocumentPath` mutation requires an argument of type `CreateDocumentPathVariables`:
+const createDocumentPathVars: CreateDocumentPathVariables = {
+  name: ..., 
+  sourceLookupId: ..., // optional
+  description: ..., // optional
+  sortOrder: ..., // optional
+  createdBy: ..., // optional
+};
+
+// Call the `createDocumentPath()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await createDocumentPath(createDocumentPathVars);
+// Variables can be defined inline as well.
+const { data } = await createDocumentPath({ name: ..., sourceLookupId: ..., description: ..., sortOrder: ..., createdBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await createDocumentPath(dataConnect, createDocumentPathVars);
+
+console.log(data.documentPath_insert);
+
+// Or, you can use the `Promise` API.
+createDocumentPath(createDocumentPathVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentPath_insert);
+});
+```
+
+### Using `CreateDocumentPath`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, createDocumentPathRef, CreateDocumentPathVariables } from '@mybox/dataconnect';
+
+// The `CreateDocumentPath` mutation requires an argument of type `CreateDocumentPathVariables`:
+const createDocumentPathVars: CreateDocumentPathVariables = {
+  name: ..., 
+  sourceLookupId: ..., // optional
+  description: ..., // optional
+  sortOrder: ..., // optional
+  createdBy: ..., // optional
+};
+
+// Call the `createDocumentPathRef()` function to get a reference to the mutation.
+const ref = createDocumentPathRef(createDocumentPathVars);
+// Variables can be defined inline as well.
+const ref = createDocumentPathRef({ name: ..., sourceLookupId: ..., description: ..., sortOrder: ..., createdBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = createDocumentPathRef(dataConnect, createDocumentPathVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.documentPath_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentPath_insert);
+});
+```
+
+## CreateDocumentPathWithId
+You can execute the `CreateDocumentPathWithId` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+createDocumentPathWithId(vars: CreateDocumentPathWithIdVariables): MutationPromise<CreateDocumentPathWithIdData, CreateDocumentPathWithIdVariables>;
+
+interface CreateDocumentPathWithIdRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateDocumentPathWithIdVariables): MutationRef<CreateDocumentPathWithIdData, CreateDocumentPathWithIdVariables>;
+}
+export const createDocumentPathWithIdRef: CreateDocumentPathWithIdRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+createDocumentPathWithId(dc: DataConnect, vars: CreateDocumentPathWithIdVariables): MutationPromise<CreateDocumentPathWithIdData, CreateDocumentPathWithIdVariables>;
+
+interface CreateDocumentPathWithIdRef {
+  ...
+  (dc: DataConnect, vars: CreateDocumentPathWithIdVariables): MutationRef<CreateDocumentPathWithIdData, CreateDocumentPathWithIdVariables>;
+}
+export const createDocumentPathWithIdRef: CreateDocumentPathWithIdRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the createDocumentPathWithIdRef:
+```typescript
+const name = createDocumentPathWithIdRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CreateDocumentPathWithId` mutation requires an argument of type `CreateDocumentPathWithIdVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CreateDocumentPathWithIdVariables {
+  id: UUIDString;
+  name: string;
+  sourceLookupId?: UUIDString | null;
+  description?: string | null;
+  sortOrder?: number | null;
+  createdBy?: string | null;
+}
+```
+### Return Type
+Recall that executing the `CreateDocumentPathWithId` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CreateDocumentPathWithIdData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CreateDocumentPathWithIdData {
+  documentPath_insert: DocumentPath_Key;
+}
+```
+### Using `CreateDocumentPathWithId`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, createDocumentPathWithId, CreateDocumentPathWithIdVariables } from '@mybox/dataconnect';
+
+// The `CreateDocumentPathWithId` mutation requires an argument of type `CreateDocumentPathWithIdVariables`:
+const createDocumentPathWithIdVars: CreateDocumentPathWithIdVariables = {
+  id: ..., 
+  name: ..., 
+  sourceLookupId: ..., // optional
+  description: ..., // optional
+  sortOrder: ..., // optional
+  createdBy: ..., // optional
+};
+
+// Call the `createDocumentPathWithId()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await createDocumentPathWithId(createDocumentPathWithIdVars);
+// Variables can be defined inline as well.
+const { data } = await createDocumentPathWithId({ id: ..., name: ..., sourceLookupId: ..., description: ..., sortOrder: ..., createdBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await createDocumentPathWithId(dataConnect, createDocumentPathWithIdVars);
+
+console.log(data.documentPath_insert);
+
+// Or, you can use the `Promise` API.
+createDocumentPathWithId(createDocumentPathWithIdVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentPath_insert);
+});
+```
+
+### Using `CreateDocumentPathWithId`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, createDocumentPathWithIdRef, CreateDocumentPathWithIdVariables } from '@mybox/dataconnect';
+
+// The `CreateDocumentPathWithId` mutation requires an argument of type `CreateDocumentPathWithIdVariables`:
+const createDocumentPathWithIdVars: CreateDocumentPathWithIdVariables = {
+  id: ..., 
+  name: ..., 
+  sourceLookupId: ..., // optional
+  description: ..., // optional
+  sortOrder: ..., // optional
+  createdBy: ..., // optional
+};
+
+// Call the `createDocumentPathWithIdRef()` function to get a reference to the mutation.
+const ref = createDocumentPathWithIdRef(createDocumentPathWithIdVars);
+// Variables can be defined inline as well.
+const ref = createDocumentPathWithIdRef({ id: ..., name: ..., sourceLookupId: ..., description: ..., sortOrder: ..., createdBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = createDocumentPathWithIdRef(dataConnect, createDocumentPathWithIdVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.documentPath_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentPath_insert);
+});
+```
+
+## UpdateDocumentPath
+You can execute the `UpdateDocumentPath` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+updateDocumentPath(vars: UpdateDocumentPathVariables): MutationPromise<UpdateDocumentPathData, UpdateDocumentPathVariables>;
+
+interface UpdateDocumentPathRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateDocumentPathVariables): MutationRef<UpdateDocumentPathData, UpdateDocumentPathVariables>;
+}
+export const updateDocumentPathRef: UpdateDocumentPathRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+updateDocumentPath(dc: DataConnect, vars: UpdateDocumentPathVariables): MutationPromise<UpdateDocumentPathData, UpdateDocumentPathVariables>;
+
+interface UpdateDocumentPathRef {
+  ...
+  (dc: DataConnect, vars: UpdateDocumentPathVariables): MutationRef<UpdateDocumentPathData, UpdateDocumentPathVariables>;
+}
+export const updateDocumentPathRef: UpdateDocumentPathRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the updateDocumentPathRef:
+```typescript
+const name = updateDocumentPathRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `UpdateDocumentPath` mutation requires an argument of type `UpdateDocumentPathVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface UpdateDocumentPathVariables {
+  id: UUIDString;
+  name?: string | null;
+  sourceLookupId?: UUIDString | null;
+  description?: string | null;
+  sortOrder?: number | null;
+  isActive?: boolean | null;
+  updatedBy?: string | null;
+}
+```
+### Return Type
+Recall that executing the `UpdateDocumentPath` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `UpdateDocumentPathData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface UpdateDocumentPathData {
+  documentPath_update?: DocumentPath_Key | null;
+}
+```
+### Using `UpdateDocumentPath`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, updateDocumentPath, UpdateDocumentPathVariables } from '@mybox/dataconnect';
+
+// The `UpdateDocumentPath` mutation requires an argument of type `UpdateDocumentPathVariables`:
+const updateDocumentPathVars: UpdateDocumentPathVariables = {
+  id: ..., 
+  name: ..., // optional
+  sourceLookupId: ..., // optional
+  description: ..., // optional
+  sortOrder: ..., // optional
+  isActive: ..., // optional
+  updatedBy: ..., // optional
+};
+
+// Call the `updateDocumentPath()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await updateDocumentPath(updateDocumentPathVars);
+// Variables can be defined inline as well.
+const { data } = await updateDocumentPath({ id: ..., name: ..., sourceLookupId: ..., description: ..., sortOrder: ..., isActive: ..., updatedBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await updateDocumentPath(dataConnect, updateDocumentPathVars);
+
+console.log(data.documentPath_update);
+
+// Or, you can use the `Promise` API.
+updateDocumentPath(updateDocumentPathVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentPath_update);
+});
+```
+
+### Using `UpdateDocumentPath`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, updateDocumentPathRef, UpdateDocumentPathVariables } from '@mybox/dataconnect';
+
+// The `UpdateDocumentPath` mutation requires an argument of type `UpdateDocumentPathVariables`:
+const updateDocumentPathVars: UpdateDocumentPathVariables = {
+  id: ..., 
+  name: ..., // optional
+  sourceLookupId: ..., // optional
+  description: ..., // optional
+  sortOrder: ..., // optional
+  isActive: ..., // optional
+  updatedBy: ..., // optional
+};
+
+// Call the `updateDocumentPathRef()` function to get a reference to the mutation.
+const ref = updateDocumentPathRef(updateDocumentPathVars);
+// Variables can be defined inline as well.
+const ref = updateDocumentPathRef({ id: ..., name: ..., sourceLookupId: ..., description: ..., sortOrder: ..., isActive: ..., updatedBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = updateDocumentPathRef(dataConnect, updateDocumentPathVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.documentPath_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentPath_update);
+});
+```
+
+## DeactivateDocumentPath
+You can execute the `DeactivateDocumentPath` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deactivateDocumentPath(vars: DeactivateDocumentPathVariables): MutationPromise<DeactivateDocumentPathData, DeactivateDocumentPathVariables>;
+
+interface DeactivateDocumentPathRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeactivateDocumentPathVariables): MutationRef<DeactivateDocumentPathData, DeactivateDocumentPathVariables>;
+}
+export const deactivateDocumentPathRef: DeactivateDocumentPathRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deactivateDocumentPath(dc: DataConnect, vars: DeactivateDocumentPathVariables): MutationPromise<DeactivateDocumentPathData, DeactivateDocumentPathVariables>;
+
+interface DeactivateDocumentPathRef {
+  ...
+  (dc: DataConnect, vars: DeactivateDocumentPathVariables): MutationRef<DeactivateDocumentPathData, DeactivateDocumentPathVariables>;
+}
+export const deactivateDocumentPathRef: DeactivateDocumentPathRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deactivateDocumentPathRef:
+```typescript
+const name = deactivateDocumentPathRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeactivateDocumentPath` mutation requires an argument of type `DeactivateDocumentPathVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeactivateDocumentPathVariables {
+  id: UUIDString;
+  updatedBy?: string | null;
+}
+```
+### Return Type
+Recall that executing the `DeactivateDocumentPath` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeactivateDocumentPathData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeactivateDocumentPathData {
+  documentPath_update?: DocumentPath_Key | null;
+}
+```
+### Using `DeactivateDocumentPath`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deactivateDocumentPath, DeactivateDocumentPathVariables } from '@mybox/dataconnect';
+
+// The `DeactivateDocumentPath` mutation requires an argument of type `DeactivateDocumentPathVariables`:
+const deactivateDocumentPathVars: DeactivateDocumentPathVariables = {
+  id: ..., 
+  updatedBy: ..., // optional
+};
+
+// Call the `deactivateDocumentPath()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deactivateDocumentPath(deactivateDocumentPathVars);
+// Variables can be defined inline as well.
+const { data } = await deactivateDocumentPath({ id: ..., updatedBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deactivateDocumentPath(dataConnect, deactivateDocumentPathVars);
+
+console.log(data.documentPath_update);
+
+// Or, you can use the `Promise` API.
+deactivateDocumentPath(deactivateDocumentPathVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentPath_update);
+});
+```
+
+### Using `DeactivateDocumentPath`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deactivateDocumentPathRef, DeactivateDocumentPathVariables } from '@mybox/dataconnect';
+
+// The `DeactivateDocumentPath` mutation requires an argument of type `DeactivateDocumentPathVariables`:
+const deactivateDocumentPathVars: DeactivateDocumentPathVariables = {
+  id: ..., 
+  updatedBy: ..., // optional
+};
+
+// Call the `deactivateDocumentPathRef()` function to get a reference to the mutation.
+const ref = deactivateDocumentPathRef(deactivateDocumentPathVars);
+// Variables can be defined inline as well.
+const ref = deactivateDocumentPathRef({ id: ..., updatedBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deactivateDocumentPathRef(dataConnect, deactivateDocumentPathVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.documentPath_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentPath_update);
+});
+```
+
+## DeleteDocumentPath
+You can execute the `DeleteDocumentPath` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deleteDocumentPath(vars: DeleteDocumentPathVariables): MutationPromise<DeleteDocumentPathData, DeleteDocumentPathVariables>;
+
+interface DeleteDocumentPathRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteDocumentPathVariables): MutationRef<DeleteDocumentPathData, DeleteDocumentPathVariables>;
+}
+export const deleteDocumentPathRef: DeleteDocumentPathRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deleteDocumentPath(dc: DataConnect, vars: DeleteDocumentPathVariables): MutationPromise<DeleteDocumentPathData, DeleteDocumentPathVariables>;
+
+interface DeleteDocumentPathRef {
+  ...
+  (dc: DataConnect, vars: DeleteDocumentPathVariables): MutationRef<DeleteDocumentPathData, DeleteDocumentPathVariables>;
+}
+export const deleteDocumentPathRef: DeleteDocumentPathRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteDocumentPathRef:
+```typescript
+const name = deleteDocumentPathRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeleteDocumentPath` mutation requires an argument of type `DeleteDocumentPathVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeleteDocumentPathVariables {
+  id: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `DeleteDocumentPath` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeleteDocumentPathData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeleteDocumentPathData {
+  documentPath_delete?: DocumentPath_Key | null;
+}
+```
+### Using `DeleteDocumentPath`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deleteDocumentPath, DeleteDocumentPathVariables } from '@mybox/dataconnect';
+
+// The `DeleteDocumentPath` mutation requires an argument of type `DeleteDocumentPathVariables`:
+const deleteDocumentPathVars: DeleteDocumentPathVariables = {
+  id: ..., 
+};
+
+// Call the `deleteDocumentPath()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deleteDocumentPath(deleteDocumentPathVars);
+// Variables can be defined inline as well.
+const { data } = await deleteDocumentPath({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deleteDocumentPath(dataConnect, deleteDocumentPathVars);
+
+console.log(data.documentPath_delete);
+
+// Or, you can use the `Promise` API.
+deleteDocumentPath(deleteDocumentPathVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentPath_delete);
+});
+```
+
+### Using `DeleteDocumentPath`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deleteDocumentPathRef, DeleteDocumentPathVariables } from '@mybox/dataconnect';
+
+// The `DeleteDocumentPath` mutation requires an argument of type `DeleteDocumentPathVariables`:
+const deleteDocumentPathVars: DeleteDocumentPathVariables = {
+  id: ..., 
+};
+
+// Call the `deleteDocumentPathRef()` function to get a reference to the mutation.
+const ref = deleteDocumentPathRef(deleteDocumentPathVars);
+// Variables can be defined inline as well.
+const ref = deleteDocumentPathRef({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deleteDocumentPathRef(dataConnect, deleteDocumentPathVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.documentPath_delete);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentPath_delete);
+});
+```
+
+## CreateDocumentMaster
+You can execute the `CreateDocumentMaster` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+createDocumentMaster(vars: CreateDocumentMasterVariables): MutationPromise<CreateDocumentMasterData, CreateDocumentMasterVariables>;
+
+interface CreateDocumentMasterRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateDocumentMasterVariables): MutationRef<CreateDocumentMasterData, CreateDocumentMasterVariables>;
+}
+export const createDocumentMasterRef: CreateDocumentMasterRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+createDocumentMaster(dc: DataConnect, vars: CreateDocumentMasterVariables): MutationPromise<CreateDocumentMasterData, CreateDocumentMasterVariables>;
+
+interface CreateDocumentMasterRef {
+  ...
+  (dc: DataConnect, vars: CreateDocumentMasterVariables): MutationRef<CreateDocumentMasterData, CreateDocumentMasterVariables>;
+}
+export const createDocumentMasterRef: CreateDocumentMasterRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the createDocumentMasterRef:
+```typescript
+const name = createDocumentMasterRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CreateDocumentMaster` mutation requires an argument of type `CreateDocumentMasterVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CreateDocumentMasterVariables {
+  name: string;
+  documentPathId?: UUIDString | null;
+  description?: string | null;
+  sortOrder?: number | null;
+  isSystemGenerated?: boolean | null;
+  reviewRequired?: boolean | null;
+  isVersioningEnabled?: boolean | null;
+  namingConvention?: string | null;
+  display?: string | null;
+  createdBy?: string | null;
+}
+```
+### Return Type
+Recall that executing the `CreateDocumentMaster` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CreateDocumentMasterData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CreateDocumentMasterData {
+  documentMaster_insert: DocumentMaster_Key;
+}
+```
+### Using `CreateDocumentMaster`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, createDocumentMaster, CreateDocumentMasterVariables } from '@mybox/dataconnect';
+
+// The `CreateDocumentMaster` mutation requires an argument of type `CreateDocumentMasterVariables`:
+const createDocumentMasterVars: CreateDocumentMasterVariables = {
+  name: ..., 
+  documentPathId: ..., // optional
+  description: ..., // optional
+  sortOrder: ..., // optional
+  isSystemGenerated: ..., // optional
+  reviewRequired: ..., // optional
+  isVersioningEnabled: ..., // optional
+  namingConvention: ..., // optional
+  display: ..., // optional
+  createdBy: ..., // optional
+};
+
+// Call the `createDocumentMaster()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await createDocumentMaster(createDocumentMasterVars);
+// Variables can be defined inline as well.
+const { data } = await createDocumentMaster({ name: ..., documentPathId: ..., description: ..., sortOrder: ..., isSystemGenerated: ..., reviewRequired: ..., isVersioningEnabled: ..., namingConvention: ..., display: ..., createdBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await createDocumentMaster(dataConnect, createDocumentMasterVars);
+
+console.log(data.documentMaster_insert);
+
+// Or, you can use the `Promise` API.
+createDocumentMaster(createDocumentMasterVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentMaster_insert);
+});
+```
+
+### Using `CreateDocumentMaster`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, createDocumentMasterRef, CreateDocumentMasterVariables } from '@mybox/dataconnect';
+
+// The `CreateDocumentMaster` mutation requires an argument of type `CreateDocumentMasterVariables`:
+const createDocumentMasterVars: CreateDocumentMasterVariables = {
+  name: ..., 
+  documentPathId: ..., // optional
+  description: ..., // optional
+  sortOrder: ..., // optional
+  isSystemGenerated: ..., // optional
+  reviewRequired: ..., // optional
+  isVersioningEnabled: ..., // optional
+  namingConvention: ..., // optional
+  display: ..., // optional
+  createdBy: ..., // optional
+};
+
+// Call the `createDocumentMasterRef()` function to get a reference to the mutation.
+const ref = createDocumentMasterRef(createDocumentMasterVars);
+// Variables can be defined inline as well.
+const ref = createDocumentMasterRef({ name: ..., documentPathId: ..., description: ..., sortOrder: ..., isSystemGenerated: ..., reviewRequired: ..., isVersioningEnabled: ..., namingConvention: ..., display: ..., createdBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = createDocumentMasterRef(dataConnect, createDocumentMasterVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.documentMaster_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentMaster_insert);
+});
+```
+
+## CreateDocumentMasterWithId
+You can execute the `CreateDocumentMasterWithId` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+createDocumentMasterWithId(vars: CreateDocumentMasterWithIdVariables): MutationPromise<CreateDocumentMasterWithIdData, CreateDocumentMasterWithIdVariables>;
+
+interface CreateDocumentMasterWithIdRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: CreateDocumentMasterWithIdVariables): MutationRef<CreateDocumentMasterWithIdData, CreateDocumentMasterWithIdVariables>;
+}
+export const createDocumentMasterWithIdRef: CreateDocumentMasterWithIdRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+createDocumentMasterWithId(dc: DataConnect, vars: CreateDocumentMasterWithIdVariables): MutationPromise<CreateDocumentMasterWithIdData, CreateDocumentMasterWithIdVariables>;
+
+interface CreateDocumentMasterWithIdRef {
+  ...
+  (dc: DataConnect, vars: CreateDocumentMasterWithIdVariables): MutationRef<CreateDocumentMasterWithIdData, CreateDocumentMasterWithIdVariables>;
+}
+export const createDocumentMasterWithIdRef: CreateDocumentMasterWithIdRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the createDocumentMasterWithIdRef:
+```typescript
+const name = createDocumentMasterWithIdRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `CreateDocumentMasterWithId` mutation requires an argument of type `CreateDocumentMasterWithIdVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface CreateDocumentMasterWithIdVariables {
+  id: UUIDString;
+  name: string;
+  documentPathId?: UUIDString | null;
+  description?: string | null;
+  sortOrder?: number | null;
+  isSystemGenerated?: boolean | null;
+  reviewRequired?: boolean | null;
+  isVersioningEnabled?: boolean | null;
+  namingConvention?: string | null;
+  display?: string | null;
+  createdBy?: string | null;
+}
+```
+### Return Type
+Recall that executing the `CreateDocumentMasterWithId` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `CreateDocumentMasterWithIdData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface CreateDocumentMasterWithIdData {
+  documentMaster_insert: DocumentMaster_Key;
+}
+```
+### Using `CreateDocumentMasterWithId`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, createDocumentMasterWithId, CreateDocumentMasterWithIdVariables } from '@mybox/dataconnect';
+
+// The `CreateDocumentMasterWithId` mutation requires an argument of type `CreateDocumentMasterWithIdVariables`:
+const createDocumentMasterWithIdVars: CreateDocumentMasterWithIdVariables = {
+  id: ..., 
+  name: ..., 
+  documentPathId: ..., // optional
+  description: ..., // optional
+  sortOrder: ..., // optional
+  isSystemGenerated: ..., // optional
+  reviewRequired: ..., // optional
+  isVersioningEnabled: ..., // optional
+  namingConvention: ..., // optional
+  display: ..., // optional
+  createdBy: ..., // optional
+};
+
+// Call the `createDocumentMasterWithId()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await createDocumentMasterWithId(createDocumentMasterWithIdVars);
+// Variables can be defined inline as well.
+const { data } = await createDocumentMasterWithId({ id: ..., name: ..., documentPathId: ..., description: ..., sortOrder: ..., isSystemGenerated: ..., reviewRequired: ..., isVersioningEnabled: ..., namingConvention: ..., display: ..., createdBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await createDocumentMasterWithId(dataConnect, createDocumentMasterWithIdVars);
+
+console.log(data.documentMaster_insert);
+
+// Or, you can use the `Promise` API.
+createDocumentMasterWithId(createDocumentMasterWithIdVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentMaster_insert);
+});
+```
+
+### Using `CreateDocumentMasterWithId`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, createDocumentMasterWithIdRef, CreateDocumentMasterWithIdVariables } from '@mybox/dataconnect';
+
+// The `CreateDocumentMasterWithId` mutation requires an argument of type `CreateDocumentMasterWithIdVariables`:
+const createDocumentMasterWithIdVars: CreateDocumentMasterWithIdVariables = {
+  id: ..., 
+  name: ..., 
+  documentPathId: ..., // optional
+  description: ..., // optional
+  sortOrder: ..., // optional
+  isSystemGenerated: ..., // optional
+  reviewRequired: ..., // optional
+  isVersioningEnabled: ..., // optional
+  namingConvention: ..., // optional
+  display: ..., // optional
+  createdBy: ..., // optional
+};
+
+// Call the `createDocumentMasterWithIdRef()` function to get a reference to the mutation.
+const ref = createDocumentMasterWithIdRef(createDocumentMasterWithIdVars);
+// Variables can be defined inline as well.
+const ref = createDocumentMasterWithIdRef({ id: ..., name: ..., documentPathId: ..., description: ..., sortOrder: ..., isSystemGenerated: ..., reviewRequired: ..., isVersioningEnabled: ..., namingConvention: ..., display: ..., createdBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = createDocumentMasterWithIdRef(dataConnect, createDocumentMasterWithIdVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.documentMaster_insert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentMaster_insert);
+});
+```
+
+## UpdateDocumentMaster
+You can execute the `UpdateDocumentMaster` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+updateDocumentMaster(vars: UpdateDocumentMasterVariables): MutationPromise<UpdateDocumentMasterData, UpdateDocumentMasterVariables>;
+
+interface UpdateDocumentMasterRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpdateDocumentMasterVariables): MutationRef<UpdateDocumentMasterData, UpdateDocumentMasterVariables>;
+}
+export const updateDocumentMasterRef: UpdateDocumentMasterRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+updateDocumentMaster(dc: DataConnect, vars: UpdateDocumentMasterVariables): MutationPromise<UpdateDocumentMasterData, UpdateDocumentMasterVariables>;
+
+interface UpdateDocumentMasterRef {
+  ...
+  (dc: DataConnect, vars: UpdateDocumentMasterVariables): MutationRef<UpdateDocumentMasterData, UpdateDocumentMasterVariables>;
+}
+export const updateDocumentMasterRef: UpdateDocumentMasterRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the updateDocumentMasterRef:
+```typescript
+const name = updateDocumentMasterRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `UpdateDocumentMaster` mutation requires an argument of type `UpdateDocumentMasterVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface UpdateDocumentMasterVariables {
+  id: UUIDString;
+  name?: string | null;
+  documentPathId?: UUIDString | null;
+  description?: string | null;
+  sortOrder?: number | null;
+  isActive?: boolean | null;
+  isSystemGenerated?: boolean | null;
+  reviewRequired?: boolean | null;
+  isVersioningEnabled?: boolean | null;
+  namingConvention?: string | null;
+  display?: string | null;
+  updatedBy?: string | null;
+}
+```
+### Return Type
+Recall that executing the `UpdateDocumentMaster` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `UpdateDocumentMasterData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface UpdateDocumentMasterData {
+  documentMaster_update?: DocumentMaster_Key | null;
+}
+```
+### Using `UpdateDocumentMaster`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, updateDocumentMaster, UpdateDocumentMasterVariables } from '@mybox/dataconnect';
+
+// The `UpdateDocumentMaster` mutation requires an argument of type `UpdateDocumentMasterVariables`:
+const updateDocumentMasterVars: UpdateDocumentMasterVariables = {
+  id: ..., 
+  name: ..., // optional
+  documentPathId: ..., // optional
+  description: ..., // optional
+  sortOrder: ..., // optional
+  isActive: ..., // optional
+  isSystemGenerated: ..., // optional
+  reviewRequired: ..., // optional
+  isVersioningEnabled: ..., // optional
+  namingConvention: ..., // optional
+  display: ..., // optional
+  updatedBy: ..., // optional
+};
+
+// Call the `updateDocumentMaster()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await updateDocumentMaster(updateDocumentMasterVars);
+// Variables can be defined inline as well.
+const { data } = await updateDocumentMaster({ id: ..., name: ..., documentPathId: ..., description: ..., sortOrder: ..., isActive: ..., isSystemGenerated: ..., reviewRequired: ..., isVersioningEnabled: ..., namingConvention: ..., display: ..., updatedBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await updateDocumentMaster(dataConnect, updateDocumentMasterVars);
+
+console.log(data.documentMaster_update);
+
+// Or, you can use the `Promise` API.
+updateDocumentMaster(updateDocumentMasterVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentMaster_update);
+});
+```
+
+### Using `UpdateDocumentMaster`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, updateDocumentMasterRef, UpdateDocumentMasterVariables } from '@mybox/dataconnect';
+
+// The `UpdateDocumentMaster` mutation requires an argument of type `UpdateDocumentMasterVariables`:
+const updateDocumentMasterVars: UpdateDocumentMasterVariables = {
+  id: ..., 
+  name: ..., // optional
+  documentPathId: ..., // optional
+  description: ..., // optional
+  sortOrder: ..., // optional
+  isActive: ..., // optional
+  isSystemGenerated: ..., // optional
+  reviewRequired: ..., // optional
+  isVersioningEnabled: ..., // optional
+  namingConvention: ..., // optional
+  display: ..., // optional
+  updatedBy: ..., // optional
+};
+
+// Call the `updateDocumentMasterRef()` function to get a reference to the mutation.
+const ref = updateDocumentMasterRef(updateDocumentMasterVars);
+// Variables can be defined inline as well.
+const ref = updateDocumentMasterRef({ id: ..., name: ..., documentPathId: ..., description: ..., sortOrder: ..., isActive: ..., isSystemGenerated: ..., reviewRequired: ..., isVersioningEnabled: ..., namingConvention: ..., display: ..., updatedBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = updateDocumentMasterRef(dataConnect, updateDocumentMasterVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.documentMaster_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentMaster_update);
+});
+```
+
+## DeactivateDocumentMaster
+You can execute the `DeactivateDocumentMaster` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deactivateDocumentMaster(vars: DeactivateDocumentMasterVariables): MutationPromise<DeactivateDocumentMasterData, DeactivateDocumentMasterVariables>;
+
+interface DeactivateDocumentMasterRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeactivateDocumentMasterVariables): MutationRef<DeactivateDocumentMasterData, DeactivateDocumentMasterVariables>;
+}
+export const deactivateDocumentMasterRef: DeactivateDocumentMasterRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deactivateDocumentMaster(dc: DataConnect, vars: DeactivateDocumentMasterVariables): MutationPromise<DeactivateDocumentMasterData, DeactivateDocumentMasterVariables>;
+
+interface DeactivateDocumentMasterRef {
+  ...
+  (dc: DataConnect, vars: DeactivateDocumentMasterVariables): MutationRef<DeactivateDocumentMasterData, DeactivateDocumentMasterVariables>;
+}
+export const deactivateDocumentMasterRef: DeactivateDocumentMasterRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deactivateDocumentMasterRef:
+```typescript
+const name = deactivateDocumentMasterRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeactivateDocumentMaster` mutation requires an argument of type `DeactivateDocumentMasterVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeactivateDocumentMasterVariables {
+  id: UUIDString;
+  updatedBy?: string | null;
+}
+```
+### Return Type
+Recall that executing the `DeactivateDocumentMaster` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeactivateDocumentMasterData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeactivateDocumentMasterData {
+  documentMaster_update?: DocumentMaster_Key | null;
+}
+```
+### Using `DeactivateDocumentMaster`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deactivateDocumentMaster, DeactivateDocumentMasterVariables } from '@mybox/dataconnect';
+
+// The `DeactivateDocumentMaster` mutation requires an argument of type `DeactivateDocumentMasterVariables`:
+const deactivateDocumentMasterVars: DeactivateDocumentMasterVariables = {
+  id: ..., 
+  updatedBy: ..., // optional
+};
+
+// Call the `deactivateDocumentMaster()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deactivateDocumentMaster(deactivateDocumentMasterVars);
+// Variables can be defined inline as well.
+const { data } = await deactivateDocumentMaster({ id: ..., updatedBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deactivateDocumentMaster(dataConnect, deactivateDocumentMasterVars);
+
+console.log(data.documentMaster_update);
+
+// Or, you can use the `Promise` API.
+deactivateDocumentMaster(deactivateDocumentMasterVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentMaster_update);
+});
+```
+
+### Using `DeactivateDocumentMaster`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deactivateDocumentMasterRef, DeactivateDocumentMasterVariables } from '@mybox/dataconnect';
+
+// The `DeactivateDocumentMaster` mutation requires an argument of type `DeactivateDocumentMasterVariables`:
+const deactivateDocumentMasterVars: DeactivateDocumentMasterVariables = {
+  id: ..., 
+  updatedBy: ..., // optional
+};
+
+// Call the `deactivateDocumentMasterRef()` function to get a reference to the mutation.
+const ref = deactivateDocumentMasterRef(deactivateDocumentMasterVars);
+// Variables can be defined inline as well.
+const ref = deactivateDocumentMasterRef({ id: ..., updatedBy: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deactivateDocumentMasterRef(dataConnect, deactivateDocumentMasterVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.documentMaster_update);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentMaster_update);
+});
+```
+
+## DeleteDocumentMaster
+You can execute the `DeleteDocumentMaster` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deleteDocumentMaster(vars: DeleteDocumentMasterVariables): MutationPromise<DeleteDocumentMasterData, DeleteDocumentMasterVariables>;
+
+interface DeleteDocumentMasterRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteDocumentMasterVariables): MutationRef<DeleteDocumentMasterData, DeleteDocumentMasterVariables>;
+}
+export const deleteDocumentMasterRef: DeleteDocumentMasterRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deleteDocumentMaster(dc: DataConnect, vars: DeleteDocumentMasterVariables): MutationPromise<DeleteDocumentMasterData, DeleteDocumentMasterVariables>;
+
+interface DeleteDocumentMasterRef {
+  ...
+  (dc: DataConnect, vars: DeleteDocumentMasterVariables): MutationRef<DeleteDocumentMasterData, DeleteDocumentMasterVariables>;
+}
+export const deleteDocumentMasterRef: DeleteDocumentMasterRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteDocumentMasterRef:
+```typescript
+const name = deleteDocumentMasterRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeleteDocumentMaster` mutation requires an argument of type `DeleteDocumentMasterVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeleteDocumentMasterVariables {
+  id: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `DeleteDocumentMaster` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeleteDocumentMasterData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeleteDocumentMasterData {
+  documentMaster_delete?: DocumentMaster_Key | null;
+}
+```
+### Using `DeleteDocumentMaster`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deleteDocumentMaster, DeleteDocumentMasterVariables } from '@mybox/dataconnect';
+
+// The `DeleteDocumentMaster` mutation requires an argument of type `DeleteDocumentMasterVariables`:
+const deleteDocumentMasterVars: DeleteDocumentMasterVariables = {
+  id: ..., 
+};
+
+// Call the `deleteDocumentMaster()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deleteDocumentMaster(deleteDocumentMasterVars);
+// Variables can be defined inline as well.
+const { data } = await deleteDocumentMaster({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deleteDocumentMaster(dataConnect, deleteDocumentMasterVars);
+
+console.log(data.documentMaster_delete);
+
+// Or, you can use the `Promise` API.
+deleteDocumentMaster(deleteDocumentMasterVars).then((response) => {
+  const data = response.data;
+  console.log(data.documentMaster_delete);
+});
+```
+
+### Using `DeleteDocumentMaster`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deleteDocumentMasterRef, DeleteDocumentMasterVariables } from '@mybox/dataconnect';
+
+// The `DeleteDocumentMaster` mutation requires an argument of type `DeleteDocumentMasterVariables`:
+const deleteDocumentMasterVars: DeleteDocumentMasterVariables = {
+  id: ..., 
+};
+
+// Call the `deleteDocumentMasterRef()` function to get a reference to the mutation.
+const ref = deleteDocumentMasterRef(deleteDocumentMasterVars);
+// Variables can be defined inline as well.
+const ref = deleteDocumentMasterRef({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deleteDocumentMasterRef(dataConnect, deleteDocumentMasterVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.documentMaster_delete);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.documentMaster_delete);
 });
 ```
 

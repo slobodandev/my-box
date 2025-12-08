@@ -3,6 +3,7 @@ import AppLayout from '@/components/layout/AppLayout';
 import { AuthProvider, RequireAuth } from '@/contexts/AuthContext';
 import { PasswordSetupPrompt } from '@/components/auth/PasswordSetupPrompt';
 import { RequireSuperAdmin } from '@/components/auth/RequireSuperAdmin';
+import { RequireAdmin } from '@/components/auth/RequireAdmin';
 
 // Auth Pages
 import SignIn from '@/pages/auth/SignIn';
@@ -11,6 +12,8 @@ import Verify from '@/pages/auth/Verify';
 
 // Admin Pages
 import UserManagement from '@/pages/admin/UserManagement';
+import DocumentPathManagement from '@/pages/admin/DocumentPathManagement';
+import DocumentMasterManagement from '@/pages/admin/DocumentMasterManagement';
 
 function App() {
   return (
@@ -31,6 +34,28 @@ function App() {
                   <RequireSuperAdmin>
                     <UserManagement />
                   </RequireSuperAdmin>
+                </RequireAuth>
+              }
+            />
+
+            {/* Admin Routes - Requires Admin or Super Admin Role */}
+            <Route
+              path="/admin/document-paths"
+              element={
+                <RequireAuth fallback={<SignIn />}>
+                  <RequireAdmin>
+                    <DocumentPathManagement />
+                  </RequireAdmin>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/admin/document-types"
+              element={
+                <RequireAuth fallback={<SignIn />}>
+                  <RequireAdmin>
+                    <DocumentMasterManagement />
+                  </RequireAdmin>
                 </RequireAuth>
               }
             />

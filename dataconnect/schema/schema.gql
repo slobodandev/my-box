@@ -49,6 +49,8 @@ type File @table {
   userId: UUID! @col(name: "user_id")
   loanId: UUID @col(name: "loan_id") # Nullable - null means personal file
   loan: Loan @ref(fields: "loanId") # Relationship to Loan
+  documentMasterId: UUID @col(name: "document_master_id") # Nullable - FK to DocumentMaster for naming convention
+  documentMaster: DocumentMaster @ref(fields: "documentMasterId") # Relationship to DocumentMaster
   originalFilename: String! @col(name: "original_filename")
   storagePath: String! @col(name: "storage_path")
   fileSize: Int! @col(name: "file_size")
@@ -66,6 +68,7 @@ type File @table {
 
 extend type File @index(fields: ["userId"], name: "idx_file_user")
 extend type File @index(fields: ["loanId"], name: "idx_file_loan")
+extend type File @index(fields: ["documentMasterId"], name: "idx_file_document_master")
 extend type File @index(fields: ["storagePath"], name: "idx_file_path")
 extend type File @index(fields: ["isDeleted"], name: "idx_file_deleted")
 
@@ -182,3 +185,56 @@ type RateLimitTracking @table(name: "rate_limit_tracking") {
 }
 
 extend type RateLimitTracking @index(fields: ["identifier", "actionType"], name: "idx_rate_limit")
+
+# ============================================================================
+# DOCUMENT MANAGEMENT TABLES (Migrated from portal-api)
+# These tables define the folder structure for loan documents
+# ============================================================================
+
+# DocumentPath - Defines folder paths/categories for organizing documents
+# Represents a hierarchical folder structure (e.g., "1 - Borrower Docs/1.1 - Company")
+type DocumentPath @table(name: "document_paths") {
+  id: UUID! @default(expr: "uuidV4()")
+  name: String! # Full path name (e.g., "1 - Borrower Docs/1.1 - Company")
+  sourceLookupId: UUID @col(name: "source_lookup_id") # Reference to source type
+  isActive: Boolean! @default(value: true) @col(name: "is_active")
+  description: String
+  sortOrder: Int! @default(value: 0) @col(name: "sort_order")
+  createdOn: Timestamp! @default(expr: "request.time") @col(name: "created_on")
+  createdBy: String @col(name: "created_by")
+  updatedOn: Timestamp! @default(expr: "request.time") @col(name: "updated_on")
+  updatedBy: String @col(name: "updated_by")
+}
+
+extend type DocumentPath @index(fields: ["name"], name: "idx_document_path_name")
+extend type DocumentPath @index(fields: ["isActive"], name: "idx_document_path_active")
+extend type DocumentPath @index(fields: ["sortOrder"], name: "idx_document_path_sort")
+
+# DocumentMaster - Defines document types that can be placed in document paths
+# Maps specific document types (e.g., "Loan Agreement") to their folder locations
+type DocumentMaster @table(name: "document_masters") {
+  id: UUID! @default(expr: "uuidV4()")
+  name: String! # Document type name (e.g., "Loan Agreement", "Borrower Narrative")
+  documentPathId: UUID @col(name: "document_path_id") # FK to DocumentPath
+  documentPath: DocumentPath @ref(fields: "documentPathId") # Relationship to DocumentPath
+  isActive: Boolean! @default(value: true) @col(name: "is_active")
+  description: String
+  sortOrder: Int! @default(value: 0) @col(name: "sort_order")
+  # Document behavior flags
+  isSystemGenerated: Boolean! @default(value: false) @col(name: "is_system_generated")
+  reviewRequired: Boolean! @default(value: false) @col(name: "review_required")
+  isVersioningEnabled: Boolean! @default(value: false) @col(name: "is_versioning_enabled")
+  # Naming and display
+  namingConvention: String @col(name: "naming_convention")
+  display: String # Display name override
+  # Audit fields
+  createdOn: Timestamp! @default(expr: "request.time") @col(name: "created_on")
+  createdBy: String @col(name: "created_by")
+  updatedOn: Timestamp! @default(expr: "request.time") @col(name: "updated_on")
+  updatedBy: String @col(name: "updated_by")
+}
+
+extend type DocumentMaster @index(fields: ["name"], name: "idx_document_master_name")
+extend type DocumentMaster @index(fields: ["documentPathId"], name: "idx_document_master_path")
+extend type DocumentMaster @index(fields: ["isActive"], name: "idx_document_master_active")
+extend type DocumentMaster @index(fields: ["sortOrder"], name: "idx_document_master_sort")

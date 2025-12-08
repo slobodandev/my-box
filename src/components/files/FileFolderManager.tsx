@@ -10,9 +10,9 @@ import '@cubone/react-file-manager/dist/style.css';
 import { useAuth } from '@/contexts/AuthContext';
 import { getAllUsers } from '@/services/dataconnect/userService';
 import { getUserFiles } from '@/services/fileService';
-import { getUserLoans } from '@/services/dataconnect/loanService';
+import { getUserLoans, getLoan } from '@/services/dataconnect/loanService';
+import { getDocumentMaster } from '@/services/dataconnect/documentMasterService';
 import { deleteFile } from '@/services/fileOperations';
-import { getFileDownloadURL } from '@/utils/storage';
 import {
   collectFilesFromFolder,
   downloadFolderAsZip,
@@ -20,6 +20,12 @@ import {
   type FolderDownloadProgress,
 } from '@/utils/folderDownload';
 import { modal } from '@/utils/modal';
+import {
+  applyNamingConvention,
+  buildNamingConventionContext,
+} from '@/utils/namingConvention';
+import { ref, getBlob } from 'firebase/storage';
+import { storage } from '@/config/firebase';
 
 interface FileFolderManagerProps {
   onRefresh?: () => void;
@@ -65,7 +71,7 @@ const buildFolderStructureFromFiles = (
       const parts = folderPath.split('/').filter(p => p);
       let currentPath = basePath;
 
-      parts.forEach((part, index) => {
+      parts.forEach((part) => {
         const parentPath = currentPath;
         currentPath = `${currentPath}/${part}`;
 
@@ -88,6 +94,8 @@ const buildFolderStructureFromFiles = (
         updatedAt: file.uploadedAt?.toString() || new Date().toISOString(),
         size: file.fileSize,
         storagePath: file.storagePath,
+        documentMasterId: file.documentMasterId,
+        loanId: file.loanId,
       } as FileManagerFile);
     } else {
       // File has no folder path - add directly to base path
@@ -100,6 +108,8 @@ const buildFolderStructureFromFiles = (
         updatedAt: file.uploadedAt?.toString() || new Date().toISOString(),
         size: file.fileSize,
         storagePath: file.storagePath,
+        documentMasterId: file.documentMasterId,
+        loanId: file.loanId,
       } as FileManagerFile);
     }
   });
@@ -420,24 +430,80 @@ export const FileFolderManager: React.FC<FileFolderManagerProps> = () => {
     }
 
     try {
-      // @ts-ignore - storagePath is added to FileManagerFile
+      // @ts-ignore - storagePath and documentMasterId are added to FileManagerFile
       const storagePath = file.storagePath as string;
+      // @ts-ignore
+      const documentMasterId = file.documentMasterId as string | undefined;
+      // @ts-ignore
+      const loanId = file.loanId as string | undefined;
+      // @ts-ignore
+      const uploadedAt = file.updatedAt as string | undefined;
 
       if (!storagePath) {
         throw new Error('File storage path not found');
       }
 
-      const downloadUrl = await getFileDownloadURL(storagePath);
+      // Determine final filename (with naming convention if applicable)
+      let downloadFilename = file.name;
 
-      // Trigger download
+      if (documentMasterId) {
+        try {
+          const docMaster = await getDocumentMaster(documentMasterId);
+
+          if (docMaster?.namingConvention) {
+            // Build context for naming convention
+            let loanData = undefined;
+            if (loanId) {
+              const loan = await getLoan(loanId);
+              if (loan) {
+                loanData = { id: loan.id, loanNumber: loan.loanNumber };
+              }
+            }
+
+            const context = buildNamingConventionContext({
+              loan: loanData,
+              user: user ? {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+              } : undefined,
+              uploadedAt: uploadedAt,
+            });
+
+            // Apply naming convention
+            const result = applyNamingConvention({
+              pattern: docMaster.namingConvention,
+              context,
+              originalFilename: file.name,
+              isVersioningEnabled: docMaster.isVersioningEnabled,
+            });
+
+            if (result.success && result.renamedFilename !== file.name) {
+              downloadFilename = result.renamedFilename;
+            }
+          }
+        } catch (ncError) {
+          // If naming convention fails, continue with original filename
+          console.error('Error applying naming convention:', ncError);
+        }
+      }
+
+      // Get blob from Firebase Storage and trigger download with proper filename
+      const storageRef = ref(storage, storagePath);
+      const blob = await getBlob(storageRef);
+
+      const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = file.name;
+      link.href = blobUrl;
+      link.download = downloadFilename;
+      link.style.display = 'none';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
 
-      console.log('File downloaded:', file.name);
+      // Clean up blob URL
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
     } catch (error: any) {
       console.error('Error downloading file:', error);
       modal.error(error.message || 'Failed to download file. Please try again.');

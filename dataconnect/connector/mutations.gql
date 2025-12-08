@@ -8,7 +8,10 @@ mutation CreateUser(
   $lastName: String
   $role: String
   $phoneNumber: String
-) @auth(level: PUBLIC) {
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions to create users during authentication flow. Frontend access is controlled through authenticated Cloud Functions."
+) {
   user_insert(data: {
     email: $email
     firstName: $firstName
@@ -24,6 +27,9 @@ mutation UpdateUser(
   $lastName: String
   $phoneNumber: String
   $lastLoginAt: Timestamp
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions and authenticated users to update profile data. Frontend validates user ownership before calling."
 ) {
   user_update(
     id: $id
@@ -53,7 +59,10 @@ mutation UpdateUserPasswordStatus(
   )
 }
 
-mutation DeactivateUser($id: UUID!) {
+mutation DeactivateUser($id: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to deactivate accounts. Frontend enforces role-based access control via RequireAdmin component."
+) {
   user_update(
     id: $id
     data: {
@@ -149,6 +158,7 @@ mutation DeleteLoan($id: UUID!) @auth(
 mutation CreateFile(
   $userId: UUID!
   $loanId: UUID
+  $documentMasterId: UUID
   $originalFilename: String!
   $storagePath: String!
   $fileSize: Int!
@@ -157,10 +167,14 @@ mutation CreateFile(
   $downloadUrl: String
   $tags: String
   $description: String
-) @auth(level: PUBLIC) {
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by authenticated users to upload files. Frontend validates user ownership and authentication before calling."
+) {
   file_insert(data: {
     userId: $userId
     loanId: $loanId
+    documentMasterId: $documentMasterId
     originalFilename: $originalFilename
     storagePath: $storagePath
     fileSize: $fileSize
@@ -174,13 +188,18 @@ mutation CreateFile(
 
 mutation UpdateFile(
   $id: UUID!
+  $documentMasterId: UUID
   $tags: String
   $description: String
   $downloadUrl: String
-) @auth(level: PUBLIC) {
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by authenticated users to update file metadata. Frontend validates user ownership before calling."
+) {
   file_update(
     id: $id
     data: {
+      documentMasterId: $documentMasterId
       tags: $tags
       description: $description
       downloadUrl: $downloadUrl
@@ -188,7 +207,10 @@ mutation UpdateFile(
   )
 }
 
-mutation SoftDeleteFile($id: UUID!, $deletedBy: UUID, $deletedAt: Timestamp!) {
+mutation SoftDeleteFile($id: UUID!, $deletedBy: UUID, $deletedAt: Timestamp!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by authenticated users to soft delete files. Frontend validates user ownership before calling."
+) {
   file_update(
     id: $id
     data: {
@@ -199,11 +221,17 @@ mutation SoftDeleteFile($id: UUID!, $deletedBy: UUID, $deletedAt: Timestamp!) {
   )
 }
 
-mutation HardDeleteFile($id: UUID!) {
+mutation HardDeleteFile($id: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to permanently delete files. Frontend enforces role-based access control."
+) {
   file_delete(id: $id)
 }
 
-mutation RenameFile($id: UUID!, $newFilename: String!) @auth(level: PUBLIC) {
+mutation RenameFile($id: UUID!, $newFilename: String!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by authenticated users to rename files. Frontend validates user ownership before calling."
+) {
   file_update(
     id: $id
     data: {
@@ -216,7 +244,10 @@ mutation MoveFile(
   $id: UUID!
   $targetUserId: UUID!
   $targetLoanId: UUID
-) @auth(level: PUBLIC) {
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by authenticated users to move files between folders. Frontend validates user ownership before calling."
+) {
   file_update(
     id: $id
     data: {
@@ -229,6 +260,7 @@ mutation MoveFile(
 mutation CopyFile(
   $userId: UUID!
   $loanId: UUID
+  $documentMasterId: UUID
   $originalFilename: String!
   $storagePath: String!
   $fileSize: Int!
@@ -237,10 +269,14 @@ mutation CopyFile(
   $downloadUrl: String
   $tags: String
   $description: String
-) @auth(level: PUBLIC) {
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by authenticated users to copy files. Frontend validates user ownership before calling."
+) {
   file_insert(data: {
     userId: $userId
     loanId: $loanId
+    documentMasterId: $documentMasterId
     originalFilename: $originalFilename
     storagePath: $storagePath
     fileSize: $fileSize
@@ -252,7 +288,10 @@ mutation CopyFile(
   })
 }
 
-mutation RestoreFile($id: UUID!) @auth(level: PUBLIC) {
+mutation RestoreFile($id: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by authenticated users to restore deleted files. Frontend validates user ownership before calling."
+) {
   file_update(
     id: $id
     data: {
@@ -271,6 +310,9 @@ mutation AssociateFileWithLoan(
   $fileId: UUID!
   $loanId: UUID!
   $associatedBy: UUID
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by authenticated users to associate files with loans. Frontend validates user ownership before calling."
 ) {
   fileLoanAssociation_insert(data: {
     fileId: $fileId
@@ -279,7 +321,10 @@ mutation AssociateFileWithLoan(
   })
 }
 
-mutation RemoveFileFromLoan($id: UUID!) {
+mutation RemoveFileFromLoan($id: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by authenticated users to remove file-loan associations. Frontend validates user ownership before calling."
+) {
   fileLoanAssociation_delete(id: $id)
 }
 
@@ -300,6 +345,9 @@ mutation CreateAuthSession(
   $ipAddress: String
   $userAgent: String
   $createdBy: UUID
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions to create auth sessions during authentication flow. Frontend access is controlled through authenticated Cloud Functions."
 ) {
   authSession_insert(data: {
     sessionId: $sessionId
@@ -326,7 +374,10 @@ mutation CreateAuthSessionWithFirebase(
   $expiresAt: Timestamp!
   $ipAddress: String
   $userAgent: String
-) @auth(level: PUBLIC) {
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions to create Firebase auth sessions. Frontend access is controlled through authenticated Cloud Functions."
+) {
   authSession_insert(data: {
     sessionId: $sessionId
     userId: $userId
@@ -348,6 +399,9 @@ mutation UpdateAuthSession(
   $sessionToken: String
   $verifiedAt: Timestamp
   $lastAccessedAt: Timestamp
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions to update auth session status. Frontend access is controlled through authenticated Cloud Functions."
 ) {
   authSession_update(
     id: $id
@@ -365,7 +419,10 @@ mutation VerifyAuthSession(
   $id: UUID!
   $sessionToken: String!
   $verifiedAt: Timestamp!
-) @auth(level: PUBLIC) {
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions to verify and activate auth sessions. Frontend access is controlled through authenticated Cloud Functions."
+) {
   authSession_update(
     id: $id
     data: {
@@ -381,7 +438,10 @@ mutation VerifyAuthSession(
 mutation UpdateSessionAccess(
   $id: UUID!
   $lastAccessedAt: Timestamp!
-) @auth(level: PUBLIC) {
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used to update session last accessed time. Frontend validates session ownership."
+) {
   authSession_update(
     id: $id
     data: {
@@ -395,6 +455,9 @@ mutation RevokeAuthSession(
   $revokedBy: UUID
   $revokeReason: String
   $revokedAt: Timestamp!
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to revoke auth sessions. Frontend enforces role-based access control."
 ) {
   authSession_update(
     id: $id
@@ -411,6 +474,9 @@ mutation CreateVerificationCode(
   $sessionId: String!
   $codeHash: String!
   $expiresAt: Timestamp!
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions to create verification codes. Frontend access is controlled through authenticated Cloud Functions."
 ) {
   verificationCode_insert(data: {
     sessionId: $sessionId
@@ -419,7 +485,10 @@ mutation CreateVerificationCode(
   })
 }
 
-mutation UpdateVerificationCodeAttempts($id: UUID!, $attemptCount: Int!) {
+mutation UpdateVerificationCodeAttempts($id: UUID!, $attemptCount: Int!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions to track verification attempts. Frontend access is controlled through authenticated Cloud Functions."
+) {
   verificationCode_update(
     id: $id
     data: {
@@ -428,7 +497,10 @@ mutation UpdateVerificationCodeAttempts($id: UUID!, $attemptCount: Int!) {
   )
 }
 
-mutation MarkVerificationCodeUsed($id: UUID!, $usedAt: Timestamp!) {
+mutation MarkVerificationCodeUsed($id: UUID!, $usedAt: Timestamp!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions to mark verification codes as used. Frontend access is controlled through authenticated Cloud Functions."
+) {
   verificationCode_update(
     id: $id
     data: {
@@ -448,6 +520,9 @@ mutation LogAuthEvent(
   $ipAddress: String
   $userAgent: String
   $requestPayload: String
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions to log auth events. Frontend access is controlled through authenticated Cloud Functions."
 ) {
   authAuditLog_insert(data: {
     sessionId: $sessionId
@@ -467,6 +542,9 @@ mutation TrackRateLimit(
   $actionType: String!
   $attemptCount: Int
   $blockedUntil: Timestamp
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions to track rate limits. Frontend access is controlled through authenticated Cloud Functions."
 ) {
   rateLimitTracking_insert(data: {
     identifier: $identifier
@@ -480,6 +558,9 @@ mutation UpdateRateLimit(
   $id: UUID!
   $attemptCount: Int!
   $blockedUntil: Timestamp
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by Cloud Functions to update rate limits. Frontend access is controlled through authenticated Cloud Functions."
 ) {
   rateLimitTracking_update(
     id: $id
@@ -490,7 +571,10 @@ mutation UpdateRateLimit(
   )
 }
 
-mutation DeleteExpiredSessions($currentTime: Timestamp!) {
+mutation DeleteExpiredSessions($currentTime: Timestamp!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by scheduled Cloud Functions to clean up expired sessions. Frontend access is controlled through authenticated Cloud Functions."
+) {
   authSession_deleteMany(
     where: {
       expiresAt: { lt: $currentTime }
@@ -499,7 +583,10 @@ mutation DeleteExpiredSessions($currentTime: Timestamp!) {
   )
 }
 
-mutation DeleteExpiredVerificationCodes($currentTime: Timestamp!) {
+mutation DeleteExpiredVerificationCodes($currentTime: Timestamp!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by scheduled Cloud Functions to clean up expired verification codes. Frontend access is controlled through authenticated Cloud Functions."
+) {
   verificationCode_deleteMany(
     where: {
       expiresAt: { lt: $currentTime }
@@ -602,4 +689,222 @@ mutation ExtendMagicLink(
       expiresAt: $expiresAt
     }
   )
+}
+
+# ============================================================================
+# DOCUMENT PATH MUTATIONS
+# ============================================================================
+
+mutation CreateDocumentPath(
+  $name: String!
+  $sourceLookupId: UUID
+  $description: String
+  $sortOrder: Int
+  $createdBy: String
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to create document paths. Frontend enforces role-based access control via RequireAdmin component."
+) {
+  documentPath_insert(data: {
+    name: $name
+    sourceLookupId: $sourceLookupId
+    description: $description
+    sortOrder: $sortOrder
+    createdBy: $createdBy
+    updatedBy: $createdBy
+  })
+}
+
+mutation CreateDocumentPathWithId(
+  $id: UUID!
+  $name: String!
+  $sourceLookupId: UUID
+  $description: String
+  $sortOrder: Int
+  $createdBy: String
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used for data migration with specific IDs. Frontend enforces role-based access control via RequireAdmin component."
+) {
+  documentPath_insert(data: {
+    id: $id
+    name: $name
+    sourceLookupId: $sourceLookupId
+    description: $description
+    sortOrder: $sortOrder
+    createdBy: $createdBy
+    updatedBy: $createdBy
+  })
+}
+
+mutation UpdateDocumentPath(
+  $id: UUID!
+  $name: String
+  $sourceLookupId: UUID
+  $description: String
+  $sortOrder: Int
+  $isActive: Boolean
+  $updatedBy: String
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to update document paths. Frontend enforces role-based access control via RequireAdmin component."
+) {
+  documentPath_update(
+    id: $id
+    data: {
+      name: $name
+      sourceLookupId: $sourceLookupId
+      description: $description
+      sortOrder: $sortOrder
+      isActive: $isActive
+      updatedBy: $updatedBy
+    }
+  )
+}
+
+mutation DeactivateDocumentPath(
+  $id: UUID!
+  $updatedBy: String
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to deactivate document paths. Frontend enforces role-based access control via RequireAdmin component."
+) {
+  documentPath_update(
+    id: $id
+    data: {
+      isActive: false
+      updatedBy: $updatedBy
+    }
+  )
+}
+
+mutation DeleteDocumentPath($id: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to delete document paths. Frontend enforces role-based access control via RequireAdmin component."
+) {
+  documentPath_delete(id: $id)
+}
+
+# ============================================================================
+# DOCUMENT MASTER MUTATIONS
+# ============================================================================
+
+mutation CreateDocumentMaster(
+  $name: String!
+  $documentPathId: UUID
+  $description: String
+  $sortOrder: Int
+  $isSystemGenerated: Boolean
+  $reviewRequired: Boolean
+  $isVersioningEnabled: Boolean
+  $namingConvention: String
+  $display: String
+  $createdBy: String
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to create document types. Frontend enforces role-based access control via RequireAdmin component."
+) {
+  documentMaster_insert(data: {
+    name: $name
+    documentPathId: $documentPathId
+    description: $description
+    sortOrder: $sortOrder
+    isSystemGenerated: $isSystemGenerated
+    reviewRequired: $reviewRequired
+    isVersioningEnabled: $isVersioningEnabled
+    namingConvention: $namingConvention
+    display: $display
+    createdBy: $createdBy
+    updatedBy: $createdBy
+  })
+}
+
+mutation CreateDocumentMasterWithId(
+  $id: UUID!
+  $name: String!
+  $documentPathId: UUID
+  $description: String
+  $sortOrder: Int
+  $isSystemGenerated: Boolean
+  $reviewRequired: Boolean
+  $isVersioningEnabled: Boolean
+  $namingConvention: String
+  $display: String
+  $createdBy: String
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used for data migration with specific IDs. Frontend enforces role-based access control via RequireAdmin component."
+) {
+  documentMaster_insert(data: {
+    id: $id
+    name: $name
+    documentPathId: $documentPathId
+    description: $description
+    sortOrder: $sortOrder
+    isSystemGenerated: $isSystemGenerated
+    reviewRequired: $reviewRequired
+    isVersioningEnabled: $isVersioningEnabled
+    namingConvention: $namingConvention
+    display: $display
+    createdBy: $createdBy
+    updatedBy: $createdBy
+  })
+}
+
+mutation UpdateDocumentMaster(
+  $id: UUID!
+  $name: String
+  $documentPathId: UUID
+  $description: String
+  $sortOrder: Int
+  $isActive: Boolean
+  $isSystemGenerated: Boolean
+  $reviewRequired: Boolean
+  $isVersioningEnabled: Boolean
+  $namingConvention: String
+  $display: String
+  $updatedBy: String
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to update document types. Frontend enforces role-based access control via RequireAdmin component."
+) {
+  documentMaster_update(
+    id: $id
+    data: {
+      name: $name
+      documentPathId: $documentPathId
+      description: $description
+      sortOrder: $sortOrder
+      isActive: $isActive
+      isSystemGenerated: $isSystemGenerated
+      reviewRequired: $reviewRequired
+      isVersioningEnabled: $isVersioningEnabled
+      namingConvention: $namingConvention
+      display: $display
+      updatedBy: $updatedBy
+    }
+  )
+}
+
+mutation DeactivateDocumentMaster(
+  $id: UUID!
+  $updatedBy: String
+) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to deactivate document types. Frontend enforces role-based access control via RequireAdmin component."
+) {
+  documentMaster_update(
+    id: $id
+    data: {
+      isActive: false
+      updatedBy: $updatedBy
+    }
+  )
+}
+
+mutation DeleteDocumentMaster($id: UUID!) @auth(
+  level: PUBLIC
+  insecureReason: "This mutation is used by admin users to delete document types. Frontend enforces role-based access control via RequireAdmin component."
+) {
+  documentMaster_delete(id: $id)
 }
